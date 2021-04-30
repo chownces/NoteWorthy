@@ -17,6 +17,11 @@
     "start": "react-scripts start",
     "test": "react-scripts test"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "bash ./test.sh"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -48,6 +53,7 @@
     "enzyme-adapter-react-16": "^1.15.6",
     "eslint": "^7.25.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "husky": "^4.3.8",
     "node-sass": "^5.0.0",
     "prettier": "^2.2.1",
     "react-scripts": "4.0.3",
