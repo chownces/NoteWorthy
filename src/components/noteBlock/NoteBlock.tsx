@@ -3,7 +3,7 @@ import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 
-type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps;
+export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps;
 
 export type NoteBlockStateProps = {
   id: string;

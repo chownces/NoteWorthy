@@ -1,4 +1,4 @@
-import NotePage from '../notePage/NotePage';
+import NotePage from '../../pages/notePage/NotePage';
 
 type AppplicationProps = {};
 

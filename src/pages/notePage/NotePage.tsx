@@ -1,8 +1,11 @@
 import React from 'react';
 
+import NoteBlock, {
+  NoteBlockHandlerProps,
+  NoteBlockStateProps
+} from '../../components/noteBlock/NoteBlock';
 import { setEol, uniqueId } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
-import NoteBlock, { NoteBlockHandlerProps, NoteBlockStateProps } from '../noteBlock/NoteBlock';
 
 type NotePageProps = {};
 
