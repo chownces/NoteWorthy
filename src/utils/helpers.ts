@@ -1,12 +1,13 @@
 /**
  * Unique block id generator
  */
-const uniqueId = (): string => Date.now().toString(36) + Math.random().toString(36).substr(2);
+export const uniqueId = (): string =>
+  Date.now().toString(36) + Math.random().toString(36).substr(2);
 
 /**
  * Sets cursor to end of line (EOL) of the current block
  */
-const setEol = (elem: HTMLElement): void => {
+export const setEol = (elem: HTMLElement): void => {
   // Get the EOL 'position' of elem
   const range = document.createRange();
   range.selectNodeContents(elem);
@@ -25,7 +26,7 @@ const setEol = (elem: HTMLElement): void => {
 /**
  * Toggles bold text in current window selection
  */
-const toggleBold = (elem: HTMLElement) => {
+export const toggleBold = (elem: HTMLElement) => {
   const selection = window.getSelection();
   const range = selection?.getRangeAt(0);
 
@@ -38,5 +39,3 @@ const toggleBold = (elem: HTMLElement) => {
 
   // range.selectNodeContents(elem);
 };
-
-export { setEol, toggleBold, uniqueId };

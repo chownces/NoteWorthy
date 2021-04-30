@@ -1,4 +1,5 @@
 import React from 'react';
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 
 import NoteBlock, {
   NoteBlockHandlerProps,
@@ -28,6 +29,17 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksRef.current = blocks;
   });
 
+  /**
+   * Boolean which toggles the edit mode for the entire page.
+   * When true, the ContentEditable components (i.e. each note block) will be editable.
+   */
+  const [isEditMode, setIsEditMode] = React.useState(false); // TODO: Look into setting a better toggle between modes
+
+  /**
+   * Handles text changes in each ContentEditable block by updating the relevant index inside `blocks`.
+   *
+   * TODO: Handle tag changes in the future.
+   */
   const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
     const blocksCopy = [...blocksRef.current];
     const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
@@ -40,6 +52,9 @@ const NotePage: React.FC<NotePageProps> = props => {
     setBlocks(blocksCopy);
   };
 
+  /**
+   * Handles the addition of a new block by adding it at the correct index inside `blocks`.
+   */
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
@@ -60,6 +75,9 @@ const NotePage: React.FC<NotePageProps> = props => {
     setBlocks(blocksCopy, focusNextBlockCallback);
   };
 
+  /**
+   * Handles the deletion of an empty block by removing it from `blocks`.
+   */
   const deleteBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
@@ -78,19 +96,63 @@ const NotePage: React.FC<NotePageProps> = props => {
     }
   };
 
+  /**
+   * Handler passed into react-beautiful-dnd to update `blocks` when a drag event occurs.
+   */
+  const onDragEndHandler = (result: DropResult) => {
+    const reorder = (arr: NoteBlockStateProps[], startIndex: number, endIndex: number) => {
+      const copy = [...arr];
+      const [removed] = copy.splice(startIndex, 1);
+      copy.splice(endIndex, 0, removed);
+
+      return copy;
+    };
+
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const newBlocks = reorder(blocksRef.current, result.source.index, result.destination.index);
+
+    setBlocks(newBlocks);
+  };
+
   const noteBlockHandlerProps: NoteBlockHandlerProps = {
     updatePage: updatePageHandler,
     addBlock: addBlockHandler,
-    deleteBlock: deleteBlockHandler
+    deleteBlock: deleteBlockHandler,
+    setIsEditMode: setIsEditMode
   };
 
-  // TODO: Handle classNames and CSS
+  // TODO: Cleanup the props passing
   return (
-    <div>
-      {blocks.map(block => (
-        <NoteBlock {...block} {...noteBlockHandlerProps} key={block.id} />
-      ))}
-    </div>
+    <DragDropContext onDragEnd={onDragEndHandler}>
+      <Droppable droppableId="note-blocks">
+        {provided => (
+          <div ref={provided.innerRef} {...provided.droppableProps}>
+            {blocks.map((block, index) => (
+              <Draggable draggableId={block.id} index={index} key={block.id}>
+                {provided => (
+                  <NoteBlock
+                    {...block}
+                    {...noteBlockHandlerProps}
+                    key={block.id}
+                    isEditMode={isEditMode}
+                    innerRef={provided.innerRef}
+                    provided={provided}
+                  />
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 };
 

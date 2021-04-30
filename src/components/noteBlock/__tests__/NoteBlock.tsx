@@ -1,4 +1,5 @@
 import { shallow } from 'enzyme';
+import { DraggableProvided } from 'react-beautiful-dnd';
 
 import NoteBlock, { NoteBlockProps } from '../NoteBlock';
 
@@ -7,9 +8,20 @@ test('NoteBlock renders correctly with <p> tag', () => {
     id: '1',
     html: 'Hello World!',
     tag: 'p',
+    isEditMode: false,
     updatePage: () => {},
     addBlock: () => {},
-    deleteBlock: () => {}
+    deleteBlock: () => {},
+    setIsEditMode: () => {},
+    innerRef: () => {},
+    // TODO: Check if this is redundant, or if there is a better way.
+    provided: {
+      innerRef(element?: HTMLElement | null) {},
+      draggableProps: {
+        'data-rbd-draggable-context-id': '',
+        'data-rbd-draggable-id': ''
+      }
+    }
   };
   const tree = shallow(<NoteBlock {...props} />);
   expect(tree.debug()).toMatchSnapshot();

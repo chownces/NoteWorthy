@@ -1,9 +1,11 @@
 import React from 'react';
+import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import { setEol, toggleBold } from '../../utils/helpers';
+import useMergedRef from '../../utils/useMergedRef';
 
-export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps;
+export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
 export type NoteBlockStateProps = {
   id: string;
@@ -15,6 +17,13 @@ export type NoteBlockHandlerProps = {
   updatePage(updatedBlock: NoteBlockStateProps): void;
   addBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
   deleteBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
+  setIsEditMode(bool: boolean): void;
+};
+
+type OwnProps = {
+  innerRef: (element?: HTMLElement | null | undefined) => any;
+  provided: DraggableProvided;
+  isEditMode: boolean;
 };
 
 const NoteBlock: React.FC<NoteBlockProps> = props => {
@@ -41,7 +50,6 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     });
   };
 
-  // TODO: Keydown handlers
   const onKeydownHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
     switch (e.key) {
       // Adds a new block below the currently focused block when 'Enter' is pressed without 'Shift'
@@ -59,8 +67,6 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           props.deleteBlock(props, noteBlockRef);
         }
         break;
-
-      // TODO: Handle case where user presses arrow up to navigate within a content block itself
 
       // Navigates to previous block, if it exists
       case 'ArrowUp':
@@ -86,18 +92,31 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           toggleBold(noteBlockRef.current as HTMLElement);
         }
         break;
+
+      // TODO: Add a better key handler, since this only triggers when a block is in focus
+      case 'Escape':
+        props.setIsEditMode(false);
+        noteBlockRef.current?.blur();
+        break;
+
+      // TODO: Handle case where user presses arrow up to navigate within a content block itself
     }
   };
 
-  // TODO: Handle draggable blocks with react-draggable
+  // TODO: Improve dragging experience
+  // TODO: Improve edit mode toggle
   return (
     <ContentEditable
       className="block"
-      innerRef={noteBlockRef}
+      innerRef={useMergedRef(noteBlockRef, props.innerRef)}
       html={props.html}
       tagName={props.tag}
       onChange={onChangeHandler}
       onKeyDown={onKeydownHandler}
+      disabled={!props.isEditMode}
+      {...props.provided.dragHandleProps} // react-beautiful-dnd props
+      {...props.provided.draggableProps} // react-beautiful-dnd props
+      onClick={() => props.setIsEditMode(true)}
     />
   );
 };
