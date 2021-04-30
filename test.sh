@@ -3,17 +3,26 @@
 export CI=true
 
 main() {
-  run_cmd "yarn format"; format_exit=$?
-  run_cmd_jest "yarn test"; test_exit=$?
+  eslint="yarn run eslint"
+  prettier_ts="yarn run format:tsx"
+  prettier_scss="yarn run format:scss"
+  jest_ts="yarn run test"
+
+  run_cmd "${eslint}"; eslint_exit=$?
+  run_cmd "${prettier_ts}"; prettier_ts_exit=$?
+  run_cmd "${prettier_scss}"; prettier_scss_exit=$?
+  run_cmd_jest "${jest_ts}"; jest_ts_exit=$?
 
   ( >&2
     echo -ne "\033[0;31m"
-    [ "${format_exit}" -eq "0" ] || echo "yarn format failed"
-    [ "${test_exit}" -eq "0" ] || echo "yarn test failed"
+    [ "${eslint_exit}" -eq "0" ] || echo "ESLint failed"
+    [ "${prettier_ts_exit}" -eq "0" ] || echo "Prettier failed for *.{ts,tsx}"
+    [ "${prettier_scss_exit}" -eq "0" ] || echo "Prettier failed for *.scss"
+    [ "${jest_ts_exit}" -eq "0" ] || echo "Jest failed"
     echo -ne "\033[0m"
   )
 
-  [[ $(( format_exit + test_exit )) -eq "0" ]]
+  [[ $(( eslint_exit + prettier_ts_exit + prettier_scss_exit + jest_ts_exit )) -eq "0" ]]
 }
 
 run_cmd() {
