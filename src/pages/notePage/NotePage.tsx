@@ -6,29 +6,16 @@ import NoteBlock, {
   NoteBlockStateProps
 } from '../../components/noteBlock/NoteBlock';
 import { setEol, uniqueId } from '../../utils/helpers';
-import useStateCallback from '../../utils/useStateCallback';
 
-type NotePageProps = {};
+export type NotePageProps = {
+  blocks: NoteBlockStateProps[];
+  setBlocks: (
+    newBlocks: NoteBlockStateProps[],
+    callback?: (newState?: NoteBlockStateProps[]) => void
+  ) => void;
+};
 
 const NotePage: React.FC<NotePageProps> = props => {
-  /**
-   * TODO: Decide on whether to keep the initial block.
-   * For now, the user cannot have 0 blocks due to the way the deleteBlockHandler is implemented
-   */
-  const [blocks, setBlocks] = useStateCallback<NoteBlockStateProps[]>([initialBlock]);
-
-  /**
-   * React.useRef is used here with the following effect to keep a mutable object reference
-   * to the updated blocks array. This is to allow access to the latest blocks array within
-   * the callback handlers below.
-   *
-   * (this is a hacky way of overcoming the stale closure problem with React hooks)
-   */
-  const blocksRef = React.useRef<NoteBlockStateProps[]>([initialBlock]);
-  React.useEffect(() => {
-    blocksRef.current = blocks;
-  });
-
   /**
    * Boolean which toggles the edit mode for the entire page.
    * When true, the ContentEditable components (i.e. each note block) will be editable.
@@ -41,7 +28,7 @@ const NotePage: React.FC<NotePageProps> = props => {
    * TODO: Handle tag changes in the future.
    */
   const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
-    const blocksCopy = [...blocksRef.current];
+    const blocksCopy = [...props.blocks];
     const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
     blocksCopy[index] = {
       ...blocksCopy[index],
@@ -49,7 +36,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
     };
 
-    setBlocks(blocksCopy);
+    props.setBlocks(blocksCopy);
   };
 
   /**
@@ -64,7 +51,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       html: '',
       tag: 'p' // TODO: Reconsider default block tag
     };
-    const blocksCopy = [...blocksRef.current];
+    const blocksCopy = [...props.blocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index + 1, 0, newBlock);
 
@@ -72,7 +59,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       (ref.current?.nextElementSibling as HTMLElement).focus();
     };
 
-    setBlocks(blocksCopy, focusNextBlockCallback);
+    props.setBlocks(blocksCopy, focusNextBlockCallback);
   };
 
   /**
@@ -84,7 +71,7 @@ const NotePage: React.FC<NotePageProps> = props => {
   ): void => {
     const previousBlock = ref.current?.previousElementSibling as HTMLElement;
     if (previousBlock) {
-      const blocksCopy = [...blocksRef.current];
+      const blocksCopy = [...props.blocks];
       const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
       blocksCopy.splice(index, 1);
 
@@ -92,7 +79,7 @@ const NotePage: React.FC<NotePageProps> = props => {
         setEol(previousBlock);
       };
 
-      setBlocks(blocksCopy, focusPreviousBlockEolCallback);
+      props.setBlocks(blocksCopy, focusPreviousBlockEolCallback);
     }
   };
 
@@ -116,9 +103,9 @@ const NotePage: React.FC<NotePageProps> = props => {
       return;
     }
 
-    const newBlocks = reorder(blocksRef.current, result.source.index, result.destination.index);
+    const newBlocks = reorder(props.blocks, result.source.index, result.destination.index);
 
-    setBlocks(newBlocks);
+    props.setBlocks(newBlocks);
   };
 
   const noteBlockHandlerProps: NoteBlockHandlerProps = {
@@ -128,13 +115,12 @@ const NotePage: React.FC<NotePageProps> = props => {
     setIsEditMode: setIsEditMode
   };
 
-  // TODO: Cleanup the props passing
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <Droppable droppableId="note-blocks">
         {provided => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            {blocks.map((block, index) => (
+            {props.blocks.map((block, index) => (
               <Draggable draggableId={block.id} index={index} key={block.id}>
                 {provided => (
                   <NoteBlock
@@ -154,13 +140,6 @@ const NotePage: React.FC<NotePageProps> = props => {
       </Droppable>
     </DragDropContext>
   );
-};
-
-// TODO: Remove default block, and handle page load from database
-const initialBlock: NoteBlockStateProps = {
-  id: uniqueId(),
-  html: 'Hello World!',
-  tag: 'p'
 };
 
 export default NotePage;

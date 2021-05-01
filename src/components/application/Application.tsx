@@ -1,9 +1,16 @@
-import NotePage from '../../pages/notePage/NotePage';
+import { BrowserRouter, Route } from 'react-router-dom';
 
-type AppplicationProps = {};
+import NotePageController from '../../pages/notePage/NotePageController';
 
-const Appplication: React.FC<AppplicationProps> = props => {
-  return <NotePage />;
+type ApplicationProps = {};
+
+const Appplication: React.FC<ApplicationProps> = props => {
+  return (
+    <BrowserRouter>
+      <Route exact path="/" component={NotePageController} />
+      {/* <Route path="/newnote" component={} /> */}
+    </BrowserRouter>
+  );
 };
 
 export default Appplication;
