@@ -107,7 +107,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // TODO: Improve edit mode toggle
   return (
     <ContentEditable
-      className="block"
+      className="noteblock"
       innerRef={useMergedRef(noteBlockRef, props.innerRef)}
       html={props.html}
       tagName={props.tag}

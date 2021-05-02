@@ -1,22 +1,17 @@
 import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 import { NoteBlockStateProps } from '../../components/noteBlock/NoteBlock';
 import useStateCallback from '../../utils/useStateCallback';
 import NotePage, { NotePageProps } from './NotePage';
 
 const NotePageController: React.FC = () => {
-  /**
-   * TODO
-   * NOTE: noteId should not change once fetched.
-   * Different notes should have different URL anyway, and force a rerender.
-   */
-  // const [noteId, setNoteId] = React.useState<string | null>(null);
-
   const [blocks, setBlocks] = useStateCallback<NoteBlockStateProps[]>([]);
+  const [isError, setIsError] = React.useState<boolean>(false);
 
-  // TODO: NOTE_ID is to be removed and handled by backend query
-  const NOTE_ID = ''; // Insert note id here
+  // Get note id of the note to render via react-router-dom URL params
+  const NOTE_ID = useParams<{ noteId: string }>().noteId;
 
   /**
    * ==================================
@@ -52,12 +47,10 @@ const NotePageController: React.FC = () => {
       if (!error) {
         setBlocks(data.getNote.blocks);
       } else {
-        // TODO: Handle request error (e.g. display message to user)
+        setIsError(true);
       }
     }
-    // `error` and `data` only changes when loading changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, setBlocks]);
+  }, [loading, error, data, setBlocks, setIsError]);
 
   /**
    * ==========================
@@ -109,7 +102,8 @@ const NotePageController: React.FC = () => {
     setBlocksAndUpdateDatabase: setBlocksAndUpdateDatabase
   };
 
-  return <NotePage {...notePageProps} />;
+  // TODO: Cleanup error handling
+  return isError ? <div>Failed to retrieve note...</div> : <NotePage {...notePageProps} />;
 };
 
 export default NotePageController;
