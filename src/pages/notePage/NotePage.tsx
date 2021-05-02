@@ -9,7 +9,7 @@ import { setEol, uniqueId } from '../../utils/helpers';
 
 export type NotePageProps = {
   blocks: NoteBlockStateProps[];
-  setBlocks: (
+  setBlocksAndUpdateDatabase: (
     newBlocks: NoteBlockStateProps[],
     callback?: (newState?: NoteBlockStateProps[]) => void
   ) => void;
@@ -24,9 +24,8 @@ const NotePage: React.FC<NotePageProps> = props => {
 
   /**
    * Handles text changes in each ContentEditable block by updating the relevant index inside `blocks`.
-   *
-   * TODO: Handle tag changes in the future.
    */
+  // TODO: Handle tag changes in the future.
   const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
     const blocksCopy = [...props.blocks];
     const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
@@ -36,7 +35,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
     };
 
-    props.setBlocks(blocksCopy);
+    props.setBlocksAndUpdateDatabase(blocksCopy);
   };
 
   /**
@@ -59,7 +58,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       (ref.current?.nextElementSibling as HTMLElement).focus();
     };
 
-    props.setBlocks(blocksCopy, focusNextBlockCallback);
+    props.setBlocksAndUpdateDatabase(blocksCopy, focusNextBlockCallback);
   };
 
   /**
@@ -79,7 +78,7 @@ const NotePage: React.FC<NotePageProps> = props => {
         setEol(previousBlock);
       };
 
-      props.setBlocks(blocksCopy, focusPreviousBlockEolCallback);
+      props.setBlocksAndUpdateDatabase(blocksCopy, focusPreviousBlockEolCallback);
     }
   };
 
@@ -105,7 +104,7 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const newBlocks = reorder(props.blocks, result.source.index, result.destination.index);
 
-    props.setBlocks(newBlocks);
+    props.setBlocksAndUpdateDatabase(newBlocks);
   };
 
   const noteBlockHandlerProps: NoteBlockHandlerProps = {
