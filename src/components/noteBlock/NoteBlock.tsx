@@ -3,7 +3,6 @@ import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import { setEol, toggleBold } from '../../utils/helpers';
-import useMergedRef from '../../utils/useMergedRef';
 
 export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
@@ -17,7 +16,7 @@ export type NoteBlockHandlerProps = {
   updatePage(updatedBlock: NoteBlockStateProps): void;
   addBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
   deleteBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
-  setIsEditMode(bool: boolean): void;
+  setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
 };
 
 type OwnProps = {
@@ -71,7 +70,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to previous block, if it exists
       case 'ArrowUp':
         e.preventDefault();
-        const previousBlock = noteBlockRef.current?.previousElementSibling as HTMLElement;
+        const previousBlock = noteBlockRef.current?.parentElement?.previousElementSibling
+          ?.children[1] as HTMLElement;
         if (previousBlock) {
           setEol(previousBlock);
         }
@@ -80,7 +80,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to next block, if it exists
       case 'ArrowDown':
         e.preventDefault();
-        const nextBlock = noteBlockRef.current?.nextElementSibling as HTMLElement;
+        const nextBlock = noteBlockRef.current?.parentElement?.nextElementSibling
+          ?.children[1] as HTMLElement;
         if (nextBlock) {
           setEol(nextBlock);
         }
@@ -105,19 +106,37 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
 
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
+  // TODO: Add toggle handle icon
   return (
-    <ContentEditable
+    /**
+     * NOTE: For any change in NoteBlock HTML structure, remember to update the various navigation handlers:
+     * NotePage::addBlockHandler
+     * NotePage::deleteBlockHandler
+     * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
+     */
+    <div
       className="noteblock"
-      innerRef={useMergedRef(noteBlockRef, props.innerRef)}
-      html={props.html}
-      tagName={props.tag}
-      onChange={onChangeHandler}
-      onKeyDown={onKeydownHandler}
-      disabled={!props.isEditMode}
+      ref={props.innerRef}
       {...props.provided.dragHandleProps} // react-beautiful-dnd props
       {...props.provided.draggableProps} // react-beautiful-dnd props
-      onClick={() => props.setIsEditMode(true)}
-    />
+    >
+      <div className="noteblock-handle"></div>
+      <ContentEditable
+        className="noteblock-text"
+        innerRef={noteBlockRef}
+        html={props.html}
+        tagName={props.tag}
+        onChange={onChangeHandler}
+        onKeyDown={onKeydownHandler}
+        disabled={!props.isEditMode}
+        onClick={() => {
+          props.setIsEditMode(true, () => {
+            noteBlockRef.current?.focus();
+            setEol(noteBlockRef.current);
+          });
+        }}
+      />
+    </div>
   );
 };
 

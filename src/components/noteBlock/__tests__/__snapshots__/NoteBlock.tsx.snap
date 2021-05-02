@@ -1,3 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`NoteBlock renders correctly with <p> tag 1`] = `"<ContentEditable className=\\"noteblock\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} data-rbd-draggable-context-id=\\"\\" data-rbd-draggable-id=\\"\\" onClick={[Function: onClick]} />"`;
+exports[`NoteBlock renders correctly with <p> tag 1`] = `
+"<div className=\\"noteblock\\" data-rbd-draggable-context-id=\\"\\" data-rbd-draggable-id=\\"\\">
+  <div className=\\"noteblock-handle\\" />
+  <ContentEditable className=\\"noteblock-text\\" innerRef={{...}} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />
+</div>"
+`;

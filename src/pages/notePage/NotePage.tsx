@@ -6,6 +6,7 @@ import NoteBlock, {
   NoteBlockStateProps
 } from '../../components/noteBlock/NoteBlock';
 import { setEol, uniqueId } from '../../utils/helpers';
+import useStateCallback from '../../utils/useStateCallback';
 
 export type NotePageProps = {
   blocks: NoteBlockStateProps[];
@@ -20,7 +21,7 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Boolean which toggles the edit mode for the entire page.
    * When true, the ContentEditable components (i.e. each note block) will be editable.
    */
-  const [isEditMode, setIsEditMode] = React.useState(false); // TODO: Look into setting a better toggle between modes
+  const [isEditMode, setIsEditMode] = useStateCallback<boolean>(false); // TODO: Look into setting a better toggle between modes
 
   /**
    * Handles text changes in each ContentEditable block by updating the relevant index inside `blocks`.
@@ -55,7 +56,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
-      (ref.current?.nextElementSibling as HTMLElement).focus();
+      (ref.current?.parentElement?.nextElementSibling?.children[1] as HTMLElement).focus();
     };
 
     props.setBlocksAndUpdateDatabase(blocksCopy, focusNextBlockCallback);
@@ -68,7 +69,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
   ): void => {
-    const previousBlock = ref.current?.previousElementSibling as HTMLElement;
+    const previousBlock = ref.current?.parentElement?.previousElementSibling
+      ?.children[1] as HTMLElement;
     if (previousBlock) {
       const blocksCopy = [...props.blocks];
       const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);

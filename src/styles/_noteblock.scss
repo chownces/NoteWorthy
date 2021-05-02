@@ -1,5 +1,26 @@
-// TODO: To be removed after block logic has been handled fully
 .noteblock {
-  border: 1px solid blue;
-  min-height: 20px;
+  display: flex;
+  margin: 0.5em 0;
+
+  .noteblock-handle {
+    cursor: grab;
+    width: 10px;
+  }
+
+  .noteblock-handle:hover {
+    background-color: grey;
+  }
+
+  .noteblock-text {
+    border: 1px solid blue; // TODO: To be removed after block logic has been handled fully
+    min-height: 20px;
+    margin: 0;
+    width: calc(100% - 10px);
+    outline: none;
+  }
+
+  // TODO: To be removed once edit mode toggle has been implemented fully
+  .noteblock-text:focus {
+    background-color: lightblue;
+  }
 }

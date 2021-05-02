@@ -5,6 +5,7 @@
  * https://github.com/jaredLunde/react-hook/blob/master/packages/merged-ref/src/index.tsx
  */
 
+// TODO: This hook is currently unused due to change in NoteBlock structure
 const useMergedRef = <T extends any>(...refs: React.Ref<T>[]): React.RefCallback<T> => (
   element: T
 ) =>
