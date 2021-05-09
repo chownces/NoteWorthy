@@ -3,13 +3,10 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { NoteBlockStateProps } from '../../components/noteBlock/NoteBlock';
-import useStateCallback from '../../utils/useStateCallback';
+// import useStateCallback from '../../utils/useStateCallback';
 import NotePage, { NotePageProps } from './NotePage';
 
 const NotePageController: React.FC = () => {
-  const [blocks, setBlocks] = useStateCallback<NoteBlockStateProps[]>([]);
-  const [isError, setIsError] = React.useState<boolean>(false);
-
   // Get note id of the note to render via react-router-dom URL params
   const NOTE_ID = useParams<{ noteId: string }>().noteId;
 
@@ -33,30 +30,18 @@ const NotePageController: React.FC = () => {
     }
   `;
 
-  const { loading, error, data } = useQuery(GET_NOTE_QUERY, {
+  const { loading: queryLoading, error: queryError, data } = useQuery(GET_NOTE_QUERY, {
     variables: {
       _id: NOTE_ID
     }
   });
 
   /**
-   * This effect handles the rerendering of the page once data is fetched asynchronously.
-   */
-  React.useEffect(() => {
-    if (!loading) {
-      if (!error) {
-        setBlocks(data.getNote.blocks);
-      } else {
-        setIsError(true);
-      }
-    }
-  }, [loading, error, data, setBlocks, setIsError]);
-
-  /**
    * ==========================
    * Handle updates in database
    * ==========================
    */
+  // TODO: Add different mutations to update blocks/ title separately
   const UPDATE_NOTE_MUTATION = gql`
     mutation updateNote($_id: ID!, $title: String, $blocks: [NoteBlockInput]) {
       updateNote(_id: $_id, input: { title: $title, blocks: $blocks }) {
@@ -72,12 +57,21 @@ const NotePageController: React.FC = () => {
     }
   `;
 
-  const [updateNote] = useMutation(UPDATE_NOTE_MUTATION);
+  // TODO: Update inMemoryCache. The manual cache update here is unnecessary...
+  // const [updateNote, { error: mutationError }] = useMutation(UPDATE_NOTE_MUTATION);
+  const [updateNote] = useMutation(UPDATE_NOTE_MUTATION, {
+    update: (cache, { data: { updateNote } }) => {
+      cache.writeQuery({
+        query: GET_NOTE_QUERY,
+        data: { getNotes: updateNote }
+      })
+    }
+  });
 
   const updateBlocksInDatabase = (blocks: NoteBlockStateProps[]) => {
     updateNote({
       variables: {
-        _id: NOTE_ID, // TODO: Remove this hardcode
+        _id: NOTE_ID,
         blocks: blocks.map(b => {
           return { id: b.id, html: b.html, tag: b.tag };
         })
@@ -85,25 +79,27 @@ const NotePageController: React.FC = () => {
     });
   };
 
-  /**
-   * Updates `blocks` state in React and also the backend.
-   */
-  // TODO: Handle Apollo InMemoryCache
-  const setBlocksAndUpdateDatabase = (
-    blocks: NoteBlockStateProps[],
-    callback?: (newState?: NoteBlockStateProps[]) => void
-  ) => {
-    setBlocks(blocks, callback);
-    updateBlocksInDatabase(blocks);
-  };
+  if (queryLoading) {
+    // TODO: Write a common Loading component
+    return (
+      <div>Loading...</div>
+    )
+  }
+  if (queryError) {
+    // TODO: Write a common Error component/ Toast
+    return (
+      <div>Error! + {queryError.message}</div>
+    )
+  }
 
   const notePageProps: NotePageProps = {
-    blocks: blocks,
-    setBlocksAndUpdateDatabase: setBlocksAndUpdateDatabase
+    blocks: data.getNote.blocks,
+
+    // TODO: Update the naming here
+    setBlocksAndUpdateDatabase: updateBlocksInDatabase
   };
 
-  // TODO: Cleanup error handling
-  return isError ? <div>Failed to retrieve note...</div> : <NotePage {...notePageProps} />;
+  return <NotePage {...notePageProps} />;
 };
 
 export default NotePageController;

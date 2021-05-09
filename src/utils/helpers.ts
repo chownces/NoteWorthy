@@ -40,6 +40,7 @@ export const toggleBold = (elem: HTMLElement) => {
   range?.surroundContents(bolded);
 
   // TODO: Handle cursor shift to the end of selection when toggleBold is called
+  // TODO: Handle untoggling also
 
   // selection.addRange(range);
 

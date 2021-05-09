@@ -29,13 +29,15 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   const noteBlockRef = React.useRef<HTMLElement>(null);
 
   /**
+   * TODO: Relook at what this is for under keydownHandlers backspace
+   * 
    * React.useRef is used here with the following effect to keep a mutable object reference
    * to the updated html prop. This is to allow access to the latest html prop within
    * the callback handlers below.
    *
    * (this is a hacky way of overcoming the stale closure problem with React hooks)
    */
-  const html = React.useRef<string | null>(null);
+  const html = React.useRef<string>("");
   React.useEffect(() => {
     html.current = props.html;
   });
@@ -47,6 +49,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       html: e.target.value === '<br>' || e.target.value === '<div><br></div>' ? '' : e.target.value,
       tag: props.tag
     });
+
+    // TODO: Apollo updates the store, which results in whole page rerender and caret jumping to the end...
   };
 
   const onKeydownHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -90,7 +94,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       case 'b':
         if (e.metaKey) {
           e.preventDefault();
-          toggleBold(noteBlockRef.current as HTMLElement);
+          toggleBold(noteBlockRef.current as HTMLElement); // TODO: Handle untoggling also!
         }
         break;
 

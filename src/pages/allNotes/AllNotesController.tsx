@@ -14,8 +14,6 @@ export type Note = {
 const AllNotesController: React.FC = () => {
   // TODO: Handle repositioning of Note 'blocks' in AllNotes page
 
-  const [notes, setNotes] = React.useState<Note[]>([]);
-
   // TODO: Change date to reflect the date and time of the latest changes (requires changes in backend)
   const GET_ALL_NOTES_QUERY = gql`
     {
@@ -27,23 +25,23 @@ const AllNotesController: React.FC = () => {
     }
   `;
 
-  const { loading, error, data } = useQuery(GET_ALL_NOTES_QUERY);
+  const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_NOTES_QUERY);
 
-  /**
-   * This effect handles the rerendering of the page once data is fetched asynchronously.
-   */
-  React.useEffect(() => {
-    if (!loading) {
-      if (!error) {
-        setNotes(data.allNotes);
-      } else {
-        // TODO: Handle request error (e.g. display message to user)
-      }
-    }
-  }, [loading, error, data, setNotes]);
+  if (queryLoading) {
+    // TODO: Write a common Loading component
+    return (
+      <div>Loading...</div>
+    )
+  }
+  if (queryError) {
+    // TODO: Write a common Error component/ Toast
+    return (
+      <div>Error! + {queryError.message}</div>
+    )
+  }
 
   const allNotesProps: AllNotesProps = {
-    notes: notes
+    notes: data.allNotes
   };
 
   return <AllNotes {...allNotesProps} />;
