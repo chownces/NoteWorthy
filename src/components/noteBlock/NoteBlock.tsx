@@ -136,7 +136,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         onClick={() => {
           props.setIsEditMode(true, () => {
             noteBlockRef.current?.focus();
-            setEol(noteBlockRef.current);
+            // TODO: This eol line is causing issues when using the mouse to position the cursor
+            // setEol(noteBlockRef.current);
           });
         }}
       />
