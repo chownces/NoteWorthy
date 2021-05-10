@@ -1,6 +1,7 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 
+import { uniqueId } from '../../utils/helpers';
 import AllNotes, { AllNotesProps } from './AllNotes';
 
 // TODO: Clean up the various type exports...
@@ -25,6 +26,37 @@ const AllNotesController: React.FC = () => {
     }
   `;
 
+  // TODO: Generate unique id with MongoDB
+  const CREATE_NOTE_MUTATION = gql`
+    mutation {
+      createNote(input: { title: "untitled", blocks: [{id: "${uniqueId()}", html: " ", tag: "p"}] }) {
+        _id
+        title
+        blocks {
+          id
+          html
+          tag
+        }
+        date
+      }
+    }
+  `;
+
+  // TODO: Add error handling
+  const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
+    update: (cache, {data: {createNote}}) => {
+      // TODO: Handle typing
+      const data: any = cache.readQuery({
+        query: GET_ALL_NOTES_QUERY
+      });
+
+      cache.writeQuery({
+        query: GET_ALL_NOTES_QUERY,
+        data: {allNotes: [...data.allNotes, createNote]}
+      })
+    }
+  });
+
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_NOTES_QUERY);
 
   if (queryLoading) {
@@ -44,7 +76,12 @@ const AllNotesController: React.FC = () => {
     notes: data.allNotes
   };
 
-  return <AllNotes {...allNotesProps} />;
+  return (
+    <>
+      <button onClick={() => createNote()}>New Note</button>
+      <AllNotes {...allNotesProps} />
+    </>
+  )
 };
 
 export default AllNotesController;
