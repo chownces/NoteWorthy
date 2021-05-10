@@ -30,14 +30,14 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
 
   /**
    * TODO: Relook at what this is for under keydownHandlers backspace
-   * 
+   *
    * React.useRef is used here with the following effect to keep a mutable object reference
    * to the updated html prop. This is to allow access to the latest html prop within
    * the callback handlers below.
    *
    * (this is a hacky way of overcoming the stale closure problem with React hooks)
    */
-  const html = React.useRef<string>("");
+  const html = React.useRef<string>('');
   React.useEffect(() => {
     html.current = props.html;
   });

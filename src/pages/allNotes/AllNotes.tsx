@@ -14,7 +14,7 @@ const AllNotes: React.FC<AllNotesProps> = props => {
   return (
     <div>
       {props.notes.map((note: Note, index: number) => (
-        <Link to={`note/${note._id}`} key={index}>
+        <Link to={`note/${note.id}`} key={index}>
           <div className="allnotes-note">
             <p>{note.title}</p>
             <p>{note.date}</p>

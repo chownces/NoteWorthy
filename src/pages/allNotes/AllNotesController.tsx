@@ -7,7 +7,7 @@ import AllNotes, { AllNotesProps } from './AllNotes';
 // TODO: Clean up the various type exports...
 // `blocks` is excluded here as we do not need it when displaying AllNotes for now.
 export type Note = {
-  _id: string;
+  id: string;
   title: string;
   date: string;
 };
@@ -19,18 +19,19 @@ const AllNotesController: React.FC = () => {
   const GET_ALL_NOTES_QUERY = gql`
     {
       allNotes {
-        _id
+        id
         title
         date
       }
     }
   `;
 
-  // TODO: Generate unique id with MongoDB
+  // NOTE: We generate our own unique block id for now, as we have to splice our array before updating it in the database
+  // TODO: See if it is possible to use MongoDB's ID! field when inserting new blocks.
   const CREATE_NOTE_MUTATION = gql`
     mutation {
       createNote(input: { title: "untitled", blocks: [{id: "${uniqueId()}", html: " ", tag: "p"}] }) {
-        _id
+        id
         title
         blocks {
           id
@@ -44,7 +45,7 @@ const AllNotesController: React.FC = () => {
 
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
-    update: (cache, {data: {createNote}}) => {
+    update: (cache, { data: { createNote } }) => {
       // TODO: Handle typing
       const data: any = cache.readQuery({
         query: GET_ALL_NOTES_QUERY
@@ -52,8 +53,8 @@ const AllNotesController: React.FC = () => {
 
       cache.writeQuery({
         query: GET_ALL_NOTES_QUERY,
-        data: {allNotes: [...data.allNotes, createNote]}
-      })
+        data: { allNotes: [...data.allNotes, createNote] }
+      });
     }
   });
 
@@ -61,15 +62,11 @@ const AllNotesController: React.FC = () => {
 
   if (queryLoading) {
     // TODO: Write a common Loading component
-    return (
-      <div>Loading...</div>
-    )
+    return <div>Loading...</div>;
   }
   if (queryError) {
     // TODO: Write a common Error component/ Toast
-    return (
-      <div>Error! + {queryError.message}</div>
-    )
+    return <div>Error! + {queryError.message}</div>;
   }
 
   const allNotesProps: AllNotesProps = {
@@ -81,7 +78,7 @@ const AllNotesController: React.FC = () => {
       <button onClick={() => createNote()}>New Note</button>
       <AllNotes {...allNotesProps} />
     </>
-  )
+  );
 };
 
 export default AllNotesController;
