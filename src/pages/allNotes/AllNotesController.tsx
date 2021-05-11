@@ -1,6 +1,7 @@
 import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 
+import Loader from '../../components/loader/Loader';
 import { uniqueId } from '../../utils/helpers';
 import AllNotes, { AllNotesProps } from './AllNotes';
 
@@ -61,8 +62,7 @@ const AllNotesController: React.FC = () => {
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_NOTES_QUERY);
 
   if (queryLoading) {
-    // TODO: Write a common Loading component
-    return <div>Loading...</div>;
+    return <Loader />;
   }
   if (queryError) {
     // TODO: Write a common Error component/ Toast

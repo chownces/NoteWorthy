@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import Loader from '../../components/loader/Loader';
 import { NoteBlockStateProps } from '../../components/noteBlock/NoteBlock';
 // import useStateCallback from '../../utils/useStateCallback';
 import NotePage, { NotePageProps } from './NotePage';
@@ -80,8 +81,7 @@ const NotePageController: React.FC = () => {
   };
 
   if (queryLoading) {
-    // TODO: Write a common Loading component
-    return <div>Loading...</div>;
+    return <Loader />;
   }
   if (queryError) {
     // TODO: Write a common Error component/ Toast
