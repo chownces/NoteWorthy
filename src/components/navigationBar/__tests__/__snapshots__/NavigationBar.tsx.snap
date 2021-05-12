@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Navigation Bar renders correct at desktop breakpoint 1`] = `
+exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
 <div>
   <div
     class="ui menu"
@@ -70,7 +70,7 @@ exports[`Navigation Bar renders correct at desktop breakpoint 1`] = `
 </div>
 `;
 
-exports[`Navigation Bar renders correct at mobile breakpoint 1`] = `
+exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
 <div>
   <div
     class="ui menu"
