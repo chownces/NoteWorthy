@@ -1,0 +1,58 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gets all notes successfully and renders them correctly 1`] = `
+<div>
+  <button>
+    New Note
+  </button>
+  <div>
+    <a
+      href="/note/6098ba47fdaba558e1955a00"
+    >
+      <div
+        class="allnotes-note"
+      >
+        <p>
+          test note 1
+        </p>
+        <p>
+          21/05/21
+        </p>
+      </div>
+    </a>
+    <a
+      href="/note/6098bbdc04c0fa63070bfe5e"
+    >
+      <div
+        class="allnotes-note"
+      >
+        <p>
+          untitled
+        </p>
+        <p>
+          31/12/21
+        </p>
+      </div>
+    </a>
+  </div>
+</div>
+`;
+
+exports[`Handles network error correctly  1`] = `
+<div>
+  <div>
+    Error! + 
+    An error occurred
+  </div>
+</div>
+`;
+
+exports[`Renders loading state correctly 1`] = `
+<div>
+  <div
+    class="ui active text loader"
+  >
+    Loading...
+  </div>
+</div>
+`;

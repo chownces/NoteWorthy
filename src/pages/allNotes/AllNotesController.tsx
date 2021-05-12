@@ -13,23 +13,20 @@ export type Note = {
   date: string;
 };
 
-const AllNotesController: React.FC = () => {
-  // TODO: Handle repositioning of Note 'blocks' in AllNotes page
-
-  // TODO: Change date to reflect the date and time of the latest changes (requires changes in backend)
-  const GET_ALL_NOTES_QUERY = gql`
-    {
-      allNotes {
-        id
-        title
-        date
-      }
+// TODO: Change date to reflect the date and time of the latest changes (requires changes in backend)
+export const GET_ALL_NOTES_QUERY = gql`
+  {
+    allNotes {
+      id
+      title
+      date
     }
-  `;
+  }
+`;
 
-  // NOTE: We generate our own unique block id for now, as we have to splice our array before updating it in the database
-  // TODO: See if it is possible to use MongoDB's ID! field when inserting new blocks.
-  const CREATE_NOTE_MUTATION = gql`
+// NOTE: We generate our own unique block id for now, as we have to splice our array before updating it in the database
+// TODO: See if it is possible to use MongoDB's ID! field when inserting new blocks.
+export const CREATE_NOTE_MUTATION = gql`
     mutation {
       createNote(input: { title: "untitled", blocks: [{id: "${uniqueId()}", html: " ", tag: "p"}] }) {
         id
@@ -43,6 +40,9 @@ const AllNotesController: React.FC = () => {
       }
     }
   `;
+
+const AllNotesController: React.FC = () => {
+  // TODO: Handle repositioning of Note 'blocks' in AllNotes page
 
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
