@@ -1,0 +1,136 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Navigation Bar renders correct at desktop breakpoint 1`] = `
+<div>
+  <div
+    class="ui menu"
+  >
+    <a
+      class="brand-logo-link"
+      href="/"
+    >
+      <div
+        class="item brand-logo-container"
+      >
+        <img
+          class="ui small image"
+          src="brand_logo.png"
+        />
+      </div>
+    </a>
+    <a
+      href="/"
+    >
+      <div
+        class="active item"
+      >
+        <i
+          aria-hidden="true"
+          class="file alternate outline icon"
+        />
+        All Notes
+      </div>
+    </a>
+    <a
+      href="/todos"
+    >
+      <div
+        class="item"
+      >
+        <i
+          aria-hidden="true"
+          class="calendar check outline icon"
+        />
+        Todo List
+      </div>
+    </a>
+    <div
+      class="right menu"
+    >
+      <a
+        href="/contribute"
+      >
+        <div
+          class="item"
+        >
+          Contribute
+        </div>
+      </a>
+      <a
+        href="/login"
+      >
+        <div
+          class="item"
+        >
+          Login
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Navigation Bar renders correct at mobile breakpoint 1`] = `
+<div>
+  <div
+    class="ui menu"
+  >
+    <a
+      class="item"
+    >
+      <i
+        aria-hidden="true"
+        class="bars icon"
+      />
+    </a>
+  </div>
+  <div
+    class="ui vertical ui overlay left sidebar menu"
+  >
+    <a
+      href="/"
+    >
+      <div
+        class="active item"
+      >
+        <i
+          aria-hidden="true"
+          class="file alternate outline icon"
+        />
+        All Notes
+      </div>
+    </a>
+    <a
+      href="/todos"
+    >
+      <div
+        class="item"
+      >
+        <i
+          aria-hidden="true"
+          class="calendar check outline icon"
+        />
+        Todo List
+      </div>
+    </a>
+    <a
+      href="/contribute"
+    >
+      <div
+        class="item"
+      >
+        Contribute
+      </div>
+    </a>
+    <a
+      href="/login"
+    >
+      <div
+        class="item"
+      >
+        Login
+      </div>
+    </a>
+  </div>
+</div>
+`;

@@ -5,6 +5,13 @@ import { Icon, Image, Menu, Sidebar } from 'semantic-ui-react';
 
 import brandLogo from '../../assets/brand_logo.png';
 
+enum NavbarItems {
+  allNotes,
+  login,
+  todos,
+  contribute
+}
+
 const NavigationBar: React.FC = () => {
   const [activeItem, setActiveItem] = React.useState<NavbarItems>(NavbarItems.allNotes);
   const [sidePanelOpen, setSidePanelOpen] = React.useState<boolean>(false);
@@ -145,12 +152,5 @@ const NavigationBar: React.FC = () => {
     </>
   );
 };
-
-enum NavbarItems {
-  allNotes,
-  login,
-  todos,
-  contribute
-}
 
 export default NavigationBar;

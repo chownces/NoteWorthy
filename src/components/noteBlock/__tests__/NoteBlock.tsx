@@ -1,5 +1,4 @@
 import { shallow } from 'enzyme';
-import { DraggableProvided } from 'react-beautiful-dnd';
 
 import NoteBlock, { NoteBlockProps } from '../NoteBlock';
 
