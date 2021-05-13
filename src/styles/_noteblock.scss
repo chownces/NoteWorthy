@@ -1,6 +1,7 @@
 .noteblock {
   display: flex;
   margin: 0.5em 0;
+  font-size: 20px;
 
   .noteblock-handle {
     cursor: grab;
@@ -13,7 +14,7 @@
 
   .noteblock-text {
     border: 1px solid blue; // TODO: To be removed after block logic has been handled fully
-    min-height: 20px;
+    min-height: 30px;
     margin: 0;
     width: calc(100% - 10px);
     outline: none;
