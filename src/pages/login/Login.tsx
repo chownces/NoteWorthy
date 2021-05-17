@@ -6,7 +6,7 @@ const Login: React.FC = () => {
   const history = useHistory();
 
   // TODO: Set this to true if the server returns invalid credentials
-  const [isWrongCredentials, _] = React.useState(false);
+  const [isWrongCredentials] = React.useState<boolean>(false);
 
   const [user, setUser] = React.useState<string | null>(null);
   const [password, setPassword] = React.useState<string | null>(null);
