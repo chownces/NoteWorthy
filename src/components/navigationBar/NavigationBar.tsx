@@ -9,7 +9,8 @@ enum NavbarItems {
   allNotes,
   login,
   todos,
-  contribute
+  contribute,
+  boardView
 }
 
 const NavigationBar: React.FC = () => {
@@ -56,6 +57,17 @@ const NavigationBar: React.FC = () => {
           >
             <Icon name="calendar check outline" />
             Todo List
+          </Menu.Item>
+        </Link>
+        <Link to="/BoardView">
+          <Menu.Item
+            as="div"
+            active={activeItem === NavbarItems.boardView}
+            onClick={() => {
+              setActiveItem(NavbarItems.boardView);
+            }}
+          >
+            BoardView
           </Menu.Item>
         </Link>
         <Menu.Menu position="right">
