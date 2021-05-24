@@ -2,10 +2,26 @@
   padding-top: 1px !important;
 }
 
-.brand-logo-link {
-  display: flex;
+.desktop-navbar {
+  .active {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 
-  .brand-logo-container {
-    padding: 0 15px 2px 10px !important;
+  .brand-logo-link {
+    display: flex;
+
+    .brand-logo-container {
+      padding: 0 15px 2px 10px !important;
+    }
+  }
+}
+
+.mobile-navbar {
+  a {
+    display: block;
+  }
+
+  .active {
+    background-color: rgba(0, 0, 0, 0.05);
   }
 }

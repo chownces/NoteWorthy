@@ -1,82 +1,45 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { Icon, Image, Menu, Sidebar } from 'semantic-ui-react';
 
 import brandLogo from '../../assets/brand_logo.png';
-
-enum NavbarItems {
-  allNotes,
-  login,
-  todos,
-  contribute
-}
+import userContext from '../userContext/UserContext';
 
 const NavigationBar: React.FC = () => {
-  const [activeItem, setActiveItem] = React.useState<NavbarItems>(NavbarItems.allNotes);
+  const user = React.useContext(userContext);
   const [sidePanelOpen, setSidePanelOpen] = React.useState<boolean>(false);
   const isMobileBreakpoint = useMediaQuery({ maxWidth: 768 });
 
-  const setActiveItemAndCloseSidePanel = (activeItem: NavbarItems) => {
-    setActiveItem(activeItem);
-    setSidePanelOpen(false);
-  };
-
-  // NOTE: We use Link instead of href inside Menu.item to prevent unnecessary page refresh
   const desktopMenuItems = (
     <>
-      <Menu>
+      <Menu className="desktop-navbar">
         <Link to="/" className="brand-logo-link">
-          <Menu.Item
-            as="div"
-            active={false}
-            onClick={() => setActiveItem(NavbarItems.allNotes)}
-            className="brand-logo-container"
-          >
+          <Menu.Item as="div" className="brand-logo-container">
             <Image src={brandLogo} size="small" />
           </Menu.Item>
         </Link>
-        <Link to="/">
-          <Menu.Item
-            as="div"
-            active={activeItem === NavbarItems.allNotes}
-            onClick={() => setActiveItem(NavbarItems.allNotes)}
-          >
+        <NavLink exact to="/" activeClassName="active">
+          <Menu.Item as="div">
             <Icon name="file alternate outline" />
             All Notes
           </Menu.Item>
-        </Link>
-        <Link to="/todos">
-          <Menu.Item
-            as="div"
-            active={activeItem === NavbarItems.todos}
-            onClick={() => {
-              setActiveItem(NavbarItems.todos);
-            }}
-          >
+        </NavLink>
+        <NavLink to="/todos" activeClassName="active">
+          <Menu.Item as="div">
             <Icon name="calendar check outline" />
             Todo List
           </Menu.Item>
-        </Link>
+        </NavLink>
         <Menu.Menu position="right">
-          <Link to="/contribute">
-            <Menu.Item
-              as="div"
-              active={activeItem === NavbarItems.contribute}
-              onClick={() => setActiveItem(NavbarItems.contribute)}
-            >
-              Contribute
+          <NavLink to="/contribute" activeClassName="active">
+            <Menu.Item as="div">Contribute</Menu.Item>
+          </NavLink>
+          <NavLink to="/login" activeClassName="active">
+            <Menu.Item as="div" onClick={user.logout}>
+              {user.user.loggedIn ? 'Logout' : 'Login'}
             </Menu.Item>
-          </Link>
-          <Link to="/login">
-            <Menu.Item
-              as="div"
-              active={activeItem === NavbarItems.login}
-              onClick={() => setActiveItem(NavbarItems.login)}
-            >
-              Login
-            </Menu.Item>
-          </Link>
+          </NavLink>
         </Menu.Menu>
       </Menu>
     </>
@@ -93,49 +56,40 @@ const NavigationBar: React.FC = () => {
   const mobileSideMenuItems = (
     <Sidebar
       as={Menu}
+      className="mobile-navbar"
       animation="overlay"
       onHide={() => setSidePanelOpen(false)}
       visible={sidePanelOpen}
       vertical
     >
-      <Link to="/">
-        <Menu.Item
-          as="div"
-          active={activeItem === NavbarItems.allNotes}
-          onClick={() => setActiveItemAndCloseSidePanel(NavbarItems.allNotes)}
-        >
+      <NavLink exact to="/" activeClassName="active">
+        <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
           <Icon name="file alternate outline" />
           All Notes
         </Menu.Item>
-      </Link>
-      <Link to="/todos">
-        <Menu.Item
-          as="div"
-          active={activeItem === NavbarItems.todos}
-          onClick={() => setActiveItemAndCloseSidePanel(NavbarItems.todos)}
-        >
+      </NavLink>
+      <NavLink to="/todos" activeClassName="active">
+        <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
           <Icon name="calendar check outline" />
           Todo List
         </Menu.Item>
-      </Link>
-      <Link to="/contribute">
-        <Menu.Item
-          as="div"
-          active={activeItem === NavbarItems.contribute}
-          onClick={() => setActiveItemAndCloseSidePanel(NavbarItems.contribute)}
-        >
+      </NavLink>
+      <NavLink to="/contribute" activeClassName="active">
+        <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
           Contribute
         </Menu.Item>
-      </Link>
-      <Link to="/login">
+      </NavLink>
+      <NavLink to="/login" activeClassName="active">
         <Menu.Item
           as="div"
-          active={activeItem === NavbarItems.login}
-          onClick={() => setActiveItemAndCloseSidePanel(NavbarItems.login)}
+          onClick={() => {
+            setSidePanelOpen(false);
+            user.logout();
+          }}
         >
-          Login
+          {user.user.loggedIn ? 'Logout' : 'Login'}
         </Menu.Item>
-      </Link>
+      </NavLink>
     </Sidebar>
   );
 

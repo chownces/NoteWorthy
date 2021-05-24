@@ -3,7 +3,7 @@
 exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
 <div>
   <div
-    class="ui menu"
+    class="ui desktop-navbar menu"
   >
     <a
       class="brand-logo-link"
@@ -19,10 +19,12 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
       </div>
     </a>
     <a
+      aria-current="page"
+      class="active"
       href="/"
     >
       <div
-        class="active item"
+        class="item"
       >
         <i
           aria-hidden="true"
@@ -85,13 +87,15 @@ exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
     </a>
   </div>
   <div
-    class="ui vertical ui overlay left sidebar menu"
+    class="ui vertical ui overlay left sidebar mobile-navbar menu"
   >
     <a
+      aria-current="page"
+      class="active"
       href="/"
     >
       <div
-        class="active item"
+        class="item"
       >
         <i
           aria-hidden="true"

@@ -1,30 +1,54 @@
+import { useMutation } from '@apollo/client';
+import gql from 'graphql-tag';
 import React from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Button, Card, Divider, Form, Header, Input, Message } from 'semantic-ui-react';
 
+import userContext from '../../components/userContext/UserContext';
+
 const Login: React.FC = () => {
   const history = useHistory();
 
-  // TODO: Set this to true if the server returns invalid credentials
-  const [isWrongCredentials] = React.useState<boolean>(false);
+  const user = React.useContext(userContext);
+  const [isWrongCredentials, setIsWrongCredentials] = React.useState<boolean>(false);
 
-  const [user, setUser] = React.useState<string | null>(null);
-  const [password, setPassword] = React.useState<string | null>(null);
+  const [formState, setFormState] = React.useState({
+    email: '',
+    password: '',
+    updatedEmail: false,
+    updatedPassword: false
+  });
+
+  const LOGIN_MUTATION = gql`
+    mutation login($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+        user {
+          firstname
+          lastname
+          email
+        }
+      }
+    }
+  `;
+
+  const [login] = useMutation(LOGIN_MUTATION, {
+    variables: {
+      email: formState.email,
+      password: formState.password
+    },
+    onCompleted: ({ login }) => {
+      user.login(login.user.email, login.user.firstname, login.user.lastname);
+      history.push('/');
+    },
+    onError: err => setIsWrongCredentials(true)
+  });
 
   const handleSubmit = () => {
-    // Check for empty input, and set the relevant states to trigger the Form error message
-    if (!user || !password) {
-      if (!user) {
-        setUser('');
-      }
-      if (!password) {
-        setPassword('');
-      }
+    if (!formState.email || !formState.password) {
+      // Check for empty input
       return;
     }
-
-    // TODO: Handle the backend authentication logic
-    history.push('/');
+    login();
   };
 
   return (
@@ -38,10 +62,13 @@ const Login: React.FC = () => {
             <Form error={isWrongCredentials} onSubmit={handleSubmit}>
               <Form.Field
                 control={Input}
-                placeholder="Username or email"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUser(e.target.value)}
+                placeholder="Email"
+                type="email"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormState({ ...formState, email: e.target.value, updatedEmail: true })
+                }
                 error={
-                  user === ''
+                  formState.updatedEmail && formState.email === ''
                     ? {
                         content: 'Please enter a valid username or email'
                       }
@@ -52,9 +79,11 @@ const Login: React.FC = () => {
                 control={Input}
                 placeholder="Password"
                 type="password"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormState({ ...formState, password: e.target.value, updatedPassword: true })
+                }
                 error={
-                  password === ''
+                  formState.updatedPassword && formState.password === ''
                     ? {
                         content: 'Please enter your password'
                       }

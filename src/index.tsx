@@ -18,7 +18,8 @@ import reportWebVitals from './reportWebVitals';
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const httpLink = createHttpLink({
-  uri: backendUrl
+  uri: backendUrl,
+  credentials: 'include'
 });
 
 const link = ApolloLink.from([httpLink]);
