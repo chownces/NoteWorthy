@@ -57,8 +57,8 @@ const Application: React.FC<ApplicationProps> = props => {
   };
 
   const nonAuthPaths = [
-    <Route path="/login" component={Login} />,
-    <Route path="/contribute" component={NotFound} />
+    <Route path="/login" component={Login} key="login" />,
+    <Route path="/contribute" component={NotFound} key="contribute" />
   ];
 
   return (
@@ -71,10 +71,10 @@ const Application: React.FC<ApplicationProps> = props => {
             [
               // TODO: Handle routing once backend is properly up
               /* <Route exact path="/" component={AllNotesController} /> */
-              <Route exact path="/" component={AllDatabasesController} />,
-              <Route path="/note/:noteId" component={NotePageController} />,
-              <Route path="/poster" component={Poster} />,
-              <Route component={NotFound} />
+              <Route exact path="/" component={AllDatabasesController} key="root" />,
+              <Route path="/note/:noteId" component={NotePageController} key="note" />,
+              <Route path="/poster" component={Poster} key="poster" />,
+              <Route component={NotFound} key="404" />
             ]
           ) : (
             <Route render={redirectToLogin} />

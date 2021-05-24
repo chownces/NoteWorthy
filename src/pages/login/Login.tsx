@@ -91,6 +91,7 @@ const Login: React.FC = () => {
                 }
               />
               <Message error header="Login Failed" content="Invalid username or password!" />
+              {/* NOTE: There is a findDomNode deprecation warning when using semantic-ui-react's Button component. This is a known issue. */}
               <Button primary fluid type="submit">
                 Log In
               </Button>
