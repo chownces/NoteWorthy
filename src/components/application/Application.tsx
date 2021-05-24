@@ -1,3 +1,5 @@
+import { useMutation } from '@apollo/client';
+import gql from 'graphql-tag';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
@@ -12,6 +14,12 @@ import NavigationBar from '../navigationBar/NavigationBar';
 import UserContext from '../userContext/UserContext';
 
 type ApplicationProps = {};
+
+const LOGOUT_MUTATION = gql`
+  mutation {
+    logout
+  }
+`;
 
 const Application: React.FC<ApplicationProps> = props => {
   // TODO: To migrate over to JWT and HTTPOnly cookies
@@ -30,13 +38,17 @@ const Application: React.FC<ApplicationProps> = props => {
       lastname: lastname
     });
 
-  const logout = () =>
+  const [logoutBackend] = useMutation(LOGOUT_MUTATION);
+
+  const logout = () => {
+    logoutBackend();
     setUser({
       loggedIn: false,
       email: '',
       firstname: '',
       lastname: ''
     });
+  };
 
   const providerValue = {
     user: user,
