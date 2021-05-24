@@ -3,7 +3,7 @@ import { act, render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import AllNotesController, {
-  CREATE_NOTE_MUTATION,
+  // CREATE_NOTE_MUTATION,
   GET_ALL_NOTES_QUERY
 } from '../AllNotesController';
 

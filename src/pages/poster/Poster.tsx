@@ -125,7 +125,7 @@ const Poster: React.FC = () => {
                     Insert in-line links to related notes and access them through a single click!
                   </List.Item>
                   <List.Item style={{ lineHeight: '1.4285em' }}>
-                    Click [[<a>here</a>]] to go to the introduction
+                    Click [[<a href="/">here</a>]] to go to the introduction
                   </List.Item>
                 </List>
               </Card.Description>
