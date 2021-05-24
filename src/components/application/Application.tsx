@@ -18,7 +18,7 @@ const Application: React.FC<ApplicationProps> = props => {
       <Container>
         <Switch>
           <Route exact path="/" component={AllNotesController} />
-          <Route path= "/boardview" component={BoardView}/>
+          <Route path="/boardview" component={BoardView} />
           <Route path="/login" component={Login} />
           <Route path="/note/:noteId" component={NotePageController} />
           <Route path="/poster" component={Poster} />

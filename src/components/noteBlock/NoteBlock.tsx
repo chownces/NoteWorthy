@@ -1,6 +1,8 @@
 import React from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { ContextMenu, ContextMenuTrigger } from 'react-contextmenu';
+import { Menu } from 'semantic-ui-react';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 
@@ -74,8 +76,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to previous block, if it exists
       case 'ArrowUp':
         e.preventDefault();
-        const previousBlock = noteBlockRef.current?.parentElement?.previousElementSibling
-          ?.children[1] as HTMLElement;
+        const previousBlock = noteBlockRef.current?.parentElement?.parentElement?.previousElementSibling
+          ?.children[0]?.children[1] as HTMLElement;
         if (previousBlock) {
           setEol(previousBlock);
         }
@@ -84,8 +86,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to next block, if it exists
       case 'ArrowDown':
         e.preventDefault();
-        const nextBlock = noteBlockRef.current?.parentElement?.nextElementSibling
-          ?.children[1] as HTMLElement;
+        const nextBlock = noteBlockRef.current?.parentElement?.parentElement?.nextElementSibling
+          ?.children[0]?.children[1] as HTMLElement;
         if (nextBlock) {
           setEol(nextBlock);
         }
@@ -108,6 +110,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     }
   };
 
+
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
@@ -118,30 +121,46 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
      * NotePage::deleteBlockHandler
      * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
      */
-    <div
-      className="noteblock"
-      ref={props.innerRef}
-      {...props.provided.dragHandleProps} // react-beautiful-dnd props
-      {...props.provided.draggableProps} // react-beautiful-dnd props
-    >
-      <div className="noteblock-handle"></div>
-      <ContentEditable
-        className="noteblock-text"
-        innerRef={noteBlockRef}
-        html={props.html}
-        tagName={props.tag}
-        onChange={onChangeHandler}
-        onKeyDown={onKeydownHandler}
-        disabled={!props.isEditMode}
-        onClick={() => {
-          props.setIsEditMode(true, () => {
-            noteBlockRef.current?.focus();
-            // TODO: This eol line is causing issues when using the mouse to position the cursor
-            // setEol(noteBlockRef.current);
-          });
-        }}
-      />
-    </div>
+    <ContextMenuTrigger id={props.id}>
+
+      <div
+        className="noteblock"
+        ref={props.innerRef}
+        {...props.provided.dragHandleProps} // react-beautiful-dnd props
+        {...props.provided.draggableProps} // react-beautiful-dnd props
+      >
+        <div className="noteblock-handle"></div>
+        
+        <ContentEditable
+          className="noteblock-text"
+          innerRef={noteBlockRef}
+          html={props.html}
+          tagName={props.tag}
+          onChange={onChangeHandler}
+          onKeyDown={onKeydownHandler}
+          disabled={!props.isEditMode}
+          onClick={() => {
+            props.setIsEditMode(true, () => {
+              noteBlockRef.current?.focus();
+              // TODO: This eol line is causing issues when using the mouse to position the cursor
+              // setEol(noteBlockRef.current);
+            });
+          }}
+        />
+
+        <ContextMenu id={props.id} >
+          <Menu vertical>
+            <Menu.Item onClick={()=>{props.deleteBlock(props, noteBlockRef); console.log("props.id: " +props.id )}}>
+              Delete Block
+            </Menu.Item>
+            <Menu.Item onClick={() => {props.addBlock(props, noteBlockRef); console.log("prop.id: " + props.id)}}>
+              Add Block
+            </Menu.Item>
+          </Menu>
+        </ContextMenu>
+
+      </div>
+    </ContextMenuTrigger>
   );
 };
 
