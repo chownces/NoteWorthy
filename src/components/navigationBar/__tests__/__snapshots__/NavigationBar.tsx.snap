@@ -44,6 +44,15 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
         Todo List
       </div>
     </a>
+    <a
+      href="/BoardView"
+    >
+      <div
+        class="item"
+      >
+        BoardView
+      </div>
+    </a>
     <div
       class="right menu"
     >

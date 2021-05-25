@@ -96,16 +96,14 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: 'p' // TODO: Reconsider default block tag
     };
     const blocksCopy = [...blocksRef.current];
-    blocksCopy.forEach(b => console.log(b.id));
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
-      (ref.current?.parentElement?.parentElement?.nextElementSibling
-        ?.children[0]?.children[1] as HTMLElement).focus();
+      (ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
+        ?.children[1] as HTMLElement).focus();
     };
 
-    
     setBlocksAndSetUnsaved(blocksCopy, focusNextBlockCallback);
   };
 
@@ -116,12 +114,11 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
   ): void => {
-    const previousBlock = ref.current?.parentElement?.parentElement
-    ?.previousElementSibling?.children[0]?.children[1] as HTMLElement;
-    
+    const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
+      ?.children[0]?.children[1] as HTMLElement;
 
-     const nextBlock = ref.current?.parentElement?.parentElement
-    ?.nextElementSibling?.children[0]?.children[1] as HTMLElement;
+    const nextBlock = ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
+      ?.children[1] as HTMLElement;
     if (previousBlock) {
       const blocksCopy = [...blocksRef.current];
       const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
@@ -132,7 +129,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       };
 
       setBlocksAndSetUnsaved(blocksCopy, focusPreviousBlockEolCallback);
-    } else if (nextBlock) { 
+    } else if (nextBlock) {
       const blocksCopy = [...blocksRef.current];
       const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
       blocksCopy.splice(index, 1);
@@ -140,7 +137,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       const focusNextBlockEolCallback = () => {
         setEol(nextBlock);
       };
-      
+
       setBlocksAndSetUnsaved(blocksCopy, focusNextBlockEolCallback);
     } else {
       const blocksCopy = [...blocksRef.current];
@@ -151,8 +148,8 @@ const NotePage: React.FC<NotePageProps> = props => {
         tag: 'p' // TODO: Reconsider default block tag
       };
       blocksCopy.splice(index, 0, newBlock);
-      const nextBlock = ref.current?.parentElement?.parentElement
-        ?.nextElementSibling?.children[0]?.children[1] as HTMLElement;
+      const nextBlock = ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
+        ?.children[1] as HTMLElement;
       const focusNextBlockEolCallback = () => {
         setEol(nextBlock);
       };
