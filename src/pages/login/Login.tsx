@@ -70,7 +70,7 @@ const Login: React.FC = () => {
                 error={
                   formState.updatedEmail && formState.email === ''
                     ? {
-                        content: 'Please enter a valid username or email'
+                        content: 'Please enter a valid email'
                       }
                     : false
                 }
@@ -97,8 +97,7 @@ const Login: React.FC = () => {
               </Button>
             </Form>
             <Divider horizontal>OR</Divider>
-            {/* TODO: Handle create new account */}
-            <Link to="/">
+            <Link to="/register">
               <p style={{ textAlign: 'center' }}>Create a new account</p>
             </Link>
           </Card.Content>

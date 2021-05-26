@@ -8,6 +8,7 @@ import Login from '../../pages/login/Login';
 import NotePageController from '../../pages/notePage/NotePageController';
 import NotFound from '../../pages/notFound/NotFound';
 import Poster from '../../pages/poster/Poster';
+import Register from '../../pages/register/Register';
 import NavigationBar from '../navigationBar/NavigationBar';
 import userContext from '../userContext/UserContext';
 
@@ -20,6 +21,7 @@ const Application: React.FC<ApplicationProps> = props => {
   const nonAuthPaths = [
     <Route path="/login" component={Login} key="login" />,
     <Route path="/contribute" component={NotFound} key="contribute" />,
+    <Route path="/register" component={Register} key="register" />
   ];
 
   return (
