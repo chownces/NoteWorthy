@@ -1,77 +1,39 @@
-import { useMutation } from '@apollo/client';
-import gql from 'graphql-tag';
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 
 import AllDatabasesController from '../../pages/allDatabases/AllDatabasesController';
-// import AllNotesController from '../../pages/allNotes/AllNotesController';
+import DatabaseContainer from '../../pages/database/DatabaseContainer';
 import Login from '../../pages/login/Login';
 import NotePageController from '../../pages/notePage/NotePageController';
 import NotFound from '../../pages/notFound/NotFound';
 import Poster from '../../pages/poster/Poster';
 import NavigationBar from '../navigationBar/NavigationBar';
-import UserContext from '../userContext/UserContext';
+import userContext from '../userContext/UserContext';
 
 type ApplicationProps = {};
 
-const LOGOUT_MUTATION = gql`
-  mutation {
-    logout
-  }
-`;
-
 const Application: React.FC<ApplicationProps> = props => {
-  // TODO: To migrate over to JWT and HTTPOnly cookies
-  const [user, setUser] = React.useState({
-    loggedIn: false,
-    email: '',
-    firstname: '',
-    lastname: ''
-  });
+  const user = React.useContext(userContext);
 
-  const login = (email: string, firstname: string, lastname: string) =>
-    setUser({
-      loggedIn: true,
-      email: email,
-      firstname: firstname,
-      lastname: lastname
-    });
-
-  const [logoutBackend] = useMutation(LOGOUT_MUTATION);
-
-  const logout = () => {
-    logoutBackend();
-    setUser({
-      loggedIn: false,
-      email: '',
-      firstname: '',
-      lastname: ''
-    });
-  };
-
-  const providerValue = {
-    user: user,
-    login: login,
-    logout: logout
-  };
-
+  // TODO: Consider disabling some of these paths when a user is logged in
   const nonAuthPaths = [
     <Route path="/login" component={Login} key="login" />,
-    <Route path="/contribute" component={NotFound} key="contribute" />
+    <Route path="/contribute" component={NotFound} key="contribute" />,
   ];
 
   return (
-    <UserContext.Provider value={providerValue}>
+    <>
       <NavigationBar />
       <Container>
         <Switch>
           {nonAuthPaths}
-          {user.loggedIn ? (
+          {user.user.loggedIn ? (
             [
               // TODO: Handle routing once backend is properly up
               /* <Route exact path="/" component={AllNotesController} /> */
               <Route exact path="/" component={AllDatabasesController} key="root" />,
+              <Route path="/database/:databaseId" component={DatabaseContainer} key="database" />,
               <Route path="/note/:noteId" component={NotePageController} key="note" />,
               <Route path="/poster" component={Poster} key="poster" />,
               <Route component={NotFound} key="404" />
@@ -81,7 +43,7 @@ const Application: React.FC<ApplicationProps> = props => {
           )}
         </Switch>
       </Container>
-    </UserContext.Provider>
+    </>
   );
 };
 

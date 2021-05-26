@@ -7,16 +7,18 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
   </button>
   <div>
     <a
-      href="/note/6098ba47fdaba558e1955a00"
+      href="/note/60adcd6e38a95f0f75f1c089"
     >
       <div
-        class="allnotes-note"
+        class="database-note"
       >
         <p>
-          test note 1
+          Title: 
+          My first note
         </p>
         <p>
-          21/05/21
+          Latest Update: 
+          2021-05-26T08:09:57.274Z
         </p>
       </div>
     </a>
@@ -24,13 +26,15 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
       href="/note/6098bbdc04c0fa63070bfe5e"
     >
       <div
-        class="allnotes-note"
+        class="database-note"
       >
         <p>
+          Title: 
           untitled
         </p>
         <p>
-          31/12/21
+          Latest Update: 
+          2021-05-26T08:09:57.274Z
         </p>
       </div>
     </a>

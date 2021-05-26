@@ -11,7 +11,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 
-import App from './components/application/Application';
+import ApplicationContainer from './components/application/ApplicationContainer';
 import reportWebVitals from './reportWebVitals';
 
 // TODO: See if there is a need to abstract this away into a Constants file.
@@ -51,7 +51,7 @@ ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <Router>
-        <App />
+        <ApplicationContainer />
       </Router>
     </ApolloProvider>
   </React.StrictMode>,

@@ -12,8 +12,8 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
   return (
     <div>
       {props.databases.map((database: Database, index: number) => (
-        <Link to={`note/${database.id}`} key={index}>
-          <div className="allnotes-note">
+        <Link to={`/database/${database.id}`} key={index}>
+          <div className="database-note">
             <p>{database.title}</p>
           </div>
         </Link>

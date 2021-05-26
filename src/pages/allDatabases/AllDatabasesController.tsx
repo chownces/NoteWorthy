@@ -2,7 +2,7 @@ import { gql, useQuery } from '@apollo/client';
 import React from 'react';
 
 import Loader from '../../components/loader/Loader';
-import { Note } from '../allNotes/AllNotesController';
+import { Note } from '../database/DatabaseContainer';
 import AllDatabases, { AllDatabasesProps } from './AllDatabases';
 
 export type Database = {
@@ -12,23 +12,8 @@ export type Database = {
   notes: Note[];
 };
 
-// TODO: Update this
-export const GET_ALL_DATABASES_QUERY = gql`
-  {
-    allDatabases {
-      id
-      title
-      currentView
-      notes {
-        id
-        title
-      }
-    }
-  }
-`;
-
 const AllDatabasesController: React.FC = () => {
-  const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_DATABASES_QUERY);
+  const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
   if (queryLoading) {
     return <Loader />;
@@ -39,7 +24,7 @@ const AllDatabasesController: React.FC = () => {
   }
 
   const allDatabasesProps: AllDatabasesProps = {
-    databases: data.allDatabases
+    databases: data.getAllUserDatabases
   };
 
   return (
@@ -49,5 +34,17 @@ const AllDatabasesController: React.FC = () => {
     </>
   );
 };
+
+// TODO: Recheck return params
+export const GET_ALL_USER_DATABASES_QUERY = gql`
+  {
+    getAllUserDatabases {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
 
 export default AllDatabasesController;

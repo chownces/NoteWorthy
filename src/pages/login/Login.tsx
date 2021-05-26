@@ -45,7 +45,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = () => {
     if (!formState.email || !formState.password) {
-      // Check for empty input
+      setFormState({ ...formState, updatedEmail: true, updatedPassword: true });
       return;
     }
     login();
