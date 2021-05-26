@@ -21,7 +21,11 @@ const ApplicationContainer: React.FC = () => {
       lastname: lastname
     });
 
-  const [logoutBackend] = useMutation(LOGOUT_MUTATION);
+  const [logoutBackend, { client }] = useMutation(LOGOUT_MUTATION, {
+    onCompleted: () => {
+      client.clearStore();
+    }
+  });
 
   const logout = () => {
     logoutBackend();
