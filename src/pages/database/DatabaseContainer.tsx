@@ -89,15 +89,11 @@ const DatabaseContainer: React.FC = () => {
   }
 
   const DatabaseProps: DatabaseProps = {
-    notes: data.getAllNotesInDatabase
+    notes: data.getAllNotesInDatabase,
+    createNoteHandler: createNote
   };
 
-  return (
-    <>
-      <button onClick={() => createNote()}>New Note</button>
-      <Database {...DatabaseProps} />
-    </>
-  );
+  return <Database {...DatabaseProps} />;
 };
 
 export default DatabaseContainer;

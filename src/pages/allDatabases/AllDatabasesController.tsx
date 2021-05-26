@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 
 import Loader from '../../components/loader/Loader';
@@ -13,6 +13,21 @@ export type Database = {
 };
 
 const AllDatabasesController: React.FC = () => {
+  // TODO: Add error handling
+  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION, {
+    update: (cache, { data: { createDatabase } }) => {
+      // TODO: Handle typing
+      const data: any = cache.readQuery({
+        query: GET_ALL_USER_DATABASES_QUERY
+      });
+
+      cache.writeQuery({
+        query: GET_ALL_USER_DATABASES_QUERY,
+        data: { getAllUserDatabases: [...data.getAllUserDatabases, createDatabase] }
+      });
+    }
+  });
+
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
   if (queryLoading) {
@@ -24,12 +39,12 @@ const AllDatabasesController: React.FC = () => {
   }
 
   const allDatabasesProps: AllDatabasesProps = {
-    databases: data.getAllUserDatabases
+    databases: data.getAllUserDatabases,
+    createDatabaseHandler: createDatabase
   };
 
   return (
     <>
-      <div>This is the all databases page</div>
       <AllDatabases {...allDatabasesProps} />
     </>
   );
@@ -39,6 +54,17 @@ const AllDatabasesController: React.FC = () => {
 export const GET_ALL_USER_DATABASES_QUERY = gql`
   {
     getAllUserDatabases {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
+
+export const CREATE_DATABASE_MUTATION = gql`
+  mutation {
+    createDatabase {
       id
       title
       currentView

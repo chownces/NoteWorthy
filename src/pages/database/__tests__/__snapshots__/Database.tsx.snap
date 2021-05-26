@@ -2,9 +2,6 @@
 
 exports[`Gets all notes successfully and renders them correctly 1`] = `
 <div>
-  <button>
-    New Note
-  </button>
   <div>
     <a
       href="/note/60adcd6e38a95f0f75f1c089"
@@ -39,6 +36,9 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
       </div>
     </a>
   </div>
+  <button>
+    New Note
+  </button>
 </div>
 `;
 
