@@ -3,6 +3,7 @@ import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import { setEol, toggleBold } from '../../utils/helpers';
+import useMergedRef from '../../utils/useMergedRef';
 
 export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
@@ -21,6 +22,7 @@ export type NoteBlockHandlerProps = {
 
 type OwnProps = {
   innerRef: (element?: HTMLElement | null | undefined) => any;
+  lastBlockRef?: React.RefObject<HTMLElement>;
   provided: DraggableProvided;
   isEditMode: boolean;
 };
@@ -108,6 +110,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     }
   };
 
+  const mergedRef = useMergedRef(noteBlockRef, props.lastBlockRef);
+
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
@@ -127,7 +131,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       <div className="noteblock-handle"></div>
       <ContentEditable
         className="noteblock-text"
-        innerRef={noteBlockRef}
+        innerRef={mergedRef}
         html={props.html}
         tagName={props.tag}
         onChange={onChangeHandler}

@@ -129,6 +129,29 @@ const NotePage: React.FC<NotePageProps> = props => {
   };
 
   /**
+   * This ref is passed to the last ContextEditable block in order to focus the newly appended block
+   * in the appendBlockHandler callback.
+   */
+  const lastBlockRef = React.useRef<HTMLElement>(null);
+
+  const appendBlockHandler = (): void => {
+    if (isEditMode) {
+      setIsEditMode(false);
+      return;
+    }
+    const newBlock: NoteBlockStateProps = {
+      id: uniqueId(), // TODO: Consider using the id provided by MongoDB
+      html: '',
+      tag: 'p' // TODO: Reconsider default block tag
+    };
+    const blocksCopy = [...blocksRef.current];
+    blocksCopy.push(newBlock);
+
+    setIsEditMode(true);
+    setBlocksAndSetUnsaved(blocksCopy, () => lastBlockRef.current?.focus());
+  };
+
+  /**
    * Handler passed into react-beautiful-dnd to update `blocks` when a drag event occurs.
    */
   const onDragEndHandler = (result: DropResult) => {
@@ -161,29 +184,33 @@ const NotePage: React.FC<NotePageProps> = props => {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEndHandler}>
-      <Droppable droppableId="note-blocks">
-        {provided => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
-            {blocks.map((block, index) => (
-              <Draggable draggableId={block.id} index={index} key={block.id}>
-                {provided => (
-                  <NoteBlock
-                    {...block}
-                    {...noteBlockHandlerProps}
-                    key={block.id}
-                    isEditMode={isEditMode}
-                    innerRef={provided.innerRef}
-                    provided={provided}
-                  />
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <div className="Notepage">
+      <DragDropContext onDragEnd={onDragEndHandler}>
+        <Droppable droppableId="note-blocks">
+          {provided => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {blocks.map((block, index) => (
+                <Draggable draggableId={block.id} index={index} key={block.id}>
+                  {provided => (
+                    <NoteBlock
+                      {...block}
+                      {...noteBlockHandlerProps}
+                      key={block.id}
+                      isEditMode={isEditMode}
+                      innerRef={provided.innerRef}
+                      lastBlockRef={index === blocks.length - 1 ? lastBlockRef : undefined}
+                      provided={provided}
+                    />
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <div className="placeholder" onClick={appendBlockHandler} />
+    </div>
   );
 };
 

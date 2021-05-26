@@ -23,9 +23,9 @@ const Application: React.FC<ApplicationProps> = props => {
   ];
 
   return (
-    <>
+    <div className="Application">
       <NavigationBar />
-      <Container>
+      <Container className="content">
         <Switch>
           {nonAuthPaths}
           {user.user.loggedIn ? (
@@ -43,7 +43,7 @@ const Application: React.FC<ApplicationProps> = props => {
           )}
         </Switch>
       </Container>
-    </>
+    </div>
   );
 };
 

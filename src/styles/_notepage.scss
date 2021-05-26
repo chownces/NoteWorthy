@@ -1,0 +1,12 @@
+.Notepage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .placeholder {
+    flex: 1;
+  }
+  .placeholder:hover {
+    cursor: pointer;
+  }
+}

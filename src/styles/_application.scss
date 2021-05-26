@@ -1,0 +1,13 @@
+#root {
+  height: 100%;
+}
+
+.Application {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    flex: 1;
+  }
+}

@@ -14,19 +14,19 @@ test('Gets all notes successfully and renders them correctly', async () => {
   const mocks = [
     {
       request: {
-        query: GET_ALL_NOTES_IN_DATABASE_QUERY,
+        query: GET_ALL_NOTES_IN_DATABASE_QUERY
       },
-      variables: { id: "60adcd3538a95f0f75f1c087" },
+      variables: { id: '60adcd3538a95f0f75f1c087' },
       result: {
         data: {
           getAllNotesInDatabase: [
             {
-              userId: "60adcd0138a95f0f75f1c085",
-              databaseId: "60adcd3538a95f0f75f1c087",
-              id: "60adcd6e38a95f0f75f1c089",
-              title: "My first note",
-              creationDate: "2021-05-26T04:21:57.091Z",
-              latestUpdate: "2021-05-26T08:09:57.274Z",
+              userId: '60adcd0138a95f0f75f1c085',
+              databaseId: '60adcd3538a95f0f75f1c087',
+              id: '60adcd6e38a95f0f75f1c089',
+              title: 'My first note',
+              creationDate: '2021-05-26T04:21:57.091Z',
+              latestUpdate: '2021-05-26T08:09:57.274Z'
             },
             {
               userId: '6098bbdc04c0fa63070bfe4e',
@@ -62,7 +62,7 @@ test('Renders loading state correctly', async () => {
       request: {
         query: GET_ALL_NOTES_IN_DATABASE_QUERY
       },
-      variables: { id: "60adcd3538a95f0f75f1c087" },
+      variables: { id: '60adcd3538a95f0f75f1c087' },
       result: {
         data: {
           getAllNotesInDatabase: [
@@ -106,7 +106,7 @@ test('Handles network error correctly ', async () => {
       request: {
         query: GET_ALL_NOTES_IN_DATABASE_QUERY
       },
-      variables: { id: "60adcd3538a95f0f75f1c087" },
+      variables: { id: '60adcd3538a95f0f75f1c087' },
       error: new Error('An error occurred')
     }
   ];
