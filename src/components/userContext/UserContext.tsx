@@ -1,6 +1,19 @@
 import React from 'react';
 
-const userContext = React.createContext({
+export type User = {
+  loggedIn: boolean;
+  email: string;
+  firstname: string;
+  lastname: string;
+};
+
+type UserContext = {
+  user: User;
+  login: (email: string, firstname: string, lastname: string) => void;
+  logout: () => void;
+};
+
+const userContext = React.createContext<UserContext>({
   user: {
     loggedIn: false,
     email: '',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 
@@ -10,18 +10,20 @@ import NotFound from '../../pages/notFound/NotFound';
 import Poster from '../../pages/poster/Poster';
 import Register from '../../pages/register/Register';
 import NavigationBar from '../navigationBar/NavigationBar';
-import userContext from '../userContext/UserContext';
+import userContext, { User } from '../userContext/UserContext';
 
-type ApplicationProps = {};
+const Application: React.FC = () => {
+  const userCtx = React.useContext(userContext);
 
-const Application: React.FC<ApplicationProps> = props => {
-  const user = React.useContext(userContext);
-
-  // TODO: Consider disabling some of these paths when a user is logged in
   const nonAuthPaths = [
-    <Route path="/login" component={Login} key="login" />,
+    <Route path="/login" render={ifAuthRedirectToRoot(userCtx.user, <Login />)} key="login" />,
     <Route path="/contribute" component={NotFound} key="contribute" />,
-    <Route path="/register" component={Register} key="register" />
+    <Route
+      path="/register"
+      component={ifAuthRedirectToRoot(userCtx.user, <Register />)}
+      key="register"
+    />,
+    <Route path="/poster" component={Poster} key="poster" />
   ];
 
   return (
@@ -30,14 +32,11 @@ const Application: React.FC<ApplicationProps> = props => {
       <Container className="content">
         <Switch>
           {nonAuthPaths}
-          {user.user.loggedIn ? (
+          {userCtx.user.loggedIn ? (
             [
-              // TODO: Handle routing once backend is properly up
-              /* <Route exact path="/" component={AllNotesController} /> */
               <Route exact path="/" component={AllDatabasesController} key="root" />,
               <Route path="/database/:databaseId" component={DatabaseContainer} key="database" />,
               <Route path="/note/:noteId" component={NotePageController} key="note" />,
-              <Route path="/poster" component={Poster} key="poster" />,
               <Route component={NotFound} key="404" />
             ]
           ) : (
@@ -49,6 +48,15 @@ const Application: React.FC<ApplicationProps> = props => {
   );
 };
 
+const ifAuthRedirectToRoot = (user: User, elseRedirectTo: ReactElement) => {
+  if (user.loggedIn) {
+    return redirectToRoot;
+  } else {
+    return () => elseRedirectTo;
+  }
+};
+
 const redirectToLogin = () => <Redirect to="/login" />;
+const redirectToRoot = () => <Redirect to="/" />;
 
 export default Application;
