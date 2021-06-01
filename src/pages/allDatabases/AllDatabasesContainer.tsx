@@ -28,6 +28,30 @@ const AllDatabasesController: React.FC = () => {
     }
   });
 
+  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
+    update: (cache, { data: { deleteDatabase } }) => {
+      // TODO: Handle typing
+      const data: any = cache.readQuery({
+        query: GET_ALL_USER_DATABASES_QUERY
+      });
+
+      cache.writeQuery({
+        query: GET_ALL_USER_DATABASES_QUERY,
+        data: {
+          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id != deleteDatabase.id)
+        }
+      });
+    }
+  });
+
+  const deleteDatabaseHandler = (databaseId: string) => {
+    deleteDatabase({
+      variables: {
+        databaseId: databaseId
+      }
+    });
+  };
+
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
   if (queryLoading) {
@@ -40,7 +64,8 @@ const AllDatabasesController: React.FC = () => {
 
   const allDatabasesProps: AllDatabasesProps = {
     databases: data.getAllUserDatabases,
-    createDatabaseHandler: createDatabase
+    createDatabaseHandler: createDatabase,
+    deleteDatabaseHandler: deleteDatabaseHandler
   };
 
   return (
@@ -71,6 +96,17 @@ export const CREATE_DATABASE_MUTATION = gql`
       notes
     }
   }
+`;
+
+export const DELETE_DATABASE_MUTATION = gql`
+  mutation deleteDatabase($databaseId: ID!) {
+   deleteDatabase(databaseId: $databaseId) {
+      id
+      title
+      currentView
+      notes
+    }
+  } 
 `;
 
 export default AllDatabasesController;

@@ -100,7 +100,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
-      (ref.current?.parentElement?.nextElementSibling?.children[1] as HTMLElement).focus();
+      (ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
+        ?.children[1] as HTMLElement).focus();
     };
 
     setBlocksAndSetUnsaved(blocksCopy, focusNextBlockCallback);
@@ -113,7 +114,10 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
   ): void => {
-    const previousBlock = ref.current?.parentElement?.previousElementSibling
+    const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
+      ?.children[0]?.children[1] as HTMLElement;
+
+    const nextBlock = ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
       ?.children[1] as HTMLElement;
     if (previousBlock) {
       const blocksCopy = [...blocksRef.current];
@@ -125,9 +129,23 @@ const NotePage: React.FC<NotePageProps> = props => {
       };
 
       setBlocksAndSetUnsaved(blocksCopy, focusPreviousBlockEolCallback);
+    } else if (nextBlock) {
+      const blocksCopy = [...blocksRef.current];
+      const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+      blocksCopy.splice(index, 1);
+
+      const focusNextBlockEolCallback = () => {
+        setEol(nextBlock);
+      };
+
+      setBlocksAndSetUnsaved(blocksCopy, focusNextBlockEolCallback);
+    } else {
+      const blocksCopy = [...blocksRef.current];
+      const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+      blocksCopy.splice(index, 1);
+      setBlocksAndSetUnsaved(blocksCopy);
     }
   };
-
   /**
    * This ref is passed to the last ContextEditable block in order to focus the newly appended block
    * in the appendBlockHandler callback.

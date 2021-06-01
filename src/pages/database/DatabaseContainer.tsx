@@ -17,9 +17,34 @@ export type Note = {
 };
 
 // TODO: Recheck query return params
-export const GET_ALL_NOTES_IN_DATABASE_QUERY = gql`
-  query getAllNotesInDatabase($id: ID!) {
-    getAllNotesInDatabase(databaseId: $id) {
+export const GET_DATABASE_QUERY = gql`
+  query getDatabase($id: ID!) {
+    getDatabase(databaseId: $id) {
+    id
+    title
+    currentView
+    notes {
+      id
+      userId 
+      databaseId 
+      title
+      blocks {
+          id
+          html
+          tag
+        }
+      creationDate
+      latestUpdate
+      }
+    }
+  }
+`;
+
+// TODO: Add a new block button in NotePage
+// TODO: Recheck query return params
+export const CREATE_NOTE_MUTATION = gql`
+  mutation createNote($id: ID!) {
+    createNote(databaseId: $id) {
       userId
       databaseId
       id
@@ -30,11 +55,9 @@ export const GET_ALL_NOTES_IN_DATABASE_QUERY = gql`
   }
 `;
 
-// TODO: Add a new block button in NotePage
-// TODO: Recheck query return params
-export const CREATE_NOTE_MUTATION = gql`
-  mutation createNote($id: ID!) {
-    createNote(databaseId: $id) {
+export const DELETE_NOTE_MUTATION = gql`
+  mutation deleteNote($noteId: ID!) {
+    deleteNote(noteId: $noteId) {
       userId
       databaseId
       id
@@ -55,18 +78,18 @@ const DatabaseContainer: React.FC = () => {
     update: (cache, { data: { createNote } }) => {
       // TODO: Handle typing
       const data: any = cache.readQuery({
-        query: GET_ALL_NOTES_IN_DATABASE_QUERY,
+        query: GET_DATABASE_QUERY,
         variables: {
           id: DATABASE_ID
         }
       });
 
       cache.writeQuery({
-        query: GET_ALL_NOTES_IN_DATABASE_QUERY,
+        query: GET_DATABASE_QUERY,
         variables: {
           id: DATABASE_ID
         },
-        data: { getAllNotesInDatabase: [...data.getAllNotesInDatabase, createNote] }
+        data: { getDatabase: [...data.getDatabase.notes, createNote] }
       });
     },
     variables: {
@@ -74,11 +97,40 @@ const DatabaseContainer: React.FC = () => {
     }
   });
 
+  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
+    update: (cache, {data: {deleteNote}}) => {
+      const data: any = cache.readQuery({
+        query: GET_DATABASE_QUERY,
+        variables: {
+          id: DATABASE_ID
+        },
+      });
+      
+      cache.writeQuery({
+        query: GET_DATABASE_QUERY,
+        variables: {
+          id: DATABASE_ID
+        },
+        data: { 
+          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId != deleteNote.id) 
+        }
+      });
+    }
+  });
+
+  const deleteNoteHandler = (noteId: string) => {
+    deleteNote({
+      variables: {
+        noteId: noteId
+      }
+    });
+  };
+
   const {
     loading: queryLoading,
     error: queryError,
     data
-  } = useQuery(GET_ALL_NOTES_IN_DATABASE_QUERY, { variables: { id: DATABASE_ID } });
+  } = useQuery(GET_DATABASE_QUERY, { variables: { id: DATABASE_ID } });
 
   if (queryLoading) {
     return <Loader />;
@@ -89,8 +141,9 @@ const DatabaseContainer: React.FC = () => {
   }
 
   const DatabaseProps: DatabaseProps = {
-    notes: data.getAllNotesInDatabase,
-    createNoteHandler: createNote
+    notes: data.getDatabase.notes,
+    createNoteHandler: createNote,
+    deleteNoteHandler: deleteNoteHandler
   };
 
   return <Database {...DatabaseProps} />;
