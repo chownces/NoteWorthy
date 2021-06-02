@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import { Icon, Menu } from 'semantic-ui-react';
 
 import { Database } from './AllDatabasesContainer';
+import RenameDatabasePopup from './RenameDatabasePopup';
 
 export type AllDatabasesProps = {
   databases: Database[];
   createDatabaseHandler: () => void;
   deleteDatabaseHandler: (databaseId: string) => void;
+  updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
+};
+
+export type RenameDatabaseProps = {
+  database: Database;
+  updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
 };
 
 const AllDatabases: React.FC<AllDatabasesProps> = props => {
@@ -18,7 +25,7 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
       <div>This is the all databases page</div>
       <div>
         {props.databases.map((database: Database, index: number) => (
-          <ContextMenuTrigger id={database.id}>
+          <ContextMenuTrigger id={database.id} holdToDisplay={1000}>
             <Link to={`/database/${database.id}`} key={index}>
               <div className="database-note">
                 <p>{database.title}</p>
@@ -35,6 +42,12 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
                     <Icon name="add" />
                     Add Database
                   </Menu.Item>
+                  <RenameDatabasePopup
+                    {...{
+                      database: database,
+                      updateDatabaseTitleHandler: props.updateDatabaseTitleHandler
+                    }}
+                  />
                 </MenuItem>
               </Menu>
             </ContextMenu>

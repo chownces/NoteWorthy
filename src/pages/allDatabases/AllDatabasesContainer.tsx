@@ -38,7 +38,7 @@ const AllDatabasesController: React.FC = () => {
       cache.writeQuery({
         query: GET_ALL_USER_DATABASES_QUERY,
         data: {
-          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id != deleteDatabase.id)
+          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id !== deleteDatabase.id)
         }
       });
     }
@@ -48,6 +48,17 @@ const AllDatabasesController: React.FC = () => {
     deleteDatabase({
       variables: {
         databaseId: databaseId
+      }
+    });
+  };
+
+  const [updateDatabaseTitle] = useMutation(UPDATE_DATABASE_TITLE_MUTATION);
+
+  const updateDatabaseTitleHandler = (databaseId: string, title: string) => {
+    updateDatabaseTitle({
+      variables: {
+        databaseId: databaseId,
+        title: title
       }
     });
   };
@@ -65,7 +76,8 @@ const AllDatabasesController: React.FC = () => {
   const allDatabasesProps: AllDatabasesProps = {
     databases: data.getAllUserDatabases,
     createDatabaseHandler: createDatabase,
-    deleteDatabaseHandler: deleteDatabaseHandler
+    deleteDatabaseHandler: deleteDatabaseHandler,
+    updateDatabaseTitleHandler: updateDatabaseTitleHandler
   };
 
   return (
@@ -100,13 +112,21 @@ export const CREATE_DATABASE_MUTATION = gql`
 
 export const DELETE_DATABASE_MUTATION = gql`
   mutation deleteDatabase($databaseId: ID!) {
-   deleteDatabase(databaseId: $databaseId) {
+    deleteDatabase(databaseId: $databaseId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_DATABASE_TITLE_MUTATION = gql`
+  mutation updateDatabaseTitle($databaseId: ID!, $title: String!) {
+    updateDatabaseTitle(databaseId: $databaseId, title: $title) {
       id
       title
       currentView
       notes
     }
-  } 
+  }
 `;
 
 export default AllDatabasesController;

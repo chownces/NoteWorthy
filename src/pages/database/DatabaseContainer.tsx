@@ -7,11 +7,22 @@ import Database, { DatabaseProps } from './Database';
 
 // TODO: Clean up the various type exports...
 // `blocks` is excluded here as we do not need it when displaying Database for now.
+export type Id = string;
+export type Title = string;
+export type CurrentView = string;
+
 export type Note = {
   userId: string;
   databaseId: string;
   id: string;
   title: string;
+  blocks: [
+    {
+      id: string;
+      html: string;
+      tag: string;
+    }
+  ];
   creationDate: string;
   latestUpdate: string;
 };
@@ -20,21 +31,21 @@ export type Note = {
 export const GET_DATABASE_QUERY = gql`
   query getDatabase($id: ID!) {
     getDatabase(databaseId: $id) {
-    id
-    title
-    currentView
-    notes {
       id
-      userId 
-      databaseId 
       title
-      blocks {
+      currentView
+      notes {
+        id
+        userId
+        databaseId
+        title
+        blocks {
           id
           html
           tag
         }
-      creationDate
-      latestUpdate
+        creationDate
+        latestUpdate
       }
     }
   }
@@ -58,6 +69,14 @@ export const CREATE_NOTE_MUTATION = gql`
 export const DELETE_NOTE_MUTATION = gql`
   mutation deleteNote($noteId: ID!) {
     deleteNote(noteId: $noteId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_NOTE_TITLE_MUTATION = gql`
+  mutation updateNoteTitle($noteId: ID!, $title: String!) {
+    updateNoteTitle(noteId: $noteId, title: $title) {
       userId
       databaseId
       id
@@ -98,21 +117,21 @@ const DatabaseContainer: React.FC = () => {
   });
 
   const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
-    update: (cache, {data: {deleteNote}}) => {
+    update: (cache, { data: { deleteNote } }) => {
       const data: any = cache.readQuery({
         query: GET_DATABASE_QUERY,
         variables: {
           id: DATABASE_ID
-        },
+        }
       });
-      
+
       cache.writeQuery({
         query: GET_DATABASE_QUERY,
         variables: {
           id: DATABASE_ID
         },
-        data: { 
-          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId != deleteNote.id) 
+        data: {
+          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId !== deleteNote.id)
         }
       });
     }
@@ -126,11 +145,20 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const {
-    loading: queryLoading,
-    error: queryError,
-    data
-  } = useQuery(GET_DATABASE_QUERY, { variables: { id: DATABASE_ID } });
+  const [updateNoteTitle] = useMutation(UPDATE_NOTE_TITLE_MUTATION);
+
+  const updateNoteTitleHandler = (noteId: string, title: string) => {
+    updateNoteTitle({
+      variables: {
+        noteId: noteId,
+        title: title
+      }
+    });
+  };
+
+  const { loading: queryLoading, error: queryError, data } = useQuery(GET_DATABASE_QUERY, {
+    variables: { id: DATABASE_ID }
+  });
 
   if (queryLoading) {
     return <Loader />;
@@ -141,9 +169,13 @@ const DatabaseContainer: React.FC = () => {
   }
 
   const DatabaseProps: DatabaseProps = {
+    id: data.getDatabase.id,
+    title: data.getDatabase.title,
+    currentView: data.getDatabase.currentView,
     notes: data.getDatabase.notes,
     createNoteHandler: createNote,
-    deleteNoteHandler: deleteNoteHandler
+    deleteNoteHandler: deleteNoteHandler,
+    updateNoteTitleHandler: updateNoteTitleHandler
   };
 
   return <Database {...DatabaseProps} />;

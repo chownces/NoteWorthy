@@ -124,7 +124,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
      * NotePage::deleteBlockHandler
      * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
      */
-    <ContextMenuTrigger id={props.id}>
+    <ContextMenuTrigger id={props.id} holdToDisplay={1000}>
       <div
         className="noteblock"
         ref={props.innerRef}

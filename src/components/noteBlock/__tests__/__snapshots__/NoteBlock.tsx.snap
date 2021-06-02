@@ -1,8 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NoteBlock renders correctly with <p> tag 1`] = `
-"<div className=\\"noteblock\\" data-rbd-draggable-context-id=\\"\\" data-rbd-draggable-id=\\"\\">
-  <div className=\\"noteblock-handle\\" />
-  <ContentEditable className=\\"noteblock-text\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />
-</div>"
+"<ContextMenuTrigger id=\\"1\\" attributes={{...}} collect={[Function: collect]} disable={false} holdToDisplay={1000} renderTag=\\"div\\" posX={0} posY={0} mouseButton={2} disableIfShiftIsPressed={false}>
+  <div className=\\"noteblock\\" data-rbd-draggable-context-id=\\"\\" data-rbd-draggable-id=\\"\\">
+    <div className=\\"noteblock-handle\\" />
+    <ContentEditable className=\\"noteblock-text\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />
+    <ContextMenu id=\\"1\\" className=\\"\\" data={{...}} hideOnLeave={false} rtl={false} onHide={[Function: onHide]} onMouseLeave={[Function: onMouseLeave]} onShow={[Function: onShow]} preventHideOnContextMenu={false} preventHideOnResize={false} preventHideOnScroll={false} style={{...}}>
+      <Menu vertical={true}>
+        <MenuItem onClick={[Function: onClick]} attributes={{...}} className=\\"\\" data={{...}} disabled={false} divider={false} onMouseMove={[Function: onMouseMove]} onMouseLeave={[Function: onMouseLeave]} preventClose={false} selected={false}>
+          <MenuItem onClick={[Function: onClick]}>
+            <Icon name=\\"trash alternate\\" as=\\"i\\" />
+            Delete Block
+          </MenuItem>
+          <MenuItem onClick={[Function: onClick]}>
+            <Icon name=\\"add\\" as=\\"i\\" />
+            Add Block
+          </MenuItem>
+        </MenuItem>
+      </Menu>
+    </ContextMenu>
+  </div>
+</ContextMenuTrigger>"
 `;

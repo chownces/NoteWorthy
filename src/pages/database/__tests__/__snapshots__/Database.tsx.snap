@@ -3,38 +3,118 @@
 exports[`Gets all notes successfully and renders them correctly 1`] = `
 <div>
   <div>
-    <a
-      href="/note/60adcd6e38a95f0f75f1c089"
+    <div
+      class="react-contextmenu-wrapper"
     >
-      <div
-        class="database-note"
+      <a
+        href="/note/60adcd6e38a95f0f75f1c089"
       >
-        <p>
-          Title: 
-          My first note
-        </p>
-        <p>
-          Latest Update: 
-          2021-05-26T08:09:57.274Z
-        </p>
-      </div>
-    </a>
-    <a
-      href="/note/6098bbdc04c0fa63070bfe5e"
+        <div
+          class="database-note"
+        >
+          <p>
+            Title: 
+            My first note
+          </p>
+          <p>
+            Latest Update: 
+            2021-05-26T08:09:57.274Z
+          </p>
+        </div>
+      </a>
+      <nav
+        class="react-contextmenu"
+        role="menu"
+        style="position: fixed; opacity: 0; pointer-events: none;"
+        tabindex="-1"
+      >
+        <div
+          class="ui vertical menu"
+        >
+          <div
+            aria-disabled="false"
+            class="react-contextmenu-item"
+            role="menuitem"
+            tabindex="-1"
+          >
+            <a
+              class="item"
+            >
+              <i
+                aria-hidden="true"
+                class="trash alternate icon"
+              />
+              Delete Note
+            </a>
+            <a
+              class="item"
+            >
+              <i
+                aria-hidden="true"
+                class="add icon"
+              />
+              Add Note
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div
+      class="react-contextmenu-wrapper"
     >
-      <div
-        class="database-note"
+      <a
+        href="/note/6098bbdc04c0fa63070bfe5e"
       >
-        <p>
-          Title: 
-          untitled
-        </p>
-        <p>
-          Latest Update: 
-          2021-05-26T08:09:57.274Z
-        </p>
-      </div>
-    </a>
+        <div
+          class="database-note"
+        >
+          <p>
+            Title: 
+            untitled
+          </p>
+          <p>
+            Latest Update: 
+            2021-05-26T08:09:57.274Z
+          </p>
+        </div>
+      </a>
+      <nav
+        class="react-contextmenu"
+        role="menu"
+        style="position: fixed; opacity: 0; pointer-events: none;"
+        tabindex="-1"
+      >
+        <div
+          class="ui vertical menu"
+        >
+          <div
+            aria-disabled="false"
+            class="react-contextmenu-item"
+            role="menuitem"
+            tabindex="-1"
+          >
+            <a
+              class="item"
+            >
+              <i
+                aria-hidden="true"
+                class="trash alternate icon"
+              />
+              Delete Note
+            </a>
+            <a
+              class="item"
+            >
+              <i
+                aria-hidden="true"
+                class="add icon"
+              />
+              Add Note
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
   </div>
   <button>
     New Note
