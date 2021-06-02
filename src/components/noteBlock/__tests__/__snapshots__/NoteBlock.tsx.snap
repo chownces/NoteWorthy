@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NoteBlock renders correctly with <p> tag 1`] = `
-"<ContextMenuTrigger id=\\"1\\" attributes={{...}} collect={[Function: collect]} disable={false} holdToDisplay={1000} renderTag=\\"div\\" posX={0} posY={0} mouseButton={2} disableIfShiftIsPressed={false}>
+"<ContextMenuTrigger id=\\"1\\" holdToDisplay={1000} attributes={{...}} collect={[Function: collect]} disable={false} renderTag=\\"div\\" posX={0} posY={0} mouseButton={2} disableIfShiftIsPressed={false}>
   <div className=\\"noteblock\\" data-rbd-draggable-context-id=\\"\\" data-rbd-draggable-id=\\"\\">
     <div className=\\"noteblock-handle\\" />
     <ContentEditable className=\\"noteblock-text\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />

@@ -55,6 +55,11 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
               />
               Add Note
             </a>
+            <a
+              class="item"
+            >
+              Rename Note 
+            </a>
           </div>
         </div>
       </nav>
@@ -110,6 +115,11 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
                 class="add icon"
               />
               Add Note
+            </a>
+            <a
+              class="item"
+            >
+              Rename Note 
             </a>
           </div>
         </div>
