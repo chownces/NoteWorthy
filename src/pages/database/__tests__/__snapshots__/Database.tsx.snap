@@ -2,6 +2,12 @@
 
 exports[`Gets all notes successfully and renders them correctly 1`] = `
 <div>
+  <button>
+    go to board view
+  </button>
+  <button>
+    Create Note
+  </button>
   <div>
     <div
       class="react-contextmenu-wrapper"
@@ -18,24 +24,23 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
           </p>
           <p>
             Latest Update: 
-            2021-05-26T08:09:57.274Z
           </p>
         </div>
       </a>
       <nav
-        class="react-contextmenu"
+        class="react-contextmenu context-menu"
         role="menu"
         style="position: fixed; opacity: 0; pointer-events: none;"
         tabindex="-1"
       >
         <div
-          class="ui vertical menu"
+          aria-disabled="false"
+          class="react-contextmenu-item"
+          role="menuitem"
+          tabindex="-1"
         >
           <div
-            aria-disabled="false"
-            class="react-contextmenu-item"
-            role="menuitem"
-            tabindex="-1"
+            class="ui vertical menu"
           >
             <a
               class="item"
@@ -44,7 +49,8 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
                 aria-hidden="true"
                 class="trash alternate icon"
               />
-              Delete Note
+              Delete 
+               Note
             </a>
             <a
               class="item"
@@ -53,12 +59,15 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
                 aria-hidden="true"
                 class="add icon"
               />
-              Add Note
+              Add 
+               Note
             </a>
             <a
               class="item"
             >
-              Rename Note 
+              Rename 
+               Note
+               
             </a>
           </div>
         </div>
@@ -79,24 +88,23 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
           </p>
           <p>
             Latest Update: 
-            2021-05-26T08:09:57.274Z
           </p>
         </div>
       </a>
       <nav
-        class="react-contextmenu"
+        class="react-contextmenu context-menu"
         role="menu"
         style="position: fixed; opacity: 0; pointer-events: none;"
         tabindex="-1"
       >
         <div
-          class="ui vertical menu"
+          aria-disabled="false"
+          class="react-contextmenu-item"
+          role="menuitem"
+          tabindex="-1"
         >
           <div
-            aria-disabled="false"
-            class="react-contextmenu-item"
-            role="menuitem"
-            tabindex="-1"
+            class="ui vertical menu"
           >
             <a
               class="item"
@@ -105,7 +113,8 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
                 aria-hidden="true"
                 class="trash alternate icon"
               />
-              Delete Note
+              Delete 
+               Note
             </a>
             <a
               class="item"
@@ -114,21 +123,21 @@ exports[`Gets all notes successfully and renders them correctly 1`] = `
                 aria-hidden="true"
                 class="add icon"
               />
-              Add Note
+              Add 
+               Note
             </a>
             <a
               class="item"
             >
-              Rename Note 
+              Rename 
+               Note
+               
             </a>
           </div>
         </div>
       </nav>
     </div>
   </div>
-  <button>
-    New Note
-  </button>
 </div>
 `;
 

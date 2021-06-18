@@ -144,6 +144,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
       blocksCopy.splice(index, 1);
       setBlocksAndSetUnsaved(blocksCopy);
+      setIsEditMode(false);
     }
   };
   /**
