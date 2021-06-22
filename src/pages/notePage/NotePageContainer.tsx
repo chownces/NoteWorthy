@@ -6,7 +6,7 @@ import Loader from '../../components/loader/Loader';
 import { NoteBlockStateProps } from '../../components/noteBlock/NoteBlock';
 import NotePage, { NotePageProps } from './NotePage';
 
-const NotePageController: React.FC = () => {
+const NotePageContainer: React.FC = () => {
   // Get note id of the note to render via react-router-dom URL params
   const NOTE_ID = useParams<{ noteId: string }>().noteId;
 
@@ -95,4 +95,4 @@ const UPDATE_NOTE_BLOCKS_MUTATION = gql`
   }
 `;
 
-export default NotePageController;
+export default NotePageContainer;

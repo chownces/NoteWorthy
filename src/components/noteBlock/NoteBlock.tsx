@@ -1,11 +1,11 @@
 import React from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu';
-import { Icon, Menu } from 'semantic-ui-react';
+import { ContextMenuTrigger } from 'react-contextmenu';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
+import ContextMenuElement from '../contextMenu/ContextMenuElement';
 
 export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
@@ -111,8 +111,17 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // TODO: Handle case where user presses arrow up to navigate within a content block itself
     }
   };
-
   const mergedRef = useMergedRef(noteBlockRef, props.lastBlockRef);
+
+  const contextMenuProps = {
+    context: 'Block',
+    renaming: false,
+    currentName: '',
+    id: props.id,
+    createHandler: () => props.addBlock(props, noteBlockRef),
+    deleteHandler: () => props.deleteBlock(props, noteBlockRef),
+    updateNameHandler: () => {}
+  };
 
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
@@ -132,7 +141,6 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         {...props.provided.draggableProps} // react-beautiful-dnd props
       >
         <div className="noteblock-handle"></div>
-
         <ContentEditable
           className="noteblock-text"
           innerRef={mergedRef}
@@ -149,21 +157,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
             });
           }}
         />
-
-        <ContextMenu id={props.id}>
-          <Menu vertical>
-            <MenuItem onClick={() => {}}>
-              <Menu.Item onClick={() => props.deleteBlock(props, noteBlockRef)}>
-                <Icon name="trash alternate" />
-                Delete Block
-              </Menu.Item>
-              <Menu.Item onClick={() => props.addBlock(props, noteBlockRef)}>
-                <Icon name="add" />
-                Add Block
-              </Menu.Item>
-            </MenuItem>
-          </Menu>
-        </ContextMenu>
+        <ContextMenuElement {...contextMenuProps} />
       </div>
     </ContextMenuTrigger>
   );

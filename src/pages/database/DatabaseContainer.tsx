@@ -3,18 +3,24 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
-import Database, { DatabaseProps } from './Database';
+import BoardDatabase, { Database, DatabaseProps } from './BoardDatabase';
+import TableDatabase from './TableDatabase';
 
 // TODO: Clean up the various type exports...
 // `blocks` is excluded here as we do not need it when displaying Database for now.
-export type Id = string;
-export type Title = string;
-export type CurrentView = string;
+
+export type Category = {
+  id: string;
+  name: string;
+  notes: string[];
+  databaseId: string;
+};
 
 export type Note = {
   userId: string;
   databaseId: string;
   id: string;
+  categoryId: string;
   title: string;
   blocks: [
     {
@@ -34,18 +40,23 @@ export const GET_DATABASE_QUERY = gql`
       id
       title
       currentView
+      categories {
+        id
+        notes
+        name
+        databaseId
+      }
       notes {
         id
         userId
         databaseId
+        categoryId
         title
         blocks {
           id
           html
           tag
         }
-        creationDate
-        latestUpdate
       }
     }
   }
@@ -54,8 +65,8 @@ export const GET_DATABASE_QUERY = gql`
 // TODO: Add a new block button in NotePage
 // TODO: Recheck query return params
 export const CREATE_NOTE_MUTATION = gql`
-  mutation createNote($id: ID!) {
-    createNote(databaseId: $id) {
+  mutation createNote($id: ID!, $categoryId: ID!, $title: String!, $index: Int!) {
+    createNote(databaseId: $id, categoryId: $categoryId, title: $title, index: $index) {
       userId
       databaseId
       id
@@ -69,7 +80,49 @@ export const CREATE_NOTE_MUTATION = gql`
 export const DELETE_NOTE_MUTATION = gql`
   mutation deleteNote($noteId: ID!) {
     deleteNote(noteId: $noteId) {
+      userId
+      databaseId
       id
+      title
+      creationDate
+      id
+    }
+  }
+`;
+
+export const CREATE_DATABASE_CATEGORY_MUTATION = gql`
+  mutation createDatabaseCategory($databaseId: ID!, $categoryName: String!, $index: Int!) {
+    createDatabaseCategory(databaseId: $databaseId, categoryName: $categoryName, index: $index) {
+      id
+      categories
+    }
+  }
+`;
+
+export const DELETE_DATABASE_CATEGORY_MUTATION = gql`
+  mutation deleteDatabaseCategory($databaseId: ID!, $categoryId: ID!) {
+    deleteDatabaseCategory(databaseId: $databaseId, categoryId: $categoryId) {
+      id
+      categories
+    }
+  }
+`;
+
+export const UPDATE_DATABASE_VIEW_MUTATION = gql`
+  mutation updateDatabaseView($databaseId: ID!, $view: String!) {
+    updateDatabaseView(databaseId: $databaseId, view: $view) {
+      id
+      currentView
+    }
+  }
+`;
+
+export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
+  mutation updateNoteCategory($noteId: ID!, $categoryId: ID!, $index: Int!) {
+    updateNoteCategory(noteId: $noteId, categoryId: $categoryId, index: $index) {
+      id
+      notes
+      categories
     }
   }
 `;
@@ -88,9 +141,9 @@ export const UPDATE_NOTE_TITLE_MUTATION = gql`
 `;
 
 const DatabaseContainer: React.FC = () => {
-  // TODO: Handle repositioning of Note 'blocks' in AllNotes page
+  // TODO: Handle repositioning of Propsteks' in AllNotePropspage
 
-  const DATABASE_ID = useParams<{ databaseId: string }>().databaseId;
+  const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
@@ -110,11 +163,19 @@ const DatabaseContainer: React.FC = () => {
         },
         data: { getDatabase: [...data.getDatabase.notes, createNote] }
       });
-    },
-    variables: {
-      id: DATABASE_ID
     }
   });
+
+  const createNoteHandler = (categoryId: string, title: string, index: number) => {
+    createNote({
+      variables: {
+        id: DATABASE_ID,
+        categoryId: categoryId,
+        title: title,
+        index: index
+      }
+    });
+  };
 
   const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
     update: (cache, { data: { deleteNote } }) => {
@@ -145,6 +206,80 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
+  const [deleteDatabaseCategory] = useMutation(DELETE_DATABASE_CATEGORY_MUTATION, {
+    update: (cache, { data: { deleteDatabaseCategory } }) => {
+      cache.writeQuery({
+        query: GET_DATABASE_QUERY,
+        variables: {
+          id: DATABASE_ID
+        },
+        data: {
+          getDatabase: deleteDatabaseCategory
+        }
+      });
+    }
+  });
+
+  const deleteDatabaseCategoryHandler = (databaseId: string, categoryId: string) => {
+    deleteDatabaseCategory({
+      variables: {
+        databaseId: databaseId,
+        categoryId: categoryId
+      }
+    });
+  };
+
+  const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION, {
+    update: (cache, { data: { createDatabaseCategory } }) => {
+      cache.writeQuery({
+        query: GET_DATABASE_QUERY,
+        variables: {
+          id: DATABASE_ID
+        },
+        data: {
+          getDatabase: createDatabaseCategory
+        }
+      });
+    }
+  });
+
+  const createDatabaseCategoryHandler = (
+    databaseId: string,
+    categoryName: string,
+    index: number
+  ) => {
+    createDatabaseCategory({
+      variables: {
+        databaseId: databaseId,
+        categoryName: categoryName,
+        index: index
+      }
+    });
+  };
+
+  const [updateDatabaseView] = useMutation(UPDATE_DATABASE_VIEW_MUTATION, {
+    update: (cache, { data: { updateDatabaseView } }) => {
+      cache.writeQuery({
+        query: GET_DATABASE_QUERY,
+        variables: {
+          id: DATABASE_ID
+        },
+        data: {
+          getDatabase: updateDatabaseView.currentView
+        }
+      });
+    }
+  });
+
+  const updateDatabaseViewHandler = (databaseId: string, view: string) => {
+    updateDatabaseView({
+      variables: {
+        databaseId: databaseId,
+        view: view
+      }
+    });
+  };
+
   const [updateNoteTitle] = useMutation(UPDATE_NOTE_TITLE_MUTATION);
 
   const updateNoteTitleHandler = (noteId: string, title: string) => {
@@ -152,6 +287,39 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         noteId: noteId,
         title: title
+      }
+    });
+  };
+
+  const [updateNoteCategory] = useMutation(UPDATE_NOTE_CATEGORY_MUTATION);
+
+  const updateNoteCategoryHandler = (
+    noteId: string,
+    categoryId: string,
+    index: number,
+    updatedDatabase: Database
+  ) => {
+    updateNoteCategory({
+      variables: {
+        noteId: noteId,
+        categoryId: categoryId,
+        index: index
+      },
+      optimisticResponse: {
+        updateNoteCategory: {
+          updatedDatabase
+        }
+      },
+      update: (cache, { data: { updateNoteCategory } }) => {
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: updatedDatabase
+          }
+        });
       }
     });
   };
@@ -170,15 +338,25 @@ const DatabaseContainer: React.FC = () => {
 
   const DatabaseProps: DatabaseProps = {
     id: data.getDatabase.id,
+    nonCategorisedId: data.getDatabase.categories[0].id,
     title: data.getDatabase.title,
     currentView: data.getDatabase.currentView,
+    categories: data.getDatabase.categories,
     notes: data.getDatabase.notes,
-    createNoteHandler: createNote,
+    createNoteHandler: createNoteHandler,
     deleteNoteHandler: deleteNoteHandler,
+    createDatabaseCategoryHandler: createDatabaseCategoryHandler,
+    deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
+    updateDatabaseViewHandler: updateDatabaseViewHandler,
+    updateNoteCategoryHandler: updateNoteCategoryHandler,
     updateNoteTitleHandler: updateNoteTitleHandler
   };
 
-  return <Database {...DatabaseProps} />;
+  return data.getDatabase.currentView === 'board' ? (
+    <BoardDatabase {...DatabaseProps} />
+  ) : (
+    <TableDatabase {...DatabaseProps} />
+  );
 };
 
 export default DatabaseContainer;
