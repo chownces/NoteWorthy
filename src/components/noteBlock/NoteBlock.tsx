@@ -1,9 +1,11 @@
 import React from 'react';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { ContextMenuTrigger } from 'react-contextmenu';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
+import ContextMenuElement, { ContextMenuType } from '../contextMenu/ContextMenuElement';
 
 export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
@@ -76,8 +78,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to previous block, if it exists
       case 'ArrowUp':
         e.preventDefault();
-        const previousBlock = noteBlockRef.current?.parentElement?.previousElementSibling
-          ?.children[1] as HTMLElement;
+        const previousBlock = noteBlockRef.current?.parentElement?.parentElement
+          ?.previousElementSibling?.children[0]?.children[1] as HTMLElement;
         if (previousBlock) {
           setEol(previousBlock);
         }
@@ -86,8 +88,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to next block, if it exists
       case 'ArrowDown':
         e.preventDefault();
-        const nextBlock = noteBlockRef.current?.parentElement?.nextElementSibling
-          ?.children[1] as HTMLElement;
+        const nextBlock = noteBlockRef.current?.parentElement?.parentElement?.nextElementSibling
+          ?.children[0]?.children[1] as HTMLElement;
         if (nextBlock) {
           setEol(nextBlock);
         }
@@ -109,8 +111,17 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // TODO: Handle case where user presses arrow up to navigate within a content block itself
     }
   };
-
   const mergedRef = useMergedRef(noteBlockRef, props.lastBlockRef);
+
+  const contextMenuProps = {
+    context: ContextMenuType.BLOCK,
+    renaming: false,
+    currentName: '',
+    id: props.id,
+    createHandler: () => props.addBlock(props, noteBlockRef),
+    deleteHandler: () => props.deleteBlock(props, noteBlockRef),
+    updateNameHandler: () => {}
+  };
 
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
@@ -122,30 +133,33 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
      * NotePage::deleteBlockHandler
      * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
      */
-    <div
-      className="noteblock"
-      ref={props.innerRef}
-      {...props.provided.dragHandleProps} // react-beautiful-dnd props
-      {...props.provided.draggableProps} // react-beautiful-dnd props
-    >
-      <div className="noteblock-handle"></div>
-      <ContentEditable
-        className="noteblock-text"
-        innerRef={mergedRef}
-        html={props.html}
-        tagName={props.tag}
-        onChange={onChangeHandler}
-        onKeyDown={onKeydownHandler}
-        disabled={!props.isEditMode}
-        onClick={() => {
-          props.setIsEditMode(true, () => {
-            noteBlockRef.current?.focus();
-            // TODO: This eol line is causing issues when using the mouse to position the cursor
-            // setEol(noteBlockRef.current);
-          });
-        }}
-      />
-    </div>
+    <ContextMenuTrigger id={props.id} holdToDisplay={1000}>
+      <div
+        className="noteblock"
+        ref={props.innerRef}
+        {...props.provided.dragHandleProps} // react-beautiful-dnd props
+        {...props.provided.draggableProps} // react-beautiful-dnd props
+      >
+        <div className="noteblock-handle"></div>
+        <ContentEditable
+          className="noteblock-text"
+          innerRef={mergedRef}
+          html={props.html}
+          tagName={props.tag}
+          onChange={onChangeHandler}
+          onKeyDown={onKeydownHandler}
+          disabled={!props.isEditMode}
+          onClick={() => {
+            props.setIsEditMode(true, () => {
+              noteBlockRef.current?.focus();
+              // TODO: This eol line is causing issues when using the mouse to position the cursor
+              // setEol(noteBlockRef.current);
+            });
+          }}
+        />
+        <ContextMenuElement {...contextMenuProps} />
+      </div>
+    </ContextMenuTrigger>
   );
 };
 

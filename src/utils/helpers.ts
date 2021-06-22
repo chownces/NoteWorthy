@@ -10,6 +10,11 @@ export const uniqueId = (): string =>
  * Sets cursor to end of line (EOL) of the current block
  */
 export const setEol = (elem: HTMLElement | null | undefined): void => {
+  // TODO: Use refs instead
+  // if (elem) {
+  //   const { selectionStart, selectionEnd } = elem.current!
+  //   elem.current?.setSelectionRange(selectionStart, selectionEnd)
+  // }
   if (elem) {
     // Get the EOL 'position' of elem
     const range = document.createRange();

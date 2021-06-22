@@ -42,6 +42,23 @@ const client = new ApolloClient({
             merge: false // Short form for always preferring incoming over existing data.
           }
         }
+      },
+      PopulatedDatabase: {
+        fields: {
+          categories: {
+            merge: false
+          },
+          notes: {
+            merge: false
+          }
+        }
+      },
+      Query: {
+        fields: {
+          getDatabase: {
+            merge: false
+          }
+        }
       }
     }
   })

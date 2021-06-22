@@ -2,10 +2,10 @@ import React, { ReactElement } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 
-import AllDatabasesController from '../../pages/allDatabases/AllDatabasesController';
+import AllDatabasesContainer from '../../pages/allDatabases/AllDatabasesContainer';
 import DatabaseContainer from '../../pages/database/DatabaseContainer';
 import Login from '../../pages/login/Login';
-import NotePageController from '../../pages/notePage/NotePageController';
+import NotePageContainer from '../../pages/notePage/NotePageContainer';
 import NotFound from '../../pages/notFound/NotFound';
 import Poster from '../../pages/poster/Poster';
 import Register from '../../pages/register/Register';
@@ -34,9 +34,13 @@ const Application: React.FC = () => {
           {nonAuthPaths}
           {userCtx.user.loggedIn ? (
             [
-              <Route exact path="/" component={AllDatabasesController} key="root" />,
-              <Route path="/database/:databaseId" component={DatabaseContainer} key="database" />,
-              <Route path="/note/:noteId" component={NotePageController} key="note" />,
+              <Route exact path="/" component={AllDatabasesContainer} key="root" />,
+              <Route path="/note/:noteId" component={NotePageContainer} key="note" />,
+              <Route
+                path="/database/:databaseId" // TODO: change to '/database/:databaseId'
+                component={DatabaseContainer}
+                key="note"
+              />,
               <Route component={NotFound} key="404" />
             ]
           ) : (
