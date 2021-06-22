@@ -3,7 +3,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import { Grid, Header, Icon } from 'semantic-ui-react';
 
 import BoardItem from '../boardDatabaseComponents/BoardItem';
-import { Category, Note } from '../DatabaseContainer';
+import { Category, Note } from '../DatabaseTypes';
 
 export type CategoryColumnProps = {
   index: number;
@@ -41,6 +41,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
           <div ref={provided.innerRef} {...provided.droppableProps}>
             {props.category.notes.map((note: string, index: number) => (
               <BoardItem
+                key={index}
                 index={index}
                 category={props.category}
                 note={props.notes.filter(x => x.id === note)[0]}

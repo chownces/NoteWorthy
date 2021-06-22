@@ -30,7 +30,7 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
           aria-hidden="true"
           class="file alternate outline icon"
         />
-        All Notes
+        All Databases
       </div>
     </a>
     <a

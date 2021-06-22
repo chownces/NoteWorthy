@@ -1,8 +1,9 @@
+import { useRef, useState } from 'react';
 import { Form, Popup } from 'semantic-ui-react';
 
 import { setEol } from '../../../utils/helpers';
 import useStateCallback from '../../../utils/useStateCallback';
-import { Category } from '../DatabaseContainer';
+import { Category } from '../DatabaseTypes';
 
 export type AddCategoryProps = {
   id: string;
@@ -12,9 +13,11 @@ export type AddCategoryProps = {
 
 const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
   const [open, setOpen] = useStateCallback(false);
+  const [text, setText] = useState('New Category');
+  const formRef = useRef(null);
 
   const onClose = (databaseId: string) => {
-    const newCategory = (document.getElementById(databaseId) as HTMLInputElement).value.trim();
+    const newCategory = text;
 
     if (props.categories.some(x => x.name === newCategory)) {
       alert('Category already exists');
@@ -22,10 +25,12 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
       alert('Please input a category name');
     } else {
       props.createDatabaseCategoryHandler(props.id, newCategory, props.categories.length);
+      setText('New Category');
     }
 
     setOpen(false);
   };
+
   // Updates title after enter key pressed in popup form
   const onEnterKey = (databaseId: string) => (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
@@ -35,7 +40,7 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
 
   // Callback to set line after popup opens
   const setLine = () => {
-    setEol(document.getElementById(props.id) as HTMLElement);
+    setEol(formRef.current);
   };
 
   return (
@@ -48,14 +53,16 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
       }}
       basic
       pinned
-      trigger={<button onClick={() => {}}>Add Category </button>}
+      trigger={<button onClick={() => {}}>Add Category</button>}
     >
       <Form>
         <input
           id={props.id}
+          ref={formRef}
           onKeyDown={onEnterKey(props.id)}
           type="text"
-          defaultValue={'New Category'}
+          value={text}
+          onChange={e => setText(e.target.value)}
         />
       </Form>
     </Popup>

@@ -5,33 +5,7 @@ import { Link } from 'react-router-dom';
 import ContextMenuElement, {
   ContextMenuType
 } from '../../components/contextMenu/ContextMenuElement';
-import { Category, Note } from './DatabaseContainer';
-
-export type DatabaseProps = {
-  // TODO: Check if we can have a better typing for notes (see DatabaseContainer.tsx)
-  id: string;
-  nonCategorisedId: string;
-  title: string;
-  currentView: string;
-  categories: Category[];
-  notes: Note[];
-  createNoteHandler: (categoryId: string, title: string, index: number) => void;
-  deleteNoteHandler: (noteId: string) => void;
-  createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
-  deleteDatabaseCategoryHandler: (databaseId: string, category: string) => void;
-  updateDatabaseViewHandler: (databaseId: string, view: string) => void;
-  updateNoteTitleHandler: (noteId: string, title: string) => void;
-};
-
-export type RenameNoteProps = {
-  note: Note;
-  updateNoteTitleHandler: (noteId: string, title: string) => void;
-};
-
-export type ChangeCategoryProps = {
-  note: Note;
-  updateNoteCategoryHandler: (noteId: string, category: string) => void;
-};
+import { DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
 
 const TableDatabase: React.FC<DatabaseProps> = props => {
   // TODO: Probably want a react-beautiful-dnd view again for displaying all notes
@@ -52,12 +26,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
 
   return (
     <>
-      {/* <Link to={`/boardDatabase/${props.id}`}>
-        <button onClick={() => props.updateDatabaseViewHandler(props.id, 'board')}>
-          go to board view
-        </button>
-      </Link> */}
-      <button onClick={() => props.updateDatabaseViewHandler(props.id, 'board')}>
+      <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.BOARD)}>
         go to board view
       </button>
 
@@ -74,7 +43,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
             <Link to={`/note/${note.id}`} key={note.id}>
               <div className="database-note">
                 <p>Title: {note.title}</p>
-                <p>Latest Update: {note.latestUpdate}</p>
+                <p>Latest Update: {new Date(note.latestUpdate).toDateString()}</p>
               </div>
             </Link>
 

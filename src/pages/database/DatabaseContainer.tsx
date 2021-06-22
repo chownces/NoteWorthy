@@ -3,37 +3,10 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
-import BoardDatabase, { Database, DatabaseProps } from './BoardDatabase';
+import BoardDatabase from './BoardDatabase';
+import { Database, DatabaseProps, DatabaseViews } from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
 
-// TODO: Clean up the various type exports...
-// `blocks` is excluded here as we do not need it when displaying Database for now.
-
-export type Category = {
-  id: string;
-  name: string;
-  notes: string[];
-  databaseId: string;
-};
-
-export type Note = {
-  userId: string;
-  databaseId: string;
-  id: string;
-  categoryId: string;
-  title: string;
-  blocks: [
-    {
-      id: string;
-      html: string;
-      tag: string;
-    }
-  ];
-  creationDate: string;
-  latestUpdate: string;
-};
-
-// TODO: Recheck query return params
 export const GET_DATABASE_QUERY = gql`
   query getDatabase($id: ID!) {
     getDatabase(databaseId: $id) {
@@ -57,13 +30,13 @@ export const GET_DATABASE_QUERY = gql`
           html
           tag
         }
+        creationDate
+        latestUpdate
       }
     }
   }
 `;
 
-// TODO: Add a new block button in NotePage
-// TODO: Recheck query return params
 export const CREATE_NOTE_MUTATION = gql`
   mutation createNote($id: ID!, $categoryId: ID!, $title: String!, $index: Int!) {
     createNote(databaseId: $id, categoryId: $categoryId, title: $title, index: $index) {
@@ -141,8 +114,6 @@ export const UPDATE_NOTE_TITLE_MUTATION = gql`
 `;
 
 const DatabaseContainer: React.FC = () => {
-  // TODO: Handle repositioning of Propsteks' in AllNotePropspage
-
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
@@ -352,10 +323,12 @@ const DatabaseContainer: React.FC = () => {
     updateNoteTitleHandler: updateNoteTitleHandler
   };
 
-  return data.getDatabase.currentView === 'board' ? (
+  return data.getDatabase.currentView === DatabaseViews.BOARD ? (
     <BoardDatabase {...DatabaseProps} />
-  ) : (
+  ) : DatabaseViews.TABLE ? (
     <TableDatabase {...DatabaseProps} />
+  ) : (
+    <></>
   );
 };
 

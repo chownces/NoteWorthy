@@ -22,7 +22,7 @@ const NavigationBar: React.FC = () => {
         <NavLink exact to="/" activeClassName="active">
           <Menu.Item as="div">
             <Icon name="file alternate outline" />
-            All Notes
+            All Databases
           </Menu.Item>
         </NavLink>
         <NavLink to="/todos" activeClassName="active">

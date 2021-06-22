@@ -2,7 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
 
 import Loader from '../../components/loader/Loader';
-import { Note } from '../database/DatabaseContainer';
+import { Note } from '../database/DatabaseTypes';
 import AllDatabases, { AllDatabasesProps } from './AllDatabases';
 
 export type Database = {

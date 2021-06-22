@@ -4,52 +4,10 @@ import { Divider, Grid, Header } from 'semantic-ui-react';
 
 import AddCategoryPopup from './boardDatabaseComponents/AddCategoryPopup';
 import CategoryColumn from './boardDatabaseComponents/CategoryColumn';
-import { Category, Note } from './DatabaseContainer';
-
-export type Database = {
-  id: string;
-  title: string;
-  currentView: string;
-  categories: Category[];
-  notes: Note[];
-};
-
-export type DatabaseProps = {
-  // TODO: Check if we can have a better typing for notes (see DatabaseContainer.tsx)
-  id: string;
-  nonCategorisedId: string;
-  title: string;
-  currentView: string;
-  categories: Category[];
-  notes: Note[];
-  createNoteHandler: (categoryId: string, title: string, index: number) => void;
-  deleteNoteHandler: (noteId: string) => void;
-  createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
-  deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
-  updateDatabaseViewHandler: (databaseId: string, view: string) => void;
-  updateNoteCategoryHandler: (
-    noteId: string,
-    categoryId: string,
-    index: number,
-    updatedDatabase: Database
-  ) => void;
-  updateNoteTitleHandler: (noteId: string, title: string) => void;
-};
+import { Category, Database, DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
 
 const BoardDatabase: React.FC<DatabaseProps> = props => {
   // TODO: Change note.date to reflect the latest date and time of update to the note (requires changes in backend)
-
-  const categoriesCopier = (categories: Category[]) => {
-    return categories.map(category => {
-      const copy: Category = {
-        id: category.id,
-        name: category.name,
-        notes: [...category.notes],
-        databaseId: category.databaseId
-      };
-      return copy;
-    });
-  };
 
   const onDragEndHandler = React.useCallback(
     (result: DropResult) => {
@@ -66,8 +24,9 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
         return;
       }
 
-      const categories = props.categories;
-      const categoriesCopy = categoriesCopier(categories);
+      const categoriesCopy: Category[] = props.categories.map(cat => {
+        return { ...cat, notes: [...cat.notes] };
+      });
 
       const sourceCategory = categoriesCopy.filter(
         category => category.id === source.droppableId
@@ -81,14 +40,8 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
       const notesCopy: Note[] = props.notes.map(note =>
         note.id === draggableId
           ? {
-              userId: note.userId,
-              databaseId: note.databaseId,
-              id: note.id,
-              categoryId: destination.droppableId,
-              title: note.title,
-              blocks: note.blocks,
-              creationDate: note.creationDate,
-              latestUpdate: note.latestUpdate
+              ...note,
+              categoryId: destination.droppableId
             }
           : note
       );
@@ -123,7 +76,7 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
-      <button onClick={() => props.updateDatabaseViewHandler(props.id, 'table')}>
+      <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.TABLE)}>
         go to table view
       </button>
       <Header as="h1" textAlign="center" style={{ marginTop: '20px' }}>
@@ -136,13 +89,7 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
         ))}
 
         <Grid.Column>
-          <AddCategoryPopup
-            {...{
-              id: props.id,
-              categories: props.categories,
-              createDatabaseCategoryHandler: props.createDatabaseCategoryHandler
-            }}
-          />
+          <AddCategoryPopup {...props} />
         </Grid.Column>
       </Grid>
     </DragDropContext>

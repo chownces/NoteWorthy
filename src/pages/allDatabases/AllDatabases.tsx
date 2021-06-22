@@ -35,7 +35,7 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
       <div>
         {props.databases.map((database: Database, index: number) => (
           <ContextMenuTrigger id={database.id} holdToDisplay={1000} key={index}>
-            <Link to={`/${database.id}`} key={index}>
+            <Link to={`/database/${database.id}`} key={index}>
               <div className="database-note">
                 <p>{database.title}</p>
               </div>

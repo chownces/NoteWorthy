@@ -37,8 +37,7 @@ const Application: React.FC = () => {
               <Route exact path="/" component={AllDatabasesContainer} key="root" />,
               <Route path="/note/:noteId" component={NotePageContainer} key="note" />,
               <Route
-                // path="/:databaseId/:view?"
-                path="/:databaseId" // TODO: change to '/database/:databaseId'
+                path="/database/:databaseId" // TODO: change to '/database/:databaseId'
                 component={DatabaseContainer}
                 key="note"
               />,
