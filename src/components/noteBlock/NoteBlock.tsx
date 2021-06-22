@@ -5,7 +5,7 @@ import { ContextMenuTrigger } from 'react-contextmenu';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
-import ContextMenuElement from '../contextMenu/ContextMenuElement';
+import ContextMenuElement, { ContextMenuType } from '../contextMenu/ContextMenuElement';
 
 export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
 
@@ -114,7 +114,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   const mergedRef = useMergedRef(noteBlockRef, props.lastBlockRef);
 
   const contextMenuProps = {
-    context: 'Block',
+    context: ContextMenuType.BLOCK,
     renaming: false,
     currentName: '',
     id: props.id,

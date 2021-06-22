@@ -1,20 +1,24 @@
+import { useRef, useState } from 'react';
 import { Form, Menu, Popup } from 'semantic-ui-react';
 
 import { setEol } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
+import { ContextMenuType } from './ContextMenuElement';
 
 export type RenameProps = {
-  context: string;
+  context: ContextMenuType;
   id: string;
   currentName: string;
   updateNameHandler: (id: string, newName: string) => void;
 };
 
-const RenameDatabasePopup: React.FC<RenameProps> = props => {
+const RenamePopup: React.FC<RenameProps> = props => {
   const [open, setOpen] = useStateCallback(false);
+  const [text, setText] = useState(props.currentName);
+  const formRef = useRef(null);
 
   const onClose = (id: string) => {
-    props.updateNameHandler(id, (document.getElementById(id) as HTMLInputElement).value.trim());
+    props.updateNameHandler(id, text);
     setOpen(false);
   };
 
@@ -27,7 +31,7 @@ const RenameDatabasePopup: React.FC<RenameProps> = props => {
 
   // Callback to set line after popup opens
   const setLine = () => {
-    setEol(document.getElementById(props.id) as HTMLElement);
+    setEol(formRef.current);
   };
 
   return (
@@ -38,18 +42,19 @@ const RenameDatabasePopup: React.FC<RenameProps> = props => {
       onClose={() => onClose(props.id)}
       basic
       pinned
-      trigger={<Menu.Item onClick={() => {}}>Rename {' ' + props.context} </Menu.Item>}
+      trigger={<Menu.Item onClick={() => {}}>{`Rename ${props.context}`}</Menu.Item>}
     >
       <Form>
         <input
-          id={props.id}
+          ref={formRef}
           onKeyDown={onEnterKey(props.id)}
           type="text"
-          defaultValue={props.currentName}
+          value={text}
+          onChange={e => setText(e.target.value)}
         />
       </Form>
     </Popup>
   );
 };
 
-export default RenameDatabasePopup;
+export default RenamePopup;

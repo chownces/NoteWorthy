@@ -2,7 +2,9 @@ import React from 'react';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 
-import ContextMenuElement from '../../components/contextMenu/ContextMenuElement';
+import ContextMenuElement, {
+  ContextMenuType
+} from '../../components/contextMenu/ContextMenuElement';
 import { Category, Note } from './DatabaseContainer';
 
 export type DatabaseProps = {
@@ -38,7 +40,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
 
   const contextMenuProps = (note: Note, index: number) => {
     return {
-      context: 'Note',
+      context: ContextMenuType.NOTE,
       renaming: true,
       currentName: note.title,
       id: note.id,

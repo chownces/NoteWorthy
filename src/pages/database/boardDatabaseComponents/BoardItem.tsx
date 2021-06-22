@@ -5,7 +5,9 @@ import { ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { Card, Label, List } from 'semantic-ui-react';
 
-import ContextMenuElement from '../../../components/contextMenu/ContextMenuElement';
+import ContextMenuElement, {
+  ContextMenuType
+} from '../../../components/contextMenu/ContextMenuElement';
 import { Category, Note } from '../DatabaseContainer';
 
 export type BoardItemProps = {
@@ -19,7 +21,7 @@ export type BoardItemProps = {
 
 const BoardItem: React.FC<BoardItemProps> = props => {
   const contextMenuProps = {
-    context: 'Note',
+    context: ContextMenuType.NOTE,
     renaming: true,
     currentName: props.note.title,
     id: props.note.id,
