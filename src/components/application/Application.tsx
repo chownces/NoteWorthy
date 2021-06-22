@@ -42,16 +42,6 @@ const Application: React.FC = () => {
                 component={DatabaseContainer}
                 key="note"
               />,
-              // <Route
-              //   path="/tableDatabase/:databaseId"
-              //   component={TableDatabaseContainer}
-              //   key="database"
-              // />,
-              // <Route
-              //   path="/boardDatabase/:databaseId"
-              //   component={BoardDatabaseContainer}
-              //   key="database"
-              // />,
               <Route component={NotFound} key="404" />
             ]
           ) : (

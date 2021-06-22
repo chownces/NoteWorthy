@@ -1,5 +1,6 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import ContentEditable from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
 import { Card, Label, List } from 'semantic-ui-react';
@@ -46,8 +47,12 @@ const BoardItem: React.FC<BoardItemProps> = props => {
                         {props.note.blocks.map((block, index) =>
                           block.html === '' ? null : (
                             <List.Item style={{ lineHeight: '1.4285em' }} key={index}>
-                              {console.log(block.html)}
-                              {block.html}
+                              <ContentEditable
+                                html={block.html}
+                                tagName="p"
+                                onChange={() => {}}
+                                disabled
+                              />
                             </List.Item>
                           )
                         )}
