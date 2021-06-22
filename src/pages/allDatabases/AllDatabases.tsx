@@ -13,22 +13,8 @@ export type AllDatabasesProps = {
   updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
 };
 
-export type RenameDatabaseProps = {
-  database: Database;
-  updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
-};
-
 const AllDatabases: React.FC<AllDatabasesProps> = props => {
   // TODO: Probably want a react-beautiful-dnd view again for displaying all notes
-  const updatedLinkHandler = (database: Database) => {
-    if (database.currentView === 'table') {
-      // return `/tableDatabase/${database.id}`;
-      return `/${database.id}`;
-    } else {
-      // return `/boardDatabase/${database.id}`;
-      return `/${database.id}`;
-    }
-  };
 
   const contextMenuProps = (database: Database, index: number) => {
     return {
@@ -49,7 +35,7 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
       <div>
         {props.databases.map((database: Database, index: number) => (
           <ContextMenuTrigger id={database.id} holdToDisplay={1000} key={index}>
-            <Link to={updatedLinkHandler(database)} key={index}>
+            <Link to={`/${database.id}`} key={index}>
               <div className="database-note">
                 <p>{database.title}</p>
               </div>
