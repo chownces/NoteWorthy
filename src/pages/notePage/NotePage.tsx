@@ -80,7 +80,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
     };
 
-    setBlocksAndSetUnsaved(blocksCopy);
+    // setBlocksAndSetUnsaved(blocksCopy);
   };
 
   /**

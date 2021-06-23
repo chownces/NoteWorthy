@@ -148,31 +148,31 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
-    update: (cache, { data: { deleteNote } }) => {
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
+  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION);
 
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId !== deleteNote.id)
-        }
-      });
-    }
-  });
-
-  const deleteNoteHandler = (noteId: string) => {
+  const deleteNoteHandler = (noteId: string, database: Database) => {
+    const deletedNote = database.notes.filter(note => note.id === noteId)[0];
     deleteNote({
       variables: {
         noteId: noteId
+      },
+
+      optimisticResponse: {
+        updateNoteCategory: {
+          deletedNote
+        }
+      },
+
+      update: (cache, { data: { deleteNote } }) => {
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: database
+          }
+        });
       }
     });
   };
@@ -281,7 +281,7 @@ const DatabaseContainer: React.FC = () => {
           updatedDatabase
         }
       },
-      update: (cache, { data: { updateNoteCategory } }) => {
+      update: cache => {
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
