@@ -9,6 +9,7 @@ import NotePage, { NotePageProps } from './NotePage';
 const NotePageContainer: React.FC = () => {
   // Get note id of the note to render via react-router-dom URL params
   const NOTE_ID = useParams<{ noteId: string }>().noteId;
+  const blocks = React.useRef<NoteBlockStateProps[]>([]);
 
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_NOTE_QUERY, {
     variables: {
@@ -18,13 +19,7 @@ const NotePageContainer: React.FC = () => {
 
   // TODO: Handle fetching errors
   const [updateNoteBlocks] = useMutation(UPDATE_NOTE_BLOCKS_MUTATION, {
-    // NOTE: The manual cache update here is unnecessary, as Apollo does it by default.
-    update: (cache, { data: { updateNoteBlocks } }) => {
-      cache.writeQuery({
-        query: GET_NOTE_QUERY,
-        data: { getNotes: updateNoteBlocks }
-      });
-    }
+    ignoreResults: true
   });
 
   const updateBlocksInDatabase = (blocks: NoteBlockStateProps[]) => {
@@ -47,8 +42,11 @@ const NotePageContainer: React.FC = () => {
     return <div>Error! + {queryError.message}</div>;
   }
 
+  // Tracks `blocks` state locally in React as a mutable ref (for react-contenteditable)
+  blocks.current = data.getNote.blocks;
+
   const notePageProps: NotePageProps = {
-    blocks: data.getNote.blocks,
+    blocks: blocks,
     updateBlocksInDatabase: updateBlocksInDatabase
   };
 
@@ -76,21 +74,19 @@ const GET_NOTE_QUERY = gql`
   }
 `;
 
-// TODO: Recheck return params
+/**
+ * IMPT: We are setting ignoreResults, and not returning the updated notepage fields
+ * to prevent Apollo cache from updating automatically. This is crucial to prevent
+ * the NotePage component from rerendering, as a rerender triggered outside the
+ * react-contenteditable component will cause its cursor to jump.
+ *
+ * Instead, we handle react-contenteditable state with useRef as recommended by
+ * their docs, and batch updates to the backend whenever there are changes.
+ */
 const UPDATE_NOTE_BLOCKS_MUTATION = gql`
   mutation updateNoteBlocks($id: ID!, $blocks: [NoteBlockInput]) {
     updateNoteBlocks(noteId: $id, input: { blocks: $blocks }) {
       id
-      userId
-      databaseId
-      title
-      blocks {
-        id
-        html
-        tag
-      }
-      creationDate
-      latestUpdate
     }
   }
 `;

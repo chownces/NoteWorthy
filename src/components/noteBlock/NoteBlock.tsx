@@ -33,28 +33,30 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   const noteBlockRef = React.useRef<HTMLElement>(null);
 
   /**
-   * TODO: Relook at what this is for under keydownHandlers backspace
+   * IMPT: Since we are tracking `blocks` state as a mutable ref instead of useState
+   * (to prevent rerender which causes react-contenteditable cursor jumping),
+   * props.updatePage does not trigger a rerender, and thus props are not updated.
    *
-   * React.useRef is used here with the following effect to keep a mutable object reference
-   * to the updated html prop. This is to allow access to the latest html prop within
-   * the callback handlers below.
-   *
-   * (this is a hacky way of overcoming the stale closure problem with React hooks)
+   * Hence, we also track the state as a mutable ref locally in this component so that
+   * the react-contenteditable values passed into our change handlers are accurate.
    */
-  const html = React.useRef<string>('');
-  React.useEffect(() => {
-    html.current = props.html;
-  });
+  const html = React.useRef<string>(props.html);
+
+  // TODO: For future use when tag changes are implemented
+  // const tag = React.useRef<string>(props.tag);
 
   const onChangeHandler = (e: ContentEditableEvent) => {
     // Additional checks for e.target.value as HTML tags are not cleared even when block is empty
+    const value =
+      e.target.value === '<br>' || e.target.value === '<div><br></div>' ? '' : e.target.value;
+
     props.updatePage({
       id: props.id,
-      html: e.target.value === '<br>' || e.target.value === '<div><br></div>' ? '' : e.target.value,
+      html: value,
       tag: props.tag
     });
 
-    // TODO: Apollo updates the store, which results in whole page rerender and caret jumping to the end...
+    html.current = value;
   };
 
   const onKeydownHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -144,7 +146,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         <ContentEditable
           className="noteblock-text"
           innerRef={mergedRef}
-          html={props.html}
+          html={html.current}
           tagName={props.tag}
           onChange={onChangeHandler}
           onKeyDown={onKeydownHandler}

@@ -9,7 +9,7 @@ import { setEol, uniqueId } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
 
 export type NotePageProps = {
-  blocks: NoteBlockStateProps[];
+  blocks: React.MutableRefObject<NoteBlockStateProps[]>;
   updateBlocksInDatabase: (newBlocks: NoteBlockStateProps[]) => void;
 };
 
@@ -19,51 +19,31 @@ const NotePage: React.FC<NotePageProps> = props => {
    * When true, the ContentEditable components (i.e. each note block) will be editable.
    */
   const [isEditMode, setIsEditMode] = useStateCallback<boolean>(false); // TODO: Look into setting a better toggle between modes
+  const hasUnsavedChanges = React.useRef<boolean>(false);
 
   /**
-   * Track `blocks` state locally in React, and have a window interval which updates the backend
-   * whenever there are changes to this state.
+   * Window interval updates the backend whenever there are changes to the `blocks` state.
    *
    * NOTE: This is not the recommended way to use Apollo, since Apollo has its own cache functionality,
    * and we are completely disregarding it. The alternative is to fire off updates to the backend on
    * EVERY change to the `blocks` state. This is not ideal as there are too many API requests and rerenders
-   * as a result, leading to poor performance.
+   * as a result, leading to poor performance. Also, react-contenteditable does not play well with rerenders
+   * triggered outside it.
    */
-  const [blocks, setBlocks] = useStateCallback(props.blocks);
-  const hasUnsavedChanges = React.useRef<boolean>(false);
-
-  /**
-   * blocksRef and the following effect helps to overcome the stale closure problem with React hooks,
-   * and allows us to access the latest blocks inside the effect that updates the blocks in the database
-   * without creating a new window listener each time. It also allows us to access the latest blocks
-   * within the NoteBlock handlers below.
-   */
-  const blocksRef = React.useRef(blocks);
-  React.useEffect(() => {
-    blocksRef.current = blocks;
-  });
-
   React.useEffect(() => {
     const interval = window.setInterval(() => {
       if (hasUnsavedChanges.current) {
-        props.updateBlocksInDatabase(blocksRef.current);
+        props.updateBlocksInDatabase(props.blocks.current);
         hasUnsavedChanges.current = false;
       }
     }, 1000);
 
     return () => window.clearInterval(interval);
-    /**
-     * It is okay to ignore this exhaustive deps warning. See the above comment on how the stale closure problem
-     * is overcomed with useRef, thus allowing us to use just one window listener, instead of creating multiple ones.
-     */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const setBlocksAndSetUnsaved = (
-    newBlocks: NoteBlockStateProps[],
-    callback?: (newState?: NoteBlockStateProps[]) => void
-  ): void => {
-    setBlocks(newBlocks, callback);
+  const setBlocksAndSetUnsaved = (newBlocks: NoteBlockStateProps[]): void => {
+    props.blocks.current = newBlocks;
     hasUnsavedChanges.current = true;
   };
 
@@ -72,7 +52,7 @@ const NotePage: React.FC<NotePageProps> = props => {
    */
   // TODO: Handle tag changes in the future.
   const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
-    const blocksCopy = [...blocksRef.current];
+    const blocksCopy = [...props.blocks.current];
     const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
     blocksCopy[index] = {
       ...blocksCopy[index],
@@ -82,6 +62,16 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     setBlocksAndSetUnsaved(blocksCopy);
   };
+
+  /**
+   * A React useState to trigger a rerender whenever there is a block addition or deletion.
+   *
+   * This is because we store `blocks` state as a mutable ref instead of useState as react-contenteditable
+   * does not play well with rerenders triggered outside of it (as recommended by their docs).
+   * We thus need to force a rerender when there are block additions or deletions to add/ remove the
+   * block from the DOM.
+   */
+  const [triggerRerender, setTriggerRerender] = useStateCallback(false);
 
   /**
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
@@ -95,7 +85,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       html: '',
       tag: 'p' // TODO: Reconsider default block tag
     };
-    const blocksCopy = [...blocksRef.current];
+    const blocksCopy = [...props.blocks.current];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index + 1, 0, newBlock);
 
@@ -104,7 +94,8 @@ const NotePage: React.FC<NotePageProps> = props => {
         ?.children[1] as HTMLElement).focus();
     };
 
-    setBlocksAndSetUnsaved(blocksCopy, focusNextBlockCallback);
+    setBlocksAndSetUnsaved(blocksCopy);
+    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
   /**
@@ -119,30 +110,25 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const nextBlock = ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
       ?.children[1] as HTMLElement;
-    if (previousBlock) {
-      const blocksCopy = [...blocksRef.current];
-      const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
-      blocksCopy.splice(index, 1);
 
+    const blocksCopy = [...props.blocks.current];
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    blocksCopy.splice(index, 1);
+    if (previousBlock) {
       const focusPreviousBlockEolCallback = () => {
         setEol(previousBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy, focusPreviousBlockEolCallback);
+      setBlocksAndSetUnsaved(blocksCopy);
+      setTriggerRerender(!triggerRerender, focusPreviousBlockEolCallback);
     } else if (nextBlock) {
-      const blocksCopy = [...blocksRef.current];
-      const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
-      blocksCopy.splice(index, 1);
-
       const focusNextBlockEolCallback = () => {
         setEol(nextBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy, focusNextBlockEolCallback);
+      setBlocksAndSetUnsaved(blocksCopy);
+      setTriggerRerender(!triggerRerender, focusNextBlockEolCallback);
     } else {
-      const blocksCopy = [...blocksRef.current];
-      const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
-      blocksCopy.splice(index, 1);
       setBlocksAndSetUnsaved(blocksCopy);
       setIsEditMode(false);
     }
@@ -163,11 +149,11 @@ const NotePage: React.FC<NotePageProps> = props => {
       html: '',
       tag: 'p' // TODO: Reconsider default block tag
     };
-    const blocksCopy = [...blocksRef.current];
+    const blocksCopy = [...props.blocks.current];
     blocksCopy.push(newBlock);
 
-    setIsEditMode(true);
-    setBlocksAndSetUnsaved(blocksCopy, () => lastBlockRef.current?.focus());
+    setIsEditMode(true, () => lastBlockRef.current?.focus());
+    setBlocksAndSetUnsaved(blocksCopy);
   };
 
   /**
@@ -190,7 +176,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       return;
     }
 
-    const newBlocks = reorder(blocksRef.current, result.source.index, result.destination.index);
+    const newBlocks = reorder(props.blocks.current, result.source.index, result.destination.index);
 
     setBlocksAndSetUnsaved(newBlocks);
   };
@@ -208,7 +194,7 @@ const NotePage: React.FC<NotePageProps> = props => {
         <Droppable droppableId="note-blocks">
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps}>
-              {blocks.map((block, index) => (
+              {props.blocks.current.map((block, index) => (
                 <Draggable draggableId={block.id} index={index} key={block.id}>
                   {provided => (
                     <NoteBlock
@@ -217,7 +203,9 @@ const NotePage: React.FC<NotePageProps> = props => {
                       key={block.id}
                       isEditMode={isEditMode}
                       innerRef={provided.innerRef}
-                      lastBlockRef={index === blocks.length - 1 ? lastBlockRef : undefined}
+                      lastBlockRef={
+                        index === props.blocks.current.length - 1 ? lastBlockRef : undefined
+                      }
                       provided={provided}
                     />
                   )}
