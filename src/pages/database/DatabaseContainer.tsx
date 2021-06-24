@@ -192,16 +192,17 @@ const DatabaseContainer: React.FC = () => {
         console.log(previousData);
         console.log(response);
 
-        const newNote = response.data.createNote;
+        const tempNote = response.data.createNote;
+        const newNote = { __typename: 'Note', categoryId: categoryId, ...tempNote, blocks: [] };
         console.log(newNote);
 
         const tempCategories = previousData.getDatabase.categories.map((cat: any) => {
           if (cat.id === categoryId) {
             const tempNotes = [...cat.notes];
             tempNotes.splice(index, 0, newNote.id);
-            return { ...cat, notes: tempNotes };
+            return { ...cat, notes: tempNotes, __typename: 'Category' };
           } else {
-            return { ...cat, notes: [...cat.notes] };
+            return { ...cat, notes: [...cat.notes], __typename: 'Category' };
           }
         });
 
@@ -216,7 +217,8 @@ const DatabaseContainer: React.FC = () => {
             categories: tempCategories,
             notes: tempNotes,
             title: previousData.getDatabase.title,
-            id: previousData.getDatabase.id
+            id: previousData.getDatabase.id,
+            __typename: 'PopulatedDatabase'
           }
         };
 
@@ -401,34 +403,29 @@ const DatabaseContainer: React.FC = () => {
     return <div>Error! + {queryError.message}</div>;
   }
 
-  console.log(data);
-  if (data) {
-    const DatabaseProps: DatabaseProps = {
-      id: data.getDatabase.id,
-      nonCategorisedId: data.getDatabase.categories[0].id,
-      title: data.getDatabase.title,
-      currentView: data.getDatabase.currentView,
-      categories: data.getDatabase.categories,
-      notes: data.getDatabase.notes,
-      createNoteHandler: createNoteHandler,
-      deleteNoteHandler: deleteNoteHandler,
-      createDatabaseCategoryHandler: createDatabaseCategoryHandler,
-      deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
-      updateDatabaseViewHandler: updateDatabaseViewHandler,
-      updateNoteCategoryHandler: updateNoteCategoryHandler,
-      updateNoteTitleHandler: updateNoteTitleHandler
-    };
+  const DatabaseProps: DatabaseProps = {
+    id: data.getDatabase.id,
+    nonCategorisedId: data.getDatabase.categories[0].id,
+    title: data.getDatabase.title,
+    currentView: data.getDatabase.currentView,
+    categories: data.getDatabase.categories,
+    notes: data.getDatabase.notes,
+    createNoteHandler: createNoteHandler,
+    deleteNoteHandler: deleteNoteHandler,
+    createDatabaseCategoryHandler: createDatabaseCategoryHandler,
+    deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
+    updateDatabaseViewHandler: updateDatabaseViewHandler,
+    updateNoteCategoryHandler: updateNoteCategoryHandler,
+    updateNoteTitleHandler: updateNoteTitleHandler
+  };
 
-    return data.getDatabase.currentView === DatabaseViews.BOARD ? (
-      <BoardDatabase {...DatabaseProps} />
-    ) : DatabaseViews.TABLE ? (
-      <TableDatabase {...DatabaseProps} />
-    ) : (
-      <></>
-    );
-  } else {
-    return <></>;
-  }
+  return data.getDatabase.currentView === DatabaseViews.BOARD ? (
+    <BoardDatabase {...DatabaseProps} />
+  ) : DatabaseViews.TABLE ? (
+    <TableDatabase {...DatabaseProps} />
+  ) : (
+    <></>
+  );
 };
 
 export default DatabaseContainer;
