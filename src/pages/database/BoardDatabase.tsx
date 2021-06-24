@@ -64,6 +64,50 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     [props]
   );
 
+  const createNoteHandler = (categoryId: string ,title: string, index: number) => {
+    const notesCopy: Note[] = props.notes.map(note => note);
+
+    const newNote : Note = {
+      userId: 'temp_userId',
+      databaseId: props.id,
+      id: 'temp_id',
+      categoryId: categoryId,
+      title: title,
+      blocks: [{
+        id:'',
+        html:'',
+        tag:''
+      }],
+      creationDate: Date.now().toString(),
+      latestUpdate: Date.now().toString()
+    };
+
+    notesCopy.splice(notesCopy.length, 0, newNote);
+    
+    const categoriesCopy: Category[] = props.categories.map(cat => {
+      if (cat.id === categoryId) {
+        const tempNotes = [...cat.notes];
+        tempNotes.splice(index, 0, 'temp_id')
+        return { ...cat, notes: tempNotes};
+      } else {
+        return { ...cat, notes: [...cat.notes] };
+      }
+    });
+    
+    console.log(categoriesCopy);
+
+    const databaseCopy: Database = {
+      id: props.id,
+      title: props.title,
+      currentView: props.currentView,
+      categories: categoriesCopy,
+      notes: notesCopy
+    };
+
+    props.createNoteHandler(categoryId, title, index, databaseCopy);
+
+  }
+
   const deleteNoteHandler = (noteId: string) => {
     const notesCopy: Note[] = props.notes.filter(note => note.id !== noteId);
 
@@ -92,7 +136,7 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     renaming: true,
     notes: props.notes,
     deleteDatabaseCategoryHandler: props.deleteDatabaseCategoryHandler,
-    createNoteHandler: props.createNoteHandler,
+    createNoteHandler: createNoteHandler,
     deleteNoteHandler: deleteNoteHandler,
     updateNoteTitleHandler: props.updateNoteTitleHandler
   };

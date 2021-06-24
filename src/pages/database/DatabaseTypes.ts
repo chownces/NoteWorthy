@@ -13,7 +13,7 @@ export type DatabaseProps = {
   currentView: string;
   categories: Category[];
   notes: Note[];
-  createNoteHandler: (categoryId: string, title: string, index: number) => void;
+  createNoteHandler: (categoryId: string, title: string, index: number, database: Database) => void;
   deleteNoteHandler: (noteId: string, database: Database) => void;
   createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
   deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;

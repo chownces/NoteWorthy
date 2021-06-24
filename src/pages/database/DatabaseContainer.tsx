@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import BoardDatabase from './BoardDatabase';
-import { Database, DatabaseProps, DatabaseViews } from './DatabaseTypes';
+import { Database, DatabaseProps, DatabaseViews} from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
 
 export const GET_DATABASE_QUERY = gql`
@@ -117,34 +117,77 @@ const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
-  const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
-    update: (cache, { data: { createNote } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
+  const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: { getDatabase: [...data.getDatabase.notes, createNote] }
-      });
-    }
-  });
+  const createNoteHandler = (categoryId: string, title: string, index: number, database: Database) => {
+   
+    // const tempNote = {
+    //   userId: 'temp_userId',
+    //   databaseId: 'temp_databaseId',
+    //   id: 'temp_id',
+    //   title: title,
+    //   creationDate: Date.now(),
+    //   latestUpdate: Date.now()
+    // }
 
-  const createNoteHandler = (categoryId: string, title: string, index: number) => {
     createNote({
       variables: {
         id: DATABASE_ID,
         categoryId: categoryId,
         title: title,
         index: index
+      }, 
+      // optimisticResponse: {
+      //   createNote: {
+      //     tempNote
+      //   }
+      // },
+      // update(cache, 
+      //   {
+      //     data: { createNote }
+      //   }
+      // ) {
+      //   cache.modify({
+      //     fields: {
+      //       notes(existingNotes = []) {
+      //         const newNoteRef = cache.writeFragment({
+                
+      //           data: createNote,
+      //           fragment: gql`
+      //             fragment NewNote on Note {
+      //               userId
+      //               databaseId
+      //               id
+      //               title
+      //               creationDate
+      //               latestUpdate
+      //             }
+      //           `
+      //         });
+      //         return existingNotes.concat(newNoteRef);
+      //       }
+      //     }
+      //   })
+      // }
+      update: (cache) => {
+        // TODO: Handle typing
+        const tempData : any = cache.readQuery({query: GET_DATABASE_QUERY, variables: {id: database.id}});
+        console.log(tempData);
+        console.log(tempData.getDatabase.notes)
+
+        
+        const tempNotes = [...tempData.getDatabase.notes, createNote];
+        console.log(tempNotes);
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: { getDatabase: tempNotes}
+        });
       }
+
     });
   };
 
@@ -158,12 +201,13 @@ const DatabaseContainer: React.FC = () => {
       },
 
       optimisticResponse: {
-        updateNoteCategory: {
-          deletedNote
+        deleteNote: {
+          deletedNote,
+          __typeName: 'Note'
         }
       },
 
-      update: (cache, { data: { deleteNote } }) => {
+      update: (cache) => {
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {

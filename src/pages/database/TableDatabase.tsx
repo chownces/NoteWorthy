@@ -34,13 +34,53 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
     props.deleteNoteHandler(noteId, databaseCopy);
   };
 
+  const createNoteHandler = (categoryId: string ,title: string, index: number) => {
+    const notesCopy: Note[] = props.notes.map(note => note);
+
+    const newNote : Note = {
+      userId: 'temp_userId',
+      databaseId: props.id,
+      id: 'temp_id',
+      categoryId: categoryId,
+      title: title,
+      blocks: [{
+        id:'',
+        html:'',
+        tag:''
+      }],
+      creationDate: Date.now().toString(),
+      latestUpdate: Date.now().toString()
+    };
+
+    notesCopy.splice(index, 0, newNote);
+    
+    const categoriesCopy: Category[] = props.categories.map(cat => {
+      if (cat.id === categoryId) {
+        return { ...cat, notes: cat.notes.splice(cat.notes.length, 0, 'temp_id') };
+      } else {
+        return { ...cat, notes: [...cat.notes] };
+      }
+    });
+    
+    const databaseCopy: Database = {
+      id: props.id,
+      title: props.title,
+      currentView: props.currentView,
+      categories: categoriesCopy,
+      notes: notesCopy
+    };
+
+    props.createNoteHandler(categoryId, title, index, databaseCopy);
+
+  }
+
   const contextMenuProps = (note: Note, index: number) => {
     return {
       context: ContextMenuType.NOTE,
       renaming: true,
       currentName: note.title,
       id: note.id,
-      createHandler: () => props.createNoteHandler(note.categoryId, 'untitled', index + 1),
+      createHandler: () => createNoteHandler(note.categoryId, 'untitled', index + 1),
       deleteHandler: () => deleteNoteHandler,
       updateNameHandler: props.updateNoteTitleHandler
     };
@@ -54,7 +94,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
 
       <button
         onClick={() =>
-          props.createNoteHandler(props.nonCategorisedId, 'untitled', props.notes.length)
+          createNoteHandler(props.nonCategorisedId, 'untitled', props.notes.length)
         }
       >
         Create Note
