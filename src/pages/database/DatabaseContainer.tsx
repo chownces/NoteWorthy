@@ -125,14 +125,14 @@ const DatabaseContainer: React.FC = () => {
     index: number,
     database: Database
   ) => {
-    const tempNote = {
-      userId: 'temp_userId',
-      databaseId: 'temp_databaseId',
-      id: 'temp_id',
-      title: title,
-      creationDate: Date.now(),
-      latestUpdate: Date.now()
-    }
+    // const tempNote = {
+    //   userId: 'temp_userId',
+    //   databaseId: 'temp_databaseId',
+    //   id: 'temp_id',
+    //   title: title,
+    //   creationDate: new Date(Date.now()).toDateString(),
+    //   latestUpdate: new Date(Date.now()).toDateString()
+    // };
 
     createNote({
       variables: {
@@ -143,7 +143,13 @@ const DatabaseContainer: React.FC = () => {
       },
       optimisticResponse: {
         createNote: {
-          tempNote,
+          userId: 'temp_userId',
+          databaseId: 'temp_databaseId',
+          id: 'temp_id',
+          title: title,
+          creationDate: new Date(Date.now()).toDateString(),
+          latestUpdate: new Date(Date.now()).toDateString(),
+          __typename: 'Note'
         }
       },
       // update(cache,
@@ -173,23 +179,66 @@ const DatabaseContainer: React.FC = () => {
       //     }
       //   })
       // }
-      update: (cache) => {
+
+      update: (cache, response) => {
         // TODO: Handle typing
-        cache.writeQuery({
+        const previousData: any = cache.readQuery({
           query: GET_DATABASE_QUERY,
           variables: {
-            id: DATABASE_ID
-          },
-          data: { getDatabase: database }
+            id: database.id
+          }
         });
-      },
-      refetchQueries: [
-        {
-          query: GET_DATABASE_QUERY,
-          variables: { id: database.id }
+
+        console.log(previousData);
+        console.log(response);
+
+        const newNote = response.data.createNote;
+        console.log(newNote);
+
+        const tempCategories = previousData.getDatabase.categories.map((cat: any) => {
+          if (cat.id === categoryId) {
+            const tempNotes = [...cat.notes];
+            tempNotes.splice(index, 0, newNote.id);
+            return { ...cat, notes: tempNotes };
+          } else {
+            return { ...cat, notes: [...cat.notes] };
+          }
+        });
+
+        const tempNotes = [...previousData.getDatabase.notes];
+        tempNotes.push(newNote);
+
+        console.log(tempCategories);
+
+        const newData = {
+          getDatabase: {
+            currentview: previousData.getDatabase.currentView,
+            categories: tempCategories,
+            notes: tempNotes,
+            title: previousData.getDatabase.title,
+            id: previousData.getDatabase.id
+          }
+        };
+
+        console.log(newData);
+
+        if (newData.getDatabase) {
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: database.id
+            },
+            data: newData
+          });
         }
-      ],
-      awaitRefetchQueries: true
+    }
+      // refetchQueries: [
+      //   {
+      //     query: GET_DATABASE_QUERY,
+      //     variables: { id: database.id }
+      //   }
+      // ],
+      // awaitRefetchQueries: true
     });
   };
 
@@ -204,7 +253,7 @@ const DatabaseContainer: React.FC = () => {
 
       optimisticResponse: {
         deleteNote: {
-          deletedNote,
+          deletedNote
         }
       },
 
@@ -352,6 +401,8 @@ const DatabaseContainer: React.FC = () => {
     return <div>Error! + {queryError.message}</div>;
   }
 
+  console.log(data);
+  if (data) {
   const DatabaseProps: DatabaseProps = {
     id: data.getDatabase.id,
     nonCategorisedId: data.getDatabase.categories[0].id,
@@ -368,6 +419,7 @@ const DatabaseContainer: React.FC = () => {
     updateNoteTitleHandler: updateNoteTitleHandler
   };
 
+ 
   return data.getDatabase.currentView === DatabaseViews.BOARD ? (
     <BoardDatabase {...DatabaseProps} />
   ) : DatabaseViews.TABLE ? (
@@ -375,6 +427,10 @@ const DatabaseContainer: React.FC = () => {
   ) : (
     <></>
   );
+  }
+  else {
+    return <></>
+  }
 };
 
 export default DatabaseContainer;

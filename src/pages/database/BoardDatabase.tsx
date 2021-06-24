@@ -80,8 +80,8 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
           tag: ''
         }
       ],
-      creationDate: Date.now().toString(),
-      latestUpdate: Date.now().toString()
+      creationDate: new Date(Date.now()).toDateString(),
+      latestUpdate: new Date(Date.now()).toDateString()
     };
 
     notesCopy.splice(notesCopy.length, 0, newNote);
