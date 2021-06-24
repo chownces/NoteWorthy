@@ -64,36 +64,38 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     [props]
   );
 
-  const createNoteHandler = (categoryId: string ,title: string, index: number) => {
+  const createNoteHandler = (categoryId: string, title: string, index: number) => {
     const notesCopy: Note[] = props.notes.map(note => note);
 
-    const newNote : Note = {
+    const newNote: Note = {
       userId: 'temp_userId',
       databaseId: props.id,
       id: 'temp_id',
       categoryId: categoryId,
       title: title,
-      blocks: [{
-        id:'',
-        html:'',
-        tag:''
-      }],
+      blocks: [
+        {
+          id: '',
+          html: '',
+          tag: ''
+        }
+      ],
       creationDate: Date.now().toString(),
       latestUpdate: Date.now().toString()
     };
 
     notesCopy.splice(notesCopy.length, 0, newNote);
-    
+
     const categoriesCopy: Category[] = props.categories.map(cat => {
       if (cat.id === categoryId) {
         const tempNotes = [...cat.notes];
-        tempNotes.splice(index, 0, 'temp_id')
-        return { ...cat, notes: tempNotes};
+        tempNotes.splice(index, 0, 'temp_id');
+        return { ...cat, notes: tempNotes };
       } else {
         return { ...cat, notes: [...cat.notes] };
       }
     });
-    
+
     console.log(categoriesCopy);
 
     const databaseCopy: Database = {
@@ -105,8 +107,7 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     };
 
     props.createNoteHandler(categoryId, title, index, databaseCopy);
-
-  }
+  };
 
   const deleteNoteHandler = (noteId: string) => {
     const notesCopy: Note[] = props.notes.filter(note => note.id !== noteId);

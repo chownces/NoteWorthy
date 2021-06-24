@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import BoardDatabase from './BoardDatabase';
-import { Database, DatabaseProps, DatabaseViews} from './DatabaseTypes';
+import { Database, DatabaseProps, DatabaseViews } from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
 
 export const GET_DATABASE_QUERY = gql`
@@ -119,16 +119,20 @@ const DatabaseContainer: React.FC = () => {
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
-  const createNoteHandler = (categoryId: string, title: string, index: number, database: Database) => {
-   
-    // const tempNote = {
-    //   userId: 'temp_userId',
-    //   databaseId: 'temp_databaseId',
-    //   id: 'temp_id',
-    //   title: title,
-    //   creationDate: Date.now(),
-    //   latestUpdate: Date.now()
-    // }
+  const createNoteHandler = (
+    categoryId: string,
+    title: string,
+    index: number,
+    database: Database
+  ) => {
+    const tempNote = {
+      userId: 'temp_userId',
+      databaseId: 'temp_databaseId',
+      id: 'temp_id',
+      title: title,
+      creationDate: Date.now(),
+      latestUpdate: Date.now()
+    }
 
     createNote({
       variables: {
@@ -136,13 +140,13 @@ const DatabaseContainer: React.FC = () => {
         categoryId: categoryId,
         title: title,
         index: index
-      }, 
-      // optimisticResponse: {
-      //   createNote: {
-      //     tempNote
-      //   }
-      // },
-      // update(cache, 
+      },
+      optimisticResponse: {
+        createNote: {
+          tempNote,
+        }
+      },
+      // update(cache,
       //   {
       //     data: { createNote }
       //   }
@@ -151,7 +155,7 @@ const DatabaseContainer: React.FC = () => {
       //     fields: {
       //       notes(existingNotes = []) {
       //         const newNoteRef = cache.writeFragment({
-                
+
       //           data: createNote,
       //           fragment: gql`
       //             fragment NewNote on Note {
@@ -171,23 +175,21 @@ const DatabaseContainer: React.FC = () => {
       // }
       update: (cache) => {
         // TODO: Handle typing
-        const tempData : any = cache.readQuery({query: GET_DATABASE_QUERY, variables: {id: database.id}});
-        console.log(tempData);
-        console.log(tempData.getDatabase.notes)
-
-        
-        const tempNotes = [...tempData.getDatabase.notes, createNote];
-        console.log(tempNotes);
-
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
             id: DATABASE_ID
           },
-          data: { getDatabase: tempNotes}
+          data: { getDatabase: database }
         });
-      }
-
+      },
+      refetchQueries: [
+        {
+          query: GET_DATABASE_QUERY,
+          variables: { id: database.id }
+        }
+      ],
+      awaitRefetchQueries: true
     });
   };
 
@@ -203,11 +205,10 @@ const DatabaseContainer: React.FC = () => {
       optimisticResponse: {
         deleteNote: {
           deletedNote,
-          __typeName: 'Note'
         }
       },
 
-      update: (cache) => {
+      update: cache => {
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
