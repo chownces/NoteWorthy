@@ -231,7 +231,7 @@ const DatabaseContainer: React.FC = () => {
             data: newData
           });
         }
-    }
+      }
       // refetchQueries: [
       //   {
       //     query: GET_DATABASE_QUERY,
@@ -403,33 +403,31 @@ const DatabaseContainer: React.FC = () => {
 
   console.log(data);
   if (data) {
-  const DatabaseProps: DatabaseProps = {
-    id: data.getDatabase.id,
-    nonCategorisedId: data.getDatabase.categories[0].id,
-    title: data.getDatabase.title,
-    currentView: data.getDatabase.currentView,
-    categories: data.getDatabase.categories,
-    notes: data.getDatabase.notes,
-    createNoteHandler: createNoteHandler,
-    deleteNoteHandler: deleteNoteHandler,
-    createDatabaseCategoryHandler: createDatabaseCategoryHandler,
-    deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
-    updateDatabaseViewHandler: updateDatabaseViewHandler,
-    updateNoteCategoryHandler: updateNoteCategoryHandler,
-    updateNoteTitleHandler: updateNoteTitleHandler
-  };
+    const DatabaseProps: DatabaseProps = {
+      id: data.getDatabase.id,
+      nonCategorisedId: data.getDatabase.categories[0].id,
+      title: data.getDatabase.title,
+      currentView: data.getDatabase.currentView,
+      categories: data.getDatabase.categories,
+      notes: data.getDatabase.notes,
+      createNoteHandler: createNoteHandler,
+      deleteNoteHandler: deleteNoteHandler,
+      createDatabaseCategoryHandler: createDatabaseCategoryHandler,
+      deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
+      updateDatabaseViewHandler: updateDatabaseViewHandler,
+      updateNoteCategoryHandler: updateNoteCategoryHandler,
+      updateNoteTitleHandler: updateNoteTitleHandler
+    };
 
- 
-  return data.getDatabase.currentView === DatabaseViews.BOARD ? (
-    <BoardDatabase {...DatabaseProps} />
-  ) : DatabaseViews.TABLE ? (
-    <TableDatabase {...DatabaseProps} />
-  ) : (
-    <></>
-  );
-  }
-  else {
-    return <></>
+    return data.getDatabase.currentView === DatabaseViews.BOARD ? (
+      <BoardDatabase {...DatabaseProps} />
+    ) : DatabaseViews.TABLE ? (
+      <TableDatabase {...DatabaseProps} />
+    ) : (
+      <></>
+    );
+  } else {
+    return <></>;
   }
 };
 
