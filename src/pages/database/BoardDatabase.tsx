@@ -64,13 +64,81 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     [props]
   );
 
+  const createNoteHandler = (categoryId: string, title: string, index: number) => {
+    const notesCopy: Note[] = props.notes.map(note => note);
+
+    const newNote: Note = {
+      userId: 'temp_userId',
+      databaseId: props.id,
+      id: 'temp_id',
+      categoryId: categoryId,
+      title: title,
+      blocks: [
+        {
+          id: '',
+          html: '',
+          tag: ''
+        }
+      ],
+      creationDate: new Date(Date.now()).toDateString(),
+      latestUpdate: new Date(Date.now()).toDateString()
+    };
+
+    notesCopy.splice(notesCopy.length, 0, newNote);
+
+    const categoriesCopy: Category[] = props.categories.map(cat => {
+      if (cat.id === categoryId) {
+        const tempNotes = [...cat.notes];
+        tempNotes.splice(index, 0, 'temp_id');
+        return { ...cat, notes: tempNotes };
+      } else {
+        return { ...cat, notes: [...cat.notes] };
+      }
+    });
+
+    console.log(categoriesCopy);
+
+    const databaseCopy: Database = {
+      id: props.id,
+      title: props.title,
+      currentView: props.currentView,
+      categories: categoriesCopy,
+      notes: notesCopy
+    };
+
+    props.createNoteHandler(categoryId, title, index, databaseCopy);
+  };
+
+  const deleteNoteHandler = (noteId: string) => {
+    const notesCopy: Note[] = props.notes.filter(note => note.id !== noteId);
+
+    const categoryId = props.notes.filter(note => note.id === noteId)[0].categoryId;
+    const categoriesCopy: Category[] = props.categories.map(cat => {
+      if (cat.id === categoryId) {
+        return { ...cat, notes: cat.notes.filter(note => note !== noteId) };
+      } else {
+        return { ...cat, notes: [...cat.notes] };
+      }
+    });
+
+    const databaseCopy: Database = {
+      id: props.id,
+      title: props.title,
+      currentView: props.currentView,
+      categories: categoriesCopy,
+      notes: notesCopy
+    };
+
+    props.deleteNoteHandler(noteId, databaseCopy);
+  };
+
   const categoryColumnProps = {
     databaseId: props.id,
     renaming: true,
     notes: props.notes,
     deleteDatabaseCategoryHandler: props.deleteDatabaseCategoryHandler,
-    createNoteHandler: props.createNoteHandler,
-    deleteNoteHandler: props.deleteNoteHandler,
+    createNoteHandler: createNoteHandler,
+    deleteNoteHandler: deleteNoteHandler,
     updateNoteTitleHandler: props.updateNoteTitleHandler
   };
 

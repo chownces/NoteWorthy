@@ -117,62 +117,158 @@ const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
-  const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
-    update: (cache, { data: { createNote } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
+  const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: { getDatabase: [...data.getDatabase.notes, createNote] }
-      });
-    }
-  });
+  const createNoteHandler = (
+    categoryId: string,
+    title: string,
+    index: number,
+    database: Database
+  ) => {
+    // const tempNote = {
+    //   userId: 'temp_userId',
+    //   databaseId: 'temp_databaseId',
+    //   id: 'temp_id',
+    //   title: title,
+    //   creationDate: new Date(Date.now()).toDateString(),
+    //   latestUpdate: new Date(Date.now()).toDateString()
+    // };
 
-  const createNoteHandler = (categoryId: string, title: string, index: number) => {
     createNote({
       variables: {
         id: DATABASE_ID,
         categoryId: categoryId,
         title: title,
         index: index
+      },
+      optimisticResponse: {
+        createNote: {
+          userId: 'temp_userId',
+          databaseId: 'temp_databaseId',
+          id: 'temp_id',
+          title: title,
+          creationDate: new Date(Date.now()).toDateString(),
+          latestUpdate: new Date(Date.now()).toDateString(),
+          __typename: 'Note'
+        }
+      },
+      // update(cache,
+      //   {
+      //     data: { createNote }
+      //   }
+      // ) {
+      //   cache.modify({
+      //     fields: {
+      //       notes(existingNotes = []) {
+      //         const newNoteRef = cache.writeFragment({
+
+      //           data: createNote,
+      //           fragment: gql`
+      //             fragment NewNote on Note {
+      //               userId
+      //               databaseId
+      //               id
+      //               title
+      //               creationDate
+      //               latestUpdate
+      //             }
+      //           `
+      //         });
+      //         return existingNotes.concat(newNoteRef);
+      //       }
+      //     }
+      //   })
+      // }
+
+      update: (cache, response) => {
+        // TODO: Handle typing
+        const previousData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: database.id
+          }
+        });
+
+        console.log(previousData);
+        console.log(response);
+
+        const tempNote = response.data.createNote;
+        const newNote = { __typename: 'Note', categoryId: categoryId, ...tempNote, blocks: [] };
+        console.log(newNote);
+
+        const tempCategories = previousData.getDatabase.categories.map((cat: any) => {
+          if (cat.id === categoryId) {
+            const tempNotes = [...cat.notes];
+            tempNotes.splice(index, 0, newNote.id);
+            return { ...cat, notes: tempNotes, __typename: 'Category' };
+          } else {
+            return { ...cat, notes: [...cat.notes], __typename: 'Category' };
+          }
+        });
+
+        const tempNotes = [...previousData.getDatabase.notes];
+        tempNotes.push(newNote);
+
+        console.log(tempCategories);
+
+        const newData = {
+          getDatabase: {
+            currentview: previousData.getDatabase.currentView,
+            categories: tempCategories,
+            notes: tempNotes,
+            title: previousData.getDatabase.title,
+            id: previousData.getDatabase.id,
+            __typename: 'PopulatedDatabase'
+          }
+        };
+
+        console.log(newData);
+
+        if (newData.getDatabase) {
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: database.id
+            },
+            data: newData
+          });
+        }
       }
+      // refetchQueries: [
+      //   {
+      //     query: GET_DATABASE_QUERY,
+      //     variables: { id: database.id }
+      //   }
+      // ],
+      // awaitRefetchQueries: true
     });
   };
 
-  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
-    update: (cache, { data: { deleteNote } }) => {
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
+  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION);
 
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId !== deleteNote.id)
-        }
-      });
-    }
-  });
-
-  const deleteNoteHandler = (noteId: string) => {
+  const deleteNoteHandler = (noteId: string, database: Database) => {
+    const deletedNote = database.notes.filter(note => note.id === noteId)[0];
     deleteNote({
       variables: {
         noteId: noteId
+      },
+
+      optimisticResponse: {
+        deleteNote: {
+          deletedNote
+        }
+      },
+
+      update: cache => {
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: database
+          }
+        });
       }
     });
   };
@@ -281,7 +377,7 @@ const DatabaseContainer: React.FC = () => {
           updatedDatabase
         }
       },
-      update: (cache, { data: { updateNoteCategory } }) => {
+      update: cache => {
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
