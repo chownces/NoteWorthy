@@ -43,8 +43,41 @@ const NotePageContainer: React.FC = () => {
   }
 
   // Tracks `blocks` state locally in React as a mutable ref (for react-contenteditable)
-  blocks.current = data.getNote.blocks;
 
+  function treeify(list: any[], idAttr: string, parentAttr: string, childrenAttr: string) {
+    if (!idAttr) idAttr = 'id';
+    if (!parentAttr) parentAttr = 'parent';
+    if (!childrenAttr) childrenAttr = 'children';
+
+    const treeList: any[] = [];
+    const lookup: any = {};
+    list.forEach(function (obj) {
+      lookup[obj[idAttr]] = obj;
+      obj[childrenAttr] = [];
+    });
+    list.forEach(function (obj) {
+      if (obj[parentAttr] != null) {
+        if (lookup[obj[parentAttr]] !== undefined) {
+          lookup[obj[parentAttr]][childrenAttr].push(obj);
+        } else {
+          //console.log('Missing Parent Data: ' + obj[parentAttr]);
+          treeList.push(obj);
+        }
+      } else {
+        treeList.push(obj);
+      }
+    });
+    return treeList;
+  }
+
+  const flatBlocks = [...data.getNote.blocks];
+  const flatBlocksCopy = flatBlocks.map(block => {
+    return { id: block.id, html: block.html, tag: block.tag, children: [...block.children] };
+  });
+
+  blocks.current = treeify(flatBlocksCopy, 'id', 'parent', 'children');
+
+  console.log(blocks.current);
   const notePageProps: NotePageProps = {
     blocks: blocks,
     updateBlocksInDatabase: updateBlocksInDatabase
@@ -67,13 +100,14 @@ const GET_NOTE_QUERY = gql`
         id
         html
         tag
+        children
+        parent
       }
       creationDate
       latestUpdate
     }
   }
 `;
-
 /**
  * IMPT: We are setting ignoreResults, and not returning the updated notepage fields
  * to prevent Apollo cache from updating automatically. This is crucial to prevent

@@ -13,6 +13,7 @@ export type NoteBlockStateProps = {
   id: string;
   html: string;
   tag: string;
+  children: NoteBlockHandlerProps[];
 };
 
 export type NoteBlockHandlerProps = {
@@ -53,7 +54,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     props.updatePage({
       id: props.id,
       html: value,
-      tag: props.tag
+      tag: props.tag,
+      children: props.children
     });
 
     html.current = value;

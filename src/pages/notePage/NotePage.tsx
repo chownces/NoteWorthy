@@ -83,7 +83,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
       html: '',
-      tag: 'p' // TODO: Reconsider default block tag
+      tag: 'p', // TODO: Reconsider default block tag
+      children: []
     };
     const blocksCopy = [...props.blocks.current];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
@@ -147,7 +148,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
       html: '',
-      tag: 'p' // TODO: Reconsider default block tag
+      tag: 'p', // TODO: Reconsider default block tag
+      children: []
     };
     const blocksCopy = [...props.blocks.current];
     blocksCopy.push(newBlock);
