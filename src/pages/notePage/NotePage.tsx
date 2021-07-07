@@ -51,16 +51,23 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles text changes in each ContentEditable block by updating the relevant index inside `blocks`.
    */
   // TODO: Handle tag changes in the future.
-  const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
-    const blocksCopy = [...props.blocks.current];
-    const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
-    blocksCopy[index] = {
-      ...blocksCopy[index],
-      html: updatedBlock.html,
-      tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
-    };
+  // const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
+  //   const blocksCopy = [...props.blocks.current];
+  //   const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
+  //   blocksCopy[index] = {
+  //     ...blocksCopy[index],
+  //     html: updatedBlock.html,
+  //     tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
+  //   };
 
-    setBlocksAndSetUnsaved(blocksCopy);
+  //   setBlocksAndSetUnsaved(blocksCopy);
+  // };
+
+  /**
+   * Copy states in neigbour, pass the baton.
+   */
+  const updatePageHandler = (updatedBlocks: NoteBlockStateProps[]): void => {
+    setBlocksAndSetUnsaved(updatedBlocks);
   };
 
   /**
@@ -95,6 +102,67 @@ const NotePage: React.FC<NotePageProps> = props => {
         ?.children[1] as HTMLElement).focus();
     };
 
+    setBlocksAndSetUnsaved(blocksCopy);
+    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+  };
+
+  // const indentBlockHandler = (
+  //   currentBlock: NoteBlockStateProps,
+  //   ref: React.RefObject<HTMLElement>
+  // ): void => {
+  //   const newBlock: NoteBlockStateProps = {
+  //     id: uniqueId(), // TODO: Consider using the id provided by MongoDB
+  //     html: '',
+  //     tag: 'p', // TODO: Reconsider default block tag
+  //     children: []
+  //   };
+  //   const blocksCopy = [...props.blocks.current];
+  //   const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+
+  //   blocksCopy[index] = {...blocksCopy[index]};
+  //   blocksCopy[index].children = [...blocksCopy[index].children];
+  //   blocksCopy[index].children.splice(0,0,newBlock);
+
+  //   const focusNextBlockCallback = () => {
+  //     (ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
+  //       ?.children[1] as HTMLElement).focus();
+  //   };
+
+  //   console.log(blocksCopy);
+  //   setBlocksAndSetUnsaved(blocksCopy);
+  //   setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+  // };
+
+  const indentBlockHandler = (
+    currentBlock: NoteBlockStateProps,
+    ref: React.RefObject<HTMLElement>
+  ): void => {
+    const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
+      ?.children[0]?.children[1] as HTMLElement;
+
+    if (!previousBlock) {
+      return;
+    }
+
+    const currentBlockCopy = {
+      id: currentBlock.id,
+      html: currentBlock.html,
+      tag: currentBlock.tag,
+      children: currentBlock.children
+    };
+
+    const focusNextBlockCallback = () => {
+      (previousBlock as HTMLElement).focus();
+    };
+
+    const blocksCopy = [...props.blocks.current];
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    blocksCopy[index - 1].children = [...blocksCopy[index - 1].children];
+    const length = blocksCopy[index - 1].children.length;
+    blocksCopy.splice(index, 1);
+    blocksCopy[index - 1].children.splice(length, 0, currentBlockCopy);
+
+    console.log(blocksCopy);
     setBlocksAndSetUnsaved(blocksCopy);
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
@@ -184,9 +252,9 @@ const NotePage: React.FC<NotePageProps> = props => {
   };
 
   const noteBlockHandlerProps: NoteBlockHandlerProps = {
-    updatePage: updatePageHandler,
     addBlock: addBlockHandler,
     deleteBlock: deleteBlockHandler,
+    indentBlock: indentBlockHandler,
     setIsEditMode: setIsEditMode
   };
 
@@ -202,6 +270,12 @@ const NotePage: React.FC<NotePageProps> = props => {
                     <NoteBlock
                       {...block}
                       {...noteBlockHandlerProps}
+                      updatePage={(updatedBlock: NoteBlockStateProps) => {
+                        const blocksCopy = [...props.blocks.current];
+                        const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
+                        blocksCopy.splice(index, 1, updatedBlock);
+                        updatePageHandler(blocksCopy);
+                      }}
                       key={block.id}
                       isEditMode={isEditMode}
                       innerRef={provided.innerRef}

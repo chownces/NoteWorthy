@@ -23,15 +23,21 @@ const NotePageContainer: React.FC = () => {
   });
 
   const updateBlocksInDatabase = (blocks: NoteBlockStateProps[]) => {
+    console.log(blocks);
+
+    const blocksCopy = blocks.map(b => {
+      return { id: b.id, html: b.html, tag: b.tag, children: b.children };
+    });
+
+    console.log(blocksCopy);
     updateNoteBlocks({
       variables: {
         id: NOTE_ID,
         // NOTE: This map is required for now since each block has a '__typename' field due to the current MongoDB schema
-        blocks: blocks.map(b => {
-          return { id: b.id, html: b.html, tag: b.tag };
-        })
+        blocks: blocks
       }
     });
+    console.log(blocks);
   };
 
   if (queryLoading) {
@@ -71,11 +77,25 @@ const NotePageContainer: React.FC = () => {
   }
 
   const flatBlocks = [...data.getNote.blocks];
+
+  console.log(flatBlocks);
+
   const flatBlocksCopy = flatBlocks.map(block => {
-    return { id: block.id, html: block.html, tag: block.tag, children: [...block.children] };
+    return {
+      children: block.children,
+      id: block.id,
+      html: block.html,
+      tag: block.tag,
+      parent: block.parent
+    };
   });
 
-  blocks.current = treeify(flatBlocksCopy, 'id', 'parent', 'children');
+  const tree = treeify(flatBlocksCopy, 'id', 'parent', 'children')[0];
+
+  flatBlocksCopy.map((block: any) => delete block.parent);
+
+  console.log(tree);
+  blocks.current = tree.children;
 
   console.log(blocks.current);
   const notePageProps: NotePageProps = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
+import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 
@@ -13,13 +13,13 @@ export type NoteBlockStateProps = {
   id: string;
   html: string;
   tag: string;
-  children: NoteBlockHandlerProps[];
+  children: NoteBlockStateProps[];
 };
 
 export type NoteBlockHandlerProps = {
-  updatePage(updatedBlock: NoteBlockStateProps): void;
   addBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
   deleteBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
+  indentBlock(currentBlock: NoteBlockStateProps, ref: React.RefObject<HTMLElement>): void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
 };
 
@@ -28,6 +28,7 @@ type OwnProps = {
   lastBlockRef?: React.RefObject<HTMLElement>;
   provided: DraggableProvided;
   isEditMode: boolean;
+  updatePage: (currentBlock: NoteBlockStateProps) => void;
 };
 
 const NoteBlock: React.FC<NoteBlockProps> = props => {
@@ -112,6 +113,11 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         noteBlockRef.current?.blur();
         break;
 
+      case 'Tab':
+        e.preventDefault();
+        props.indentBlock(props, noteBlockRef);
+        break;
+
       // TODO: Handle case where user presses arrow up to navigate within a content block itself
     }
   };
@@ -127,6 +133,12 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     updateNameHandler: () => {}
   };
 
+  const noteBlockHandlerProps: NoteBlockHandlerProps = {
+    addBlock: props.addBlock,
+    deleteBlock: props.deleteBlock,
+    indentBlock: props.indentBlock,
+    setIsEditMode: props.setIsEditMode
+  };
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
@@ -161,8 +173,37 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
             });
           }}
         />
-        <ContextMenuElement {...contextMenuProps} />
+        <div className="indent">
+          {props.children.map((block, index) => (
+            <Draggable draggableId={block.id} index={index} key={block.id}>
+              {provided => (
+                <NoteBlock
+                  {...block}
+                  {...noteBlockHandlerProps}
+                  updatePage={(updatedBlock: NoteBlockStateProps) => {
+                    const blockCopy = {
+                      id: props.id,
+                      tag: props.tag,
+                      html: props.html,
+                      children: [...props.children]
+                    };
+
+                    const index = blockCopy.children.map(b => b.id).indexOf(updatedBlock.id);
+                    blockCopy.children.splice(index, 1, updatedBlock);
+                    props.updatePage(blockCopy);
+                  }}
+                  key={block.id}
+                  isEditMode={props.isEditMode}
+                  innerRef={provided.innerRef}
+                  lastBlockRef={index === props.children.length - 1 ? noteBlockRef : undefined}
+                  provided={provided}
+                />
+              )}
+            </Draggable>
+          ))}
+        </div>
       </div>
+      <ContextMenuElement {...contextMenuProps} />
     </ContextMenuTrigger>
   );
 };

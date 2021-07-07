@@ -25,3 +25,8 @@
     background-color: lightblue;
   }
 }
+
+.indent::after {
+  content: '\a';
+  white-space: pre;
+}
