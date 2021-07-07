@@ -26,7 +26,8 @@
   }
 }
 
-.indent::after {
-  content: '\a';
-  white-space: pre;
+.indent {
+  margin-left: 50px;
+  margin-top: -10px;
+  margin-bottom: -10px;
 }

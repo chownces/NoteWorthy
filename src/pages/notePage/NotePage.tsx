@@ -3,6 +3,7 @@ import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautif
 
 import NoteBlock, {
   NoteBlockHandlerProps,
+  NoteBlockNavigationProps,
   NoteBlockStateProps
 } from '../../components/noteBlock/NoteBlock';
 import { setEol, uniqueId } from '../../utils/helpers';
@@ -83,6 +84,14 @@ const NotePage: React.FC<NotePageProps> = props => {
   /**
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
    */
+
+  const nextBlockGetter = (ref: React.RefObject<HTMLElement>) =>
+    ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
+      ?.children[0]?.children[1];
+
+  const previousBlockGetter = (ref: React.RefObject<HTMLElement>) =>
+    ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling?.children[0]
+      ?.children[0]?.children[1];
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
@@ -98,8 +107,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
-      (ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
-        ?.children[1] as HTMLElement).focus();
+      (nextBlockGetter(ref) as HTMLElement).focus();
     };
 
     setBlocksAndSetUnsaved(blocksCopy);
@@ -137,9 +145,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
   ): void => {
-    const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
-      ?.children[0]?.children[1] as HTMLElement;
-
+    const previousBlock = previousBlockGetter(ref);
     if (!previousBlock) {
       return;
     }
@@ -174,11 +180,9 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>
   ): void => {
-    const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
-      ?.children[0]?.children[1] as HTMLElement;
+    const previousBlock = previousBlockGetter(ref) as HTMLElement;
 
-    const nextBlock = ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
-      ?.children[1] as HTMLElement;
+    const nextBlock = nextBlockGetter(ref) as HTMLElement;
 
     const blocksCopy = [...props.blocks.current];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
@@ -258,6 +262,11 @@ const NotePage: React.FC<NotePageProps> = props => {
     setIsEditMode: setIsEditMode
   };
 
+  const noteBlockNavigationProps: NoteBlockNavigationProps = {
+    nextBlockGetter: nextBlockGetter,
+    previousBlockGetter: previousBlockGetter
+  };
+
   return (
     <div className="Notepage">
       <DragDropContext onDragEnd={onDragEndHandler}>
@@ -270,6 +279,7 @@ const NotePage: React.FC<NotePageProps> = props => {
                     <NoteBlock
                       {...block}
                       {...noteBlockHandlerProps}
+                      {...noteBlockNavigationProps}
                       updatePage={(updatedBlock: NoteBlockStateProps) => {
                         const blocksCopy = [...props.blocks.current];
                         const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);

@@ -7,13 +7,21 @@ import { setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
 import ContextMenuElement, { ContextMenuType } from '../contextMenu/ContextMenuElement';
 
-export type NoteBlockProps = NoteBlockStateProps & NoteBlockHandlerProps & OwnProps;
+export type NoteBlockProps = NoteBlockStateProps &
+  NoteBlockHandlerProps &
+  NoteBlockNavigationProps &
+  OwnProps;
 
 export type NoteBlockStateProps = {
   id: string;
   html: string;
   tag: string;
   children: NoteBlockStateProps[];
+};
+
+export type NoteBlockNavigationProps = {
+  nextBlockGetter: (ref: React.RefObject<HTMLElement>) => Element | undefined;
+  previousBlockGetter: (ref: React.RefObject<HTMLElement>) => Element | undefined;
 };
 
 export type NoteBlockHandlerProps = {
@@ -83,8 +91,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to previous block, if it exists
       case 'ArrowUp':
         e.preventDefault();
-        const previousBlock = noteBlockRef.current?.parentElement?.parentElement
-          ?.previousElementSibling?.children[0]?.children[1] as HTMLElement;
+        const previousBlock = props.previousBlockGetter(noteBlockRef) as HTMLElement;
         if (previousBlock) {
           setEol(previousBlock);
         }
@@ -93,8 +100,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to next block, if it exists
       case 'ArrowDown':
         e.preventDefault();
-        const nextBlock = noteBlockRef.current?.parentElement?.parentElement?.nextElementSibling
-          ?.children[0]?.children[1] as HTMLElement;
+        const nextBlock = props.nextBlockGetter(noteBlockRef) as HTMLElement;
         if (nextBlock) {
           setEol(nextBlock);
         }
@@ -139,6 +145,11 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     indentBlock: props.indentBlock,
     setIsEditMode: props.setIsEditMode
   };
+
+  const noteBlockNavigationProps: NoteBlockNavigationProps = {
+    nextBlockGetter: props.nextBlockGetter,
+    previousBlockGetter: props.previousBlockGetter
+  };
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
@@ -149,30 +160,33 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
      * NotePage::deleteBlockHandler
      * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
      */
-    <ContextMenuTrigger id={props.id} holdToDisplay={1000}>
-      <div
-        className="noteblock"
-        ref={props.innerRef}
-        {...props.provided.dragHandleProps} // react-beautiful-dnd props
-        {...props.provided.draggableProps} // react-beautiful-dnd props
-      >
-        <div className="noteblock-handle"></div>
-        <ContentEditable
-          className="noteblock-text"
-          innerRef={mergedRef}
-          html={html.current}
-          tagName={props.tag}
-          onChange={onChangeHandler}
-          onKeyDown={onKeydownHandler}
-          disabled={!props.isEditMode}
-          onClick={() => {
-            props.setIsEditMode(true, () => {
-              noteBlockRef.current?.focus();
-              // TODO: This eol line is causing issues when using the mouse to position the cursor
-              // setEol(noteBlockRef.current);
-            });
-          }}
-        />
+    <div>
+      <ContextMenuTrigger id={props.id} holdToDisplay={1000}>
+        <div
+          className="noteblock"
+          ref={props.innerRef}
+          {...props.provided.dragHandleProps} // react-beautiful-dnd props
+          {...props.provided.draggableProps} // react-beautiful-dnd props
+        >
+          <div className="noteblock-handle"></div>
+          <ContentEditable
+            className="noteblock-text"
+            innerRef={mergedRef}
+            html={html.current}
+            tagName={props.tag}
+            onChange={onChangeHandler}
+            onKeyDown={onKeydownHandler}
+            disabled={!props.isEditMode}
+            onClick={() => {
+              props.setIsEditMode(true, () => {
+                noteBlockRef.current?.focus();
+                // TODO: This eol line is causing issues when using the mouse to position the cursor
+                // setEol(noteBlockRef.current);
+              });
+            }}
+          />
+        </div>
+        <ContextMenuElement {...contextMenuProps} />
         <div className="indent">
           {props.children.map((block, index) => (
             <Draggable draggableId={block.id} index={index} key={block.id}>
@@ -180,6 +194,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
                 <NoteBlock
                   {...block}
                   {...noteBlockHandlerProps}
+                  {...noteBlockNavigationProps}
                   updatePage={(updatedBlock: NoteBlockStateProps) => {
                     const blockCopy = {
                       id: props.id,
@@ -202,9 +217,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
             </Draggable>
           ))}
         </div>
-      </div>
-      <ContextMenuElement {...contextMenuProps} />
-    </ContextMenuTrigger>
+      </ContextMenuTrigger>
+    </div>
   );
 };
 
