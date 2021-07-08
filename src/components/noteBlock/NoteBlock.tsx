@@ -118,6 +118,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // Navigates to next block, if it exists
       case 'ArrowDown':
         e.preventDefault();
+
         const nextBlock = props.nextBlockGetter(noteBlockRef) as HTMLElement;
         if (nextBlock) {
           setEol(nextBlock);
@@ -127,6 +128,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       case 'b':
         if (e.metaKey) {
           e.preventDefault();
+
           toggleBold(noteBlockRef.current as HTMLElement); // TODO: Handle untoggling also!
         }
         break;
@@ -196,7 +198,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
      * NotePage::deleteBlockHandler
      * NoteBlock::onKeydownHandler (ArrowUp and ArrowDown)
      */
-    <div>
+    <div className="note-block">
       <ContextMenuTrigger id={props.id} holdToDisplay={1000}>
         <div
           className="noteblock"
@@ -247,7 +249,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
                 key={block.id}
                 isEditMode={props.isEditMode}
                 innerRef={provided.innerRef}
-                lastBlockRef={index === props.children.length - 1 ? noteBlockRef : undefined}
+                lastBlockRef={undefined}
                 provided={provided}
               />
             )}

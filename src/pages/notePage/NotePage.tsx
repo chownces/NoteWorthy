@@ -73,19 +73,47 @@ const NotePage: React.FC<NotePageProps> = props => {
 
   const nextBlockGetter = (ref: React.RefObject<HTMLElement>) => {
     const nextChild =
-      ref.current?.parentElement?.parentElement?.parentElement?.children[0]?.children[0]
-        ?.children[1];
-    console.log(nextChild);
-    return (
+      ref.current?.parentElement?.parentElement?.parentElement?.children[1]?.children[0]
+        ?.children[0]?.children[0]?.children[1];
+
+    const nextSibling =
       ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
-        ?.children[0]?.children[1] || nextChild
-    );
+        ?.children[0]?.children[1];
+
+    let nextRelative = undefined;
+    let nextAncestor = ref.current?.parentElement?.parentElement?.parentElement;
+
+    while (
+      nextRelative === undefined &&
+      nextAncestor?.parentElement?.parentElement?.className === 'note-block'
+    ) {
+      nextAncestor = nextAncestor?.parentElement?.parentElement;
+      nextRelative = nextAncestor?.nextElementSibling?.children[0]?.children[0]?.children[1];
+    }
+
+    console.log(nextRelative);
+    return nextChild || nextSibling || nextRelative;
   };
 
-  const previousBlockGetter = (ref: React.RefObject<HTMLElement>) =>
-    ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling?.children[0]
-      ?.children[0]?.children[1];
+  const previousBlockGetter = (ref: React.RefObject<HTMLElement>) => {
+    let previousRelative =
+      ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling;
+    while (previousRelative?.children[1].children !== undefined) {
+      if (previousRelative?.children[1]?.children.length === 0) {
+        break;
+      }
+      const numSibs = previousRelative?.children[1].children.length;
+      previousRelative = previousRelative?.children[1].children[numSibs - 1];
+    }
 
+    previousRelative = previousRelative?.children[0]?.children[0]?.children[1];
+
+    const previousParent =
+      ref.current?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement
+        ?.children[0]?.children[0]?.children[1];
+
+    return previousRelative || previousParent;
+  };
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
@@ -141,10 +169,16 @@ const NotePage: React.FC<NotePageProps> = props => {
     console.log(blocksCopy);
     updateBlocksHandler(blocksCopy);
 
+    console.log(ref);
     const focusNextBlockCallback = () => {
+      console.log(ref.current?.parentElement);
+
+      const numSibs =
+        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children.length;
       const indentBlockRef =
-        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children[0]
-          ?.children[0]?.children[0]?.children[1];
+        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children[
+          (numSibs || 1) - 1
+        ]?.children[0]?.children[0]?.children[1];
       console.log(indentBlockRef);
       (indentBlockRef as HTMLElement).focus();
     };
