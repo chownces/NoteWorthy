@@ -52,21 +52,7 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles text changes in each ContentEditable block by updating the relevant index inside `blocks`.
    */
   // TODO: Handle tag changes in the future.
-  // const updatePageHandler = (updatedBlock: NoteBlockStateProps): void => {
-  //   const blocksCopy = [...props.blocks.current];
-  //   const index = blocksCopy.map(b => b.id).indexOf(updatedBlock.id);
-  //   blocksCopy[index] = {
-  //     ...blocksCopy[index],
-  //     html: updatedBlock.html,
-  //     tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
-  //   };
 
-  //   setBlocksAndSetUnsaved(blocksCopy);
-  // };
-
-  /**
-   * Copy states in neigbour, pass the baton.
-   */
   const updatePageHandler = (updatedBlocks: NoteBlockStateProps[]): void => {
     setBlocksAndSetUnsaved(updatedBlocks);
   };
@@ -92,9 +78,12 @@ const NotePage: React.FC<NotePageProps> = props => {
   const previousBlockGetter = (ref: React.RefObject<HTMLElement>) =>
     ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling?.children[0]
       ?.children[0]?.children[1];
+
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[]
   ): void => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
@@ -102,7 +91,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: 'p', // TODO: Reconsider default block tag
       children: []
     };
-    const blocksCopy = [...props.blocks.current];
+    const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index + 1, 0, newBlock);
 
@@ -110,40 +99,16 @@ const NotePage: React.FC<NotePageProps> = props => {
       (nextBlockGetter(ref) as HTMLElement).focus();
     };
 
-    setBlocksAndSetUnsaved(blocksCopy);
+    updateBlocksHandler(blocksCopy);
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
-  // const indentBlockHandler = (
-  //   currentBlock: NoteBlockStateProps,
-  //   ref: React.RefObject<HTMLElement>
-  // ): void => {
-  //   const newBlock: NoteBlockStateProps = {
-  //     id: uniqueId(), // TODO: Consider using the id provided by MongoDB
-  //     html: '',
-  //     tag: 'p', // TODO: Reconsider default block tag
-  //     children: []
-  //   };
-  //   const blocksCopy = [...props.blocks.current];
-  //   const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
-
-  //   blocksCopy[index] = {...blocksCopy[index]};
-  //   blocksCopy[index].children = [...blocksCopy[index].children];
-  //   blocksCopy[index].children.splice(0,0,newBlock);
-
-  //   const focusNextBlockCallback = () => {
-  //     (ref.current?.parentElement?.parentElement?.nextElementSibling?.children[0]
-  //       ?.children[1] as HTMLElement).focus();
-  //   };
-
-  //   console.log(blocksCopy);
-  //   setBlocksAndSetUnsaved(blocksCopy);
-  //   setTriggerRerender(!triggerRerender, focusNextBlockCallback);
-  // };
-
+  // Indents current block and adds it as a child of the previous block
   const indentBlockHandler = (
     currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[]
   ): void => {
     const previousBlock = previousBlockGetter(ref);
     if (!previousBlock) {
@@ -161,7 +126,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       (previousBlock as HTMLElement).focus();
     };
 
-    const blocksCopy = [...props.blocks.current];
+    const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy[index - 1].children = [...blocksCopy[index - 1].children];
     const length = blocksCopy[index - 1].children.length;
@@ -169,7 +134,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy[index - 1].children.splice(length, 0, currentBlockCopy);
 
     console.log(blocksCopy);
-    setBlocksAndSetUnsaved(blocksCopy);
+    updateBlocksHandler(blocksCopy);
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
@@ -178,13 +143,15 @@ const NotePage: React.FC<NotePageProps> = props => {
    */
   const deleteBlockHandler = (
     currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[]
   ): void => {
     const previousBlock = previousBlockGetter(ref) as HTMLElement;
 
     const nextBlock = nextBlockGetter(ref) as HTMLElement;
 
-    const blocksCopy = [...props.blocks.current];
+    const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index, 1);
     if (previousBlock) {
@@ -192,17 +159,17 @@ const NotePage: React.FC<NotePageProps> = props => {
         setEol(previousBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy);
+      updateBlocksHandler(blocksCopy);
       setTriggerRerender(!triggerRerender, focusPreviousBlockEolCallback);
     } else if (nextBlock) {
       const focusNextBlockEolCallback = () => {
         setEol(nextBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy);
+      updateBlocksHandler(blocksCopy);
       setTriggerRerender(!triggerRerender, focusNextBlockEolCallback);
     } else {
-      setBlocksAndSetUnsaved(blocksCopy);
+      updateBlocksHandler(blocksCopy);
       setIsEditMode(false);
     }
   };
@@ -259,6 +226,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     addBlock: addBlockHandler,
     deleteBlock: deleteBlockHandler,
     indentBlock: indentBlockHandler,
+    updateBlocksHandler: updatePageHandler,
+    blocks: props.blocks.current,
     setIsEditMode: setIsEditMode
   };
 
