@@ -71,9 +71,16 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
    */
 
-  const nextBlockGetter = (ref: React.RefObject<HTMLElement>) =>
-    ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
-      ?.children[0]?.children[1];
+  const nextBlockGetter = (ref: React.RefObject<HTMLElement>) => {
+    const nextChild =
+      ref.current?.parentElement?.parentElement?.parentElement?.children[0]?.children[0]
+        ?.children[1];
+    console.log(nextChild);
+    return (
+      ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
+        ?.children[0]?.children[1] || nextChild
+    );
+  };
 
   const previousBlockGetter = (ref: React.RefObject<HTMLElement>) =>
     ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling?.children[0]
@@ -108,22 +115,20 @@ const NotePage: React.FC<NotePageProps> = props => {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
-    currentBlocks: NoteBlockStateProps[]
+    currentBlocks: NoteBlockStateProps[],
+    html: string
   ): void => {
     const previousBlock = previousBlockGetter(ref);
     if (!previousBlock) {
       return;
     }
 
+    console.log(currentBlock.html);
     const currentBlockCopy = {
       id: currentBlock.id,
-      html: currentBlock.html,
+      html: html,
       tag: currentBlock.tag,
       children: currentBlock.children
-    };
-
-    const focusNextBlockCallback = () => {
-      (previousBlock as HTMLElement).focus();
     };
 
     const blocksCopy = [...currentBlocks];
@@ -135,6 +140,14 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     console.log(blocksCopy);
     updateBlocksHandler(blocksCopy);
+
+    const focusNextBlockCallback = () => {
+      const indentBlockRef =
+        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children[0]
+          ?.children[0]?.children[0]?.children[1];
+      console.log(indentBlockRef);
+      (indentBlockRef as HTMLElement).focus();
+    };
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 

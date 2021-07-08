@@ -8,7 +8,7 @@ exports[`NoteBlock renders correctly with <p> tag 1`] = `
       <ContentEditable className=\\"noteblock-text\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />
     </div>
     <ContextMenuElement context=\\"Block\\" renaming={false} currentName=\\"\\" id=\\"1\\" createHandler={[Function: createHandler]} deleteHandler={[Function: deleteHandler]} updateNameHandler={[Function: updateNameHandler]} />
-    <div className=\\"indent\\" />
   </ContextMenuTrigger>
+  <div className=\\"indent\\" />
 </div>"
 `;

@@ -41,7 +41,8 @@ export type NoteBlockHandlerProps = {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
-    currentBlocks: NoteBlockStateProps[]
+    currentBlocks: NoteBlockStateProps[],
+    html: string
   ) => void;
   updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void;
   blocks: NoteBlockStateProps[];
@@ -138,7 +139,13 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
 
       case 'Tab':
         e.preventDefault();
-        props.indentBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks);
+        props.indentBlock(
+          props,
+          noteBlockRef,
+          props.updateBlocksHandler,
+          props.blocks,
+          html.current
+        );
         break;
 
       // TODO: Handle case where user presses arrow up to navigate within a content block itself
