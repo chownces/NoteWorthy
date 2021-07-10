@@ -45,6 +45,23 @@ export type NoteBlockHandlerProps = {
     html: string
   ) => void;
   updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void;
+  unindentBlockHandler: (
+    currentBlock: NoteBlockStateProps,
+    parentRef: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    parentBlock: NoteBlockStateProps,
+    parentBlocks: NoteBlockStateProps[],
+    currentBlocks: NoteBlockStateProps[],
+    html: string,
+    parentHtml: string
+  ) => void;
+  unindentBlock:
+    | ((
+        currentBlock: NoteBlockStateProps,
+        currentBlocks: NoteBlockStateProps[],
+        html: string
+      ) => void)
+    | undefined;
   blocks: NoteBlockStateProps[];
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
 };
@@ -100,10 +117,14 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
 
       // Deletes currently focused block if 'Backspace' is pressed and block is empty
       case 'Backspace':
-        if (!html.current) {
+        if (!html.current && props.unindentBlock === undefined) {
           e.preventDefault();
           props.deleteBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks);
+        } else if (props.unindentBlock !== undefined) {
+          e.preventDefault();
+          props.unindentBlock(props, props.blocks, html.current);
         }
+
         break;
 
       // Navigates to previous block, if it exists
@@ -153,6 +174,23 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       // TODO: Handle case where user presses arrow up to navigate within a content block itself
     }
   };
+
+  const unindentBlock = (
+    currentBlock: NoteBlockStateProps,
+    currentBlocks: NoteBlockStateProps[],
+    currentHtml: string
+  ) =>
+    props.unindentBlockHandler(
+      currentBlock,
+      noteBlockRef,
+      props.updateBlocksHandler,
+      props,
+      props.blocks,
+      currentBlocks,
+      currentHtml,
+      html.current
+    );
+
   const mergedRef = useMergedRef(noteBlockRef, props.lastBlockRef);
 
   const contextMenuProps = {
@@ -180,6 +218,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       };
       props.updatePage(blockCopy);
     },
+    unindentBlockHandler: props.unindentBlockHandler,
+    unindentBlock: unindentBlock,
     blocks: props.children,
     setIsEditMode: props.setIsEditMode
   };

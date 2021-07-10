@@ -88,7 +88,7 @@ const NotePage: React.FC<NotePageProps> = props => {
         ?.children[0]?.children[1];
 
     let nextRelative = undefined;
-    let nextAncestor = ref.current?.parentElement?.parentElement?.parentElement;
+    let nextAncestor = currElement?.parentElement?.parentElement?.parentElement;
 
     while (
       nextRelative === undefined &&
@@ -99,6 +99,14 @@ const NotePage: React.FC<NotePageProps> = props => {
     }
 
     return nextChild || nextSibling || nextRelative;
+  };
+
+  const nextSiblingGetter = (ref: React.RefObject<HTMLElement>) => {
+    const nextSibling =
+      ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
+        ?.children[0]?.children[1];
+
+    return nextSibling;
   };
 
   const previousBlockGetter = (ref: React.RefObject<HTMLElement>) => {
@@ -141,16 +149,35 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: 'p', // TODO: Reconsider default block tag
       children: []
     };
+
     const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
-    blocksCopy.splice(index + 1, 0, newBlock);
+    if (currentBlock.children.length !== 0) {
+      const currentBlockCopy = {
+        id: currentBlock.id,
+        html: currentBlock.html,
+        tag: currentBlock.tag,
+        children: currentBlock.children
+      };
+      currentBlockCopy.children.splice(0, 0, newBlock);
+      blocksCopy.splice(index, 1, currentBlockCopy);
 
-    const focusNextBlockCallback = () => {
-      (nextBlockGetter(ref) as HTMLElement).focus();
-    };
+      const focusNextBlockCallback = () => {
+        (nextBlockGetter(ref) as HTMLElement).focus();
+      };
 
-    updateBlocksHandler(blocksCopy);
-    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+      updateBlocksHandler(blocksCopy);
+      setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+    } else {
+      blocksCopy.splice(index + 1, 0, newBlock);
+
+      const focusNextBlockCallback = () => {
+        (nextBlockGetter(ref) as HTMLElement).focus();
+      };
+
+      updateBlocksHandler(blocksCopy);
+      setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+    }
   };
 
   // Indents current block and adds it as a child of the previous block
@@ -188,6 +215,58 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const focusNextBlockCallback = () => {
       const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
+      (indentBlockRef as HTMLElement).focus();
+    };
+    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+  };
+
+  //unindent block by adding it as a sibling to its parent
+  const unindentBlockHandler = (
+    currentBlock: NoteBlockStateProps,
+    parentRef: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    parentBlock: NoteBlockStateProps,
+    parentBlocks: NoteBlockStateProps[],
+    currentBlocks: NoteBlockStateProps[],
+    html: string,
+    parentHtml: string
+  ): void => {
+    //cannot unindent any further
+    if (parentBlock === undefined) {
+      return;
+    }
+
+    const currentBlockCopy = {
+      id: currentBlock.id,
+      html: html,
+      tag: currentBlock.tag,
+      children: [...currentBlock.children]
+    };
+
+    const blocksCopy = [...currentBlocks];
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+
+    //Remove all siblings after currentBlock, add as child of currentBlock
+    const newChildren = blocksCopy.splice(index, blocksCopy.length - index);
+    newChildren.splice(0, 1);
+    currentBlockCopy.children.splice(currentBlockCopy.children.length, 0, ...newChildren);
+
+    const parentBlockCopy = {
+      id: parentBlock.id,
+      html: parentHtml,
+      tag: parentBlock.tag,
+      children: [...blocksCopy]
+    };
+
+    const parentBlocksCopy = [...parentBlocks];
+    const parentIndex = parentBlocksCopy.map(b => b.id).indexOf(parentBlock.id);
+    parentBlocksCopy.splice(parentIndex, 1);
+    parentBlocksCopy.splice(parentIndex, 0, parentBlockCopy, currentBlockCopy);
+
+    updateBlocksHandler(parentBlocksCopy);
+
+    const focusNextBlockCallback = () => {
+      const indentBlockRef = nextSiblingGetter(parentRef);
       (indentBlockRef as HTMLElement).focus();
     };
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
@@ -282,6 +361,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     deleteBlock: deleteBlockHandler,
     indentBlock: indentBlockHandler,
     updateBlocksHandler: updatePageHandler,
+    unindentBlockHandler: unindentBlockHandler,
+    unindentBlock: undefined,
     blocks: props.blocks.current,
     setIsEditMode: setIsEditMode
   };
