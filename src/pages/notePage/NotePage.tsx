@@ -120,6 +120,15 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     return previousRelative || previousParent;
   };
+
+  const previousSiblingGetter = (ref: React.RefObject<HTMLElement>) => {
+    const previousSibling =
+      ref.current?.parentElement?.parentElement?.parentElement?.previousElementSibling?.children[0]
+        ?.children[0]?.children[1];
+
+    return previousSibling;
+  };
+
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
@@ -153,7 +162,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     html: string
   ): void => {
     const previousBlock = previousBlockGetter(ref);
-    if (!previousBlock) {
+    const previousSibling = previousSiblingGetter(ref);
+    if (!previousSibling) {
       return;
     }
 
