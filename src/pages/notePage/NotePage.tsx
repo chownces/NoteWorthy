@@ -272,6 +272,64 @@ const NotePage: React.FC<NotePageProps> = props => {
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
+  const appendToPreviousBlockHandler = (
+    currentBlock: NoteBlockStateProps,
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[],
+    html: string
+  ): void => {
+    const previousSibling = previousSiblingGetter(ref);
+    if (!previousSibling) {
+      return;
+    }
+
+    const previousRelativeRef = previousBlockGetter(ref);
+
+    const blocksCopy = [...currentBlocks];
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const previousSiblingBlock = blocksCopy[index - 1];
+
+    const previousSiblingBlockCopy: NoteBlockStateProps = {
+      id: previousSiblingBlock.id,
+      html: previousSiblingBlock.html,
+      children: [...previousSiblingBlock.children],
+      tag: previousSiblingBlock.tag
+    };
+
+    let previousBlockCopy = previousSiblingBlockCopy;
+
+    while (previousBlockCopy.children.length !== 0) {
+      const index = previousBlockCopy.children.length - 1;
+      const tempBlock = previousBlockCopy.children[index];
+
+      const tempBlockCopy = {
+        id: tempBlock.id,
+        html: tempBlock.html,
+        children: [...tempBlock.children],
+        tag: tempBlock.tag
+      };
+
+      previousBlockCopy.children.splice(index, 1, tempBlockCopy);
+
+      previousBlockCopy = tempBlockCopy;
+    }
+
+    console.log(html);
+    previousBlockCopy.html = previousBlockCopy.html + html;
+
+    console.log(previousBlockCopy.html);
+    const currentBlockChildrenCopy = [...currentBlock.children];
+    blocksCopy.splice(index - 1, 2, previousSiblingBlockCopy, ...currentBlockChildrenCopy);
+
+    updateBlocksHandler(blocksCopy);
+
+    const focusNextBlockCallback = () => {
+      (previousRelativeRef as HTMLElement).focus();
+    };
+    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+  };
+
   /**
    * Handles the deletion of an empty block by removing it from `blocks`.
    */
@@ -364,6 +422,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     unindentBlockHandler: unindentBlockHandler,
     unindentBlock: undefined,
     blocks: props.blocks.current,
+    appendToPreviousBlockHandler: appendToPreviousBlockHandler,
     setIsEditMode: setIsEditMode
   };
 

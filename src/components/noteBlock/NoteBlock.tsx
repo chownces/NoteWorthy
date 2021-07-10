@@ -63,6 +63,13 @@ export type NoteBlockHandlerProps = {
       ) => void)
     | undefined;
   blocks: NoteBlockStateProps[];
+  appendToPreviousBlockHandler: (
+    currentBlock: NoteBlockStateProps,
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[],
+    html: string
+  ) => void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
 };
 
@@ -105,6 +112,19 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     html.current = value;
   };
 
+  const isAtCursorStart = () => {
+    const isSupported = typeof window.getSelection !== 'undefined';
+    if (isSupported) {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount !== 0) {
+        const range = selection.getRangeAt(0).cloneRange();
+
+        return range.startOffset === 0 && range.endOffset === 0;
+      }
+    }
+    return false;
+  };
+
   const onKeydownHandler = (e: React.KeyboardEvent<HTMLDivElement>) => {
     switch (e.key) {
       // Adds a new block below the currently focused block when 'Enter' is pressed without 'Shift'
@@ -120,9 +140,19 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         if (!html.current && props.unindentBlock === undefined) {
           e.preventDefault();
           props.deleteBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks);
-        } else if (props.unindentBlock !== undefined) {
+        } else if (props.unindentBlock !== undefined && isAtCursorStart()) {
           e.preventDefault();
           props.unindentBlock(props, props.blocks, html.current);
+        } else if (props.unindentBlock === undefined && isAtCursorStart()) {
+          e.preventDefault();
+
+          props.appendToPreviousBlockHandler(
+            props,
+            noteBlockRef,
+            props.updateBlocksHandler,
+            props.blocks,
+            html.current
+          );
         }
 
         break;
@@ -220,6 +250,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     },
     unindentBlockHandler: props.unindentBlockHandler,
     unindentBlock: unindentBlock,
+    appendToPreviousBlockHandler: props.appendToPreviousBlockHandler,
     blocks: props.children,
     setIsEditMode: props.setIsEditMode
   };

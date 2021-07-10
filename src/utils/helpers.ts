@@ -18,8 +18,12 @@ export const setEol = (elem: HTMLElement | null | undefined): void => {
   if (elem) {
     // Get the EOL 'position' of elem
     const range = document.createRange();
+
     range.selectNodeContents(elem);
     range.collapse(false); // collapse range to the end
+    console.log('start' + range.startOffset);
+    console.log('end' + range.endOffset);
+    console.log(range);
 
     // Set the cursor to EOL 'position'
     const selection = window.getSelection();
