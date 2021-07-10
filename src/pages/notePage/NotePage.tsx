@@ -71,13 +71,20 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
    */
 
-  const nextBlockGetter = (ref: React.RefObject<HTMLElement>) => {
+  const nextBlockGetter = (ref: React.RefObject<HTMLElement>, previousBlock?: HTMLElement) => {
+    let currElement = ref.current;
+
+    // for handling indentation, previousblock must be referenced to access indented/next block
+    if (previousBlock) {
+      currElement = previousBlock;
+    }
+
     const nextChild =
-      ref.current?.parentElement?.parentElement?.parentElement?.children[1]?.children[0]
+      currElement?.parentElement?.parentElement?.parentElement?.children[1]?.children[0]
         ?.children[0]?.children[0]?.children[1];
 
     const nextSibling =
-      ref.current?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
+      currElement?.parentElement?.parentElement?.parentElement?.nextElementSibling?.children[0]
         ?.children[0]?.children[1];
 
     let nextRelative = undefined;
@@ -91,7 +98,6 @@ const NotePage: React.FC<NotePageProps> = props => {
       nextRelative = nextAncestor?.nextElementSibling?.children[0]?.children[0]?.children[1];
     }
 
-    console.log(nextRelative);
     return nextChild || nextSibling || nextRelative;
   };
 
@@ -151,7 +157,6 @@ const NotePage: React.FC<NotePageProps> = props => {
       return;
     }
 
-    console.log(currentBlock.html);
     const currentBlockCopy = {
       id: currentBlock.id,
       html: html,
@@ -166,20 +171,13 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.splice(index, 1);
     blocksCopy[index - 1].children.splice(length, 0, currentBlockCopy);
 
-    console.log(blocksCopy);
     updateBlocksHandler(blocksCopy);
 
-    console.log(ref);
-    const focusNextBlockCallback = () => {
-      console.log(ref.current?.parentElement);
+    console.log(ref.current);
+    console.log(previousBlock);
 
-      const numSibs =
-        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children.length;
-      const indentBlockRef =
-        previousBlock?.parentElement?.parentElement?.parentElement?.children[1]?.children[
-          (numSibs || 1) - 1
-        ]?.children[0]?.children[0]?.children[1];
-      console.log(indentBlockRef);
+    const focusNextBlockCallback = () => {
+      const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
       (indentBlockRef as HTMLElement).focus();
     };
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
