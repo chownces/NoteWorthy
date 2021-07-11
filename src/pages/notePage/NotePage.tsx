@@ -137,11 +137,43 @@ const NotePage: React.FC<NotePageProps> = props => {
     return previousSibling;
   };
 
+  /**
+   * Reupdates currentblock then refocuses on it, to fix non-updating contentEditable bug when
+   * appending html contents of one block to a previous block
+   */
+  const refocusHandler = (
+    currentBlock: NoteBlockStateProps,
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[],
+    html: string
+  ): void => {
+    const blocksCopy = [...currentBlocks];
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const currentBlockCopy = {
+      id: currentBlock.id,
+      html: html,
+      tag: currentBlock.tag,
+      children: currentBlock.children
+    };
+
+    currentBlockCopy.children.splice(0, 0);
+    blocksCopy.splice(index, 1, currentBlockCopy);
+
+    const focusNextBlockCallback = () => {
+      (ref.current as HTMLElement).focus();
+    };
+
+    updateBlocksHandler(blocksCopy);
+    setTriggerRerender(!triggerRerender, focusNextBlockCallback);
+  };
+
   const addBlockHandler = (
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
-    currentBlocks: NoteBlockStateProps[]
+    currentBlocks: NoteBlockStateProps[],
+    html: string
   ): void => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
@@ -152,13 +184,14 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const currentBlockCopy = {
+      id: currentBlock.id,
+      html: html,
+      tag: currentBlock.tag,
+      children: currentBlock.children
+    };
+
     if (currentBlock.children.length !== 0) {
-      const currentBlockCopy = {
-        id: currentBlock.id,
-        html: currentBlock.html,
-        tag: currentBlock.tag,
-        children: currentBlock.children
-      };
       currentBlockCopy.children.splice(0, 0, newBlock);
       blocksCopy.splice(index, 1, currentBlockCopy);
 
@@ -169,7 +202,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       updateBlocksHandler(blocksCopy);
       setTriggerRerender(!triggerRerender, focusNextBlockCallback);
     } else {
-      blocksCopy.splice(index + 1, 0, newBlock);
+      blocksCopy.splice(index, 1, currentBlockCopy, newBlock);
 
       const focusNextBlockCallback = () => {
         (nextBlockGetter(ref) as HTMLElement).focus();
@@ -209,9 +242,6 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy[index - 1].children.splice(length, 0, currentBlockCopy);
 
     updateBlocksHandler(blocksCopy);
-
-    console.log(ref.current);
-    console.log(previousBlock);
 
     const focusNextBlockCallback = () => {
       const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
@@ -286,6 +316,10 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const previousRelativeRef = previousBlockGetter(ref);
 
+    if (previousRelativeRef) {
+      previousRelativeRef.innerHTML = previousRelativeRef?.innerHTML + html;
+    }
+
     const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     const previousSiblingBlock = blocksCopy[index - 1];
@@ -315,10 +349,8 @@ const NotePage: React.FC<NotePageProps> = props => {
       previousBlockCopy = tempBlockCopy;
     }
 
-    console.log(html);
     previousBlockCopy.html = previousBlockCopy.html + html;
 
-    console.log(previousBlockCopy.html);
     const currentBlockChildrenCopy = [...currentBlock.children];
     blocksCopy.splice(index - 1, 2, previousSiblingBlockCopy, ...currentBlockChildrenCopy);
 
@@ -423,6 +455,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     unindentBlock: undefined,
     blocks: props.blocks.current,
     appendToPreviousBlockHandler: appendToPreviousBlockHandler,
+    refocusHandler: refocusHandler,
     setIsEditMode: setIsEditMode
   };
 

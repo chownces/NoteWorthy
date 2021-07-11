@@ -29,7 +29,8 @@ export type NoteBlockHandlerProps = {
     currentBlock: NoteBlockStateProps,
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
-    currentBlocks: NoteBlockStateProps[]
+    currentBlocks: NoteBlockStateProps[],
+    html: string
   ) => void;
   deleteBlock: (
     currentBlock: NoteBlockStateProps,
@@ -70,6 +71,13 @@ export type NoteBlockHandlerProps = {
     currentBlocks: NoteBlockStateProps[],
     html: string
   ) => void;
+  refocusHandler: (
+    currentBlock: NoteBlockStateProps,
+    ref: React.RefObject<HTMLElement>,
+    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
+    currentBlocks: NoteBlockStateProps[],
+    html: string
+  ) => void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
 };
 
@@ -97,8 +105,22 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // TODO: For future use when tag changes are implemented
   // const tag = React.useRef<string>(props.tag);
 
+  const onFocus = () => {
+    if (props.html !== html.current) {
+      html.current = props.html;
+      props.refocusHandler(
+        props,
+        noteBlockRef,
+        props.updateBlocksHandler,
+        props.blocks,
+        html.current
+      );
+    }
+  };
+
   const onChangeHandler = (e: ContentEditableEvent) => {
     // Additional checks for e.target.value as HTML tags are not cleared even when block is empty
+
     const value =
       e.target.value === '<br>' || e.target.value === '<div><br></div>' ? '' : e.target.value;
 
@@ -131,7 +153,13 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
       case 'Enter':
         if (!e.shiftKey) {
           e.preventDefault();
-          props.addBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks);
+          props.addBlock(
+            props,
+            noteBlockRef,
+            props.updateBlocksHandler,
+            props.blocks,
+            html.current
+          );
         }
         break;
 
@@ -229,7 +257,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     currentName: '',
     id: props.id,
     createHandler: () =>
-      props.addBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks),
+      props.addBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks, html.current),
     deleteHandler: () =>
       props.deleteBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks),
     updateNameHandler: () => {}
@@ -251,6 +279,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     unindentBlockHandler: props.unindentBlockHandler,
     unindentBlock: unindentBlock,
     appendToPreviousBlockHandler: props.appendToPreviousBlockHandler,
+    refocusHandler: props.refocusHandler,
     blocks: props.children,
     setIsEditMode: props.setIsEditMode
   };
@@ -262,6 +291,27 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
+
+  const contenteditable = (
+    <ContentEditable
+      className="noteblock-text"
+      innerRef={mergedRef}
+      html={html.current}
+      tagName={props.tag}
+      onChange={onChangeHandler}
+      onFocus={onFocus}
+      onKeyDown={onKeydownHandler}
+      disabled={!props.isEditMode}
+      onClick={() => {
+        props.setIsEditMode(true, () => {
+          noteBlockRef.current?.focus();
+          // TODO: This eol line is causing issues when using the mouse to position the cursor
+          // setEol(noteBlockRef.current);
+        });
+      }}
+    />
+  );
+
   return (
     /**
      * NOTE: For any change in NoteBlock HTML structure, remember to update the various navigation handlers:
@@ -278,22 +328,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           {...props.provided.draggableProps} // react-beautiful-dnd props
         >
           <div className="noteblock-handle"></div>
-          <ContentEditable
-            className="noteblock-text"
-            innerRef={mergedRef}
-            html={html.current}
-            tagName={props.tag}
-            onChange={onChangeHandler}
-            onKeyDown={onKeydownHandler}
-            disabled={!props.isEditMode}
-            onClick={() => {
-              props.setIsEditMode(true, () => {
-                noteBlockRef.current?.focus();
-                // TODO: This eol line is causing issues when using the mouse to position the cursor
-                // setEol(noteBlockRef.current);
-              });
-            }}
-          />
+          {contenteditable}
         </div>
         <ContextMenuElement {...contextMenuProps} />
       </ContextMenuTrigger>

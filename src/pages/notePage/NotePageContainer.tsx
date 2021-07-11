@@ -23,13 +23,6 @@ const NotePageContainer: React.FC = () => {
   });
 
   const updateBlocksInDatabase = (blocks: NoteBlockStateProps[]) => {
-    console.log(blocks);
-
-    const blocksCopy = blocks.map(b => {
-      return { id: b.id, html: b.html, tag: b.tag, children: b.children };
-    });
-
-    console.log(blocksCopy);
     updateNoteBlocks({
       variables: {
         id: NOTE_ID,
@@ -37,7 +30,6 @@ const NotePageContainer: React.FC = () => {
         blocks: blocks
       }
     });
-    console.log(blocks);
   };
 
   if (queryLoading) {
@@ -78,8 +70,6 @@ const NotePageContainer: React.FC = () => {
 
   const flatBlocks = [...data.getNote.blocks];
 
-  console.log(flatBlocks);
-
   const flatBlocksCopy = flatBlocks.map(block => {
     return {
       children: block.children,
@@ -94,10 +84,8 @@ const NotePageContainer: React.FC = () => {
 
   flatBlocksCopy.map((block: any) => delete block.parent);
 
-  console.log(tree);
   blocks.current = tree.children;
 
-  console.log(blocks.current);
   const notePageProps: NotePageProps = {
     blocks: blocks,
     updateBlocksInDatabase: updateBlocksInDatabase
