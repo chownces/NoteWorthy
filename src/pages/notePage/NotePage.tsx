@@ -6,7 +6,7 @@ import NoteBlock, {
   NoteBlockNavigationProps,
   NoteBlockStateProps
 } from '../../components/noteBlock/NoteBlock';
-import { setEol, uniqueId } from '../../utils/helpers';
+import { getCaretPosition, setCaret, setEol, uniqueId } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
 
 export type NotePageProps = {
@@ -21,6 +21,8 @@ const NotePage: React.FC<NotePageProps> = props => {
    */
   const [isEditMode, setIsEditMode] = useStateCallback<boolean>(false); // TODO: Look into setting a better toggle between modes
   const hasUnsavedChanges = React.useRef<boolean>(false);
+
+  const [isAppendedToPreviousBlock, setIsAppendedToPreviousBlock] = React.useState<boolean>(false);
 
   /**
    * Window interval updates the backend whenever there are changes to the `blocks` state.
@@ -241,12 +243,29 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.splice(index, 1);
     blocksCopy[index - 1].children.splice(length, 0, currentBlockCopy);
 
+    const coordinates = getCaretPosition(ref.current);
+
+    let focusNextBlockCallback = () => {
+      const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
+
+      setEol(indentBlockRef as HTMLElement);
+    };
+
+    if (coordinates) {
+      const [startOffset, , index] = coordinates;
+
+      focusNextBlockCallback = () => {
+        const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
+        indentBlockRef as HTMLElement;
+
+        setCaret(indentBlockRef as HTMLElement, startOffset, index);
+      };
+    } else {
+      console.log('Caret retrieval failed');
+    }
+
     updateBlocksHandler(blocksCopy);
 
-    const focusNextBlockCallback = () => {
-      const indentBlockRef = nextBlockGetter(ref, previousBlock as HTMLElement);
-      (indentBlockRef as HTMLElement).focus();
-    };
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
@@ -354,6 +373,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     const currentBlockChildrenCopy = [...currentBlock.children];
     blocksCopy.splice(index - 1, 2, previousSiblingBlockCopy, ...currentBlockChildrenCopy);
 
+    setIsAppendedToPreviousBlock(true);
+
     updateBlocksHandler(blocksCopy);
 
     const focusNextBlockCallback = () => {
@@ -456,7 +477,9 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocks: props.blocks.current,
     appendToPreviousBlockHandler: appendToPreviousBlockHandler,
     refocusHandler: refocusHandler,
-    setIsEditMode: setIsEditMode
+    setIsEditMode: setIsEditMode,
+    isAppendedToPreviousBlock: isAppendedToPreviousBlock,
+    setIsAppendedToPreviousBlock: setIsAppendedToPreviousBlock
   };
 
   const noteBlockNavigationProps: NoteBlockNavigationProps = {

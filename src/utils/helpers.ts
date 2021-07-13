@@ -21,9 +21,6 @@ export const setEol = (elem: HTMLElement | null | undefined): void => {
 
     range.selectNodeContents(elem);
     range.collapse(false); // collapse range to the end
-    console.log('start' + range.startOffset);
-    console.log('end' + range.endOffset);
-    console.log(range);
 
     // Set the cursor to EOL 'position'
     const selection = window.getSelection();
@@ -35,6 +32,59 @@ export const setEol = (elem: HTMLElement | null | undefined): void => {
     elem.focus();
   } else {
     console.log('Error in setting end of line for current block!');
+  }
+};
+
+//Get caret startOffset, endOffset and node index for noteBlock
+export const getCaretPosition = (elem: HTMLElement | undefined | null) => {
+  const isSupported = typeof window.getSelection !== 'undefined';
+
+  if (isSupported) {
+    const selection = window.getSelection();
+
+    console.log(selection?.anchorNode);
+    const anchorNode = selection?.anchorNode;
+
+    let num = -1;
+    if (elem) {
+      elem.childNodes.forEach((node, index) => {
+        if (node === anchorNode) {
+          num = index;
+        }
+      });
+    }
+    if (selection && selection.rangeCount !== 0) {
+      const range = selection.getRangeAt(0).cloneRange();
+      return [range.startOffset, range.endOffset, num];
+    }
+  }
+  return undefined;
+};
+
+//set cursor position, using given startOffset and node index for noteblock childNodes
+export const setCaret = (
+  elem: HTMLElement | null | undefined,
+  startOffset: number | undefined,
+  index: number
+): void => {
+  if (elem) {
+    if (index <= 0 && startOffset === 0) {
+      elem.focus();
+      return;
+    }
+
+    if (startOffset) {
+      const newRange = document.createRange();
+
+      newRange.setStart(elem.childNodes[index], startOffset);
+
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges(); // clear all existing selections
+        selection.addRange(newRange);
+      }
+      elem.focus();
+    }
   }
 };
 

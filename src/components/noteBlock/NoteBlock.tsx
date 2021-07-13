@@ -3,7 +3,7 @@ import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 
-import { setEol, toggleBold } from '../../utils/helpers';
+import { getCaretPosition, setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
 import ContextMenuElement, { ContextMenuType } from '../contextMenu/ContextMenuElement';
 
@@ -79,6 +79,8 @@ export type NoteBlockHandlerProps = {
     html: string
   ) => void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
+  isAppendedToPreviousBlock: boolean;
+  setIsAppendedToPreviousBlock: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 type OwnProps = {
@@ -106,15 +108,18 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // const tag = React.useRef<string>(props.tag);
 
   const onFocus = () => {
-    if (props.html !== html.current) {
-      html.current = props.html;
-      props.refocusHandler(
-        props,
-        noteBlockRef,
-        props.updateBlocksHandler,
-        props.blocks,
-        html.current
-      );
+    if (props.isAppendedToPreviousBlock) {
+      if (props.html !== html.current) {
+        html.current = props.html;
+        props.refocusHandler(
+          props,
+          noteBlockRef,
+          props.updateBlocksHandler,
+          props.blocks,
+          html.current
+        );
+      }
+      props.setIsAppendedToPreviousBlock(false);
     }
   };
 
@@ -134,15 +139,13 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     html.current = value;
   };
 
-  const isAtCursorStart = () => {
-    const isSupported = typeof window.getSelection !== 'undefined';
-    if (isSupported) {
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount !== 0) {
-        const range = selection.getRangeAt(0).cloneRange();
+  const isAtCursorStart = (elem: HTMLElement) => {
+    const caretPosition = getCaretPosition(elem);
 
-        return range.startOffset === 0 && range.endOffset === 0;
-      }
+    if (caretPosition) {
+      const [startOffset, endOffset, index] = caretPosition;
+
+      return startOffset === 0 && endOffset === 0 && (index === -1 || index === 0);
     }
     return false;
   };
@@ -168,10 +171,16 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         if (!html.current && props.unindentBlock === undefined) {
           e.preventDefault();
           props.deleteBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks);
-        } else if (props.unindentBlock !== undefined && isAtCursorStart()) {
+        } else if (
+          props.unindentBlock !== undefined &&
+          isAtCursorStart(noteBlockRef.current as HTMLElement)
+        ) {
           e.preventDefault();
           props.unindentBlock(props, props.blocks, html.current);
-        } else if (props.unindentBlock === undefined && isAtCursorStart()) {
+        } else if (
+          props.unindentBlock === undefined &&
+          isAtCursorStart(noteBlockRef.current as HTMLElement)
+        ) {
           e.preventDefault();
 
           props.appendToPreviousBlockHandler(
@@ -281,7 +290,9 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     appendToPreviousBlockHandler: props.appendToPreviousBlockHandler,
     refocusHandler: props.refocusHandler,
     blocks: props.children,
-    setIsEditMode: props.setIsEditMode
+    setIsEditMode: props.setIsEditMode,
+    isAppendedToPreviousBlock: props.isAppendedToPreviousBlock,
+    setIsAppendedToPreviousBlock: props.setIsAppendedToPreviousBlock
   };
 
   const noteBlockNavigationProps: NoteBlockNavigationProps = {
