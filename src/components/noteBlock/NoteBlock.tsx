@@ -79,8 +79,16 @@ export type NoteBlockHandlerProps = {
     html: string
   ) => void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
-  isAppendedToPreviousBlock: boolean;
-  setIsAppendedToPreviousBlock: React.Dispatch<React.SetStateAction<boolean>>;
+  isAppendedToPreviousBlock: [boolean, () => void];
+  setIsAppendedToPreviousBlock: (
+    newState: [boolean, () => void],
+    callback?: ((newState?: [boolean, () => void] | undefined) => void) | undefined
+  ) => void;
+  triggerRerender: boolean;
+  setTriggerRerender: (
+    newState: boolean,
+    callback?: ((newState?: boolean | undefined) => void) | undefined
+  ) => void;
 };
 
 type OwnProps = {
@@ -108,18 +116,11 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // const tag = React.useRef<string>(props.tag);
 
   const onFocus = () => {
-    if (props.isAppendedToPreviousBlock) {
+    if (props.isAppendedToPreviousBlock[0]) {
       if (props.html !== html.current) {
         html.current = props.html;
-        props.refocusHandler(
-          props,
-          noteBlockRef,
-          props.updateBlocksHandler,
-          props.blocks,
-          html.current
-        );
       }
-      props.setIsAppendedToPreviousBlock(false);
+      props.setIsAppendedToPreviousBlock([false, () => {}], props.isAppendedToPreviousBlock[1]);
     }
   };
 
@@ -292,7 +293,9 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     blocks: props.children,
     setIsEditMode: props.setIsEditMode,
     isAppendedToPreviousBlock: props.isAppendedToPreviousBlock,
-    setIsAppendedToPreviousBlock: props.setIsAppendedToPreviousBlock
+    setIsAppendedToPreviousBlock: props.setIsAppendedToPreviousBlock,
+    triggerRerender: props.triggerRerender,
+    setTriggerRerender: props.setTriggerRerender
   };
 
   const noteBlockNavigationProps: NoteBlockNavigationProps = {
@@ -320,6 +323,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           // setEol(noteBlockRef.current);
         });
       }}
+      onBlur={() => {}}
     />
   );
 

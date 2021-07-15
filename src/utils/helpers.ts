@@ -35,6 +35,46 @@ export const setEol = (elem: HTMLElement | null | undefined): void => {
   }
 };
 
+export const setSol = (elem: HTMLElement | null | undefined): void => {
+  // TODO: Use refs instead
+  // if (elem) {
+  //   const { selectionStart, selectionEnd } = elem.current!
+  //   elem.current?.setSelectionRange(selectionStart, selectionEnd)
+  // }
+  if (elem) {
+    // Get the EOL 'position' of elem
+    const range = document.createRange();
+
+    range.selectNodeContents(elem);
+    range.collapse(true); // collapse range to the start
+
+    // Set the cursor to EOL 'position'
+    const selection = window.getSelection();
+    if (selection) {
+      selection.removeAllRanges(); // clear all existing selections
+      selection.addRange(range);
+    }
+
+    elem.focus();
+  } else {
+    console.log('Error in setting start of line for current block!');
+  }
+};
+
+export const getNodeLength = (elem: HTMLElement | undefined | null) => {
+  let [length, charCount]: [number, number | undefined] = [0, 0];
+  if (elem) {
+    elem.childNodes.forEach((node, index) => {
+      // console.log(elem.childNodes.length);
+      if (node.nodeValue && node.nodeValue?.length !== 0) {
+        [length, charCount] = [index + 1, node.nodeValue?.length];
+        // console.log(length, node.nodeValue);
+      }
+    });
+  }
+
+  return [length, charCount];
+};
 //Get caret startOffset, endOffset and node index for noteBlock
 export const getCaretPosition = (elem: HTMLElement | undefined | null) => {
   const isSupported = typeof window.getSelection !== 'undefined';
@@ -76,6 +116,10 @@ export const setCaret = (
     if (startOffset) {
       const newRange = document.createRange();
 
+      // console.log(elem);
+      // console.log(elem.childNodes[index]);
+
+      // console.log(startOffset);
       newRange.setStart(elem.childNodes[index], startOffset);
 
       const selection = window.getSelection();

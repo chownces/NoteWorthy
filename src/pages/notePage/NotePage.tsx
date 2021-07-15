@@ -6,7 +6,14 @@ import NoteBlock, {
   NoteBlockNavigationProps,
   NoteBlockStateProps
 } from '../../components/noteBlock/NoteBlock';
-import { getCaretPosition, setCaret, setEol, uniqueId } from '../../utils/helpers';
+import {
+  getCaretPosition,
+  getNodeLength,
+  setCaret,
+  setEol,
+  setSol,
+  uniqueId
+} from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
 
 export type NotePageProps = {
@@ -22,7 +29,9 @@ const NotePage: React.FC<NotePageProps> = props => {
   const [isEditMode, setIsEditMode] = useStateCallback<boolean>(false); // TODO: Look into setting a better toggle between modes
   const hasUnsavedChanges = React.useRef<boolean>(false);
 
-  const [isAppendedToPreviousBlock, setIsAppendedToPreviousBlock] = React.useState<boolean>(false);
+  const [isAppendedToPreviousBlock, setIsAppendedToPreviousBlock] = useStateCallback<
+    [boolean, () => void]
+  >([false, () => {}]);
 
   /**
    * Window interval updates the backend whenever there are changes to the `blocks` state.
@@ -281,6 +290,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     parentHtml: string
   ): void => {
     //cannot unindent any further
+
+    setTriggerRerender(!triggerRerender);
     if (parentBlock === undefined) {
       return;
     }
@@ -335,10 +346,6 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const previousRelativeRef = previousBlockGetter(ref);
 
-    if (previousRelativeRef) {
-      previousRelativeRef.innerHTML = previousRelativeRef?.innerHTML + html;
-    }
-
     const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     const previousSiblingBlock = blocksCopy[index - 1];
@@ -373,8 +380,20 @@ const NotePage: React.FC<NotePageProps> = props => {
     const currentBlockChildrenCopy = [...currentBlock.children];
     blocksCopy.splice(index - 1, 2, previousSiblingBlockCopy, ...currentBlockChildrenCopy);
 
-    setIsAppendedToPreviousBlock(true);
+    const [length, charCount] = getNodeLength(previousRelativeRef as HTMLElement);
 
+    console.log(length, charCount);
+
+    setIsAppendedToPreviousBlock([
+      true,
+      () => {
+        if (charCount === 0) {
+          setSol(previousRelativeRef as HTMLElement);
+        } else {
+          setCaret(previousRelativeRef as HTMLElement, charCount, length - 1);
+        }
+      }
+    ]);
     updateBlocksHandler(blocksCopy);
 
     const focusNextBlockCallback = () => {
@@ -479,7 +498,9 @@ const NotePage: React.FC<NotePageProps> = props => {
     refocusHandler: refocusHandler,
     setIsEditMode: setIsEditMode,
     isAppendedToPreviousBlock: isAppendedToPreviousBlock,
-    setIsAppendedToPreviousBlock: setIsAppendedToPreviousBlock
+    setIsAppendedToPreviousBlock: setIsAppendedToPreviousBlock,
+    triggerRerender: triggerRerender,
+    setTriggerRerender: setTriggerRerender
   };
 
   const noteBlockNavigationProps: NoteBlockNavigationProps = {
