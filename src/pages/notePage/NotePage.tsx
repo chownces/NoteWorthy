@@ -207,7 +207,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       setIsAppendedToPreviousBlock([
         true,
         () => {
-          setEol(nextBlockGetter(ref) as HTMLElement);
+          setSol(nextBlockGetter(ref) as HTMLElement);
         }
       ]);
     }
