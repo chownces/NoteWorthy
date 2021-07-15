@@ -3,7 +3,7 @@ import { Draggable, DraggableProvided } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 
-import { getCaretPosition, setEol, toggleBold } from '../../utils/helpers';
+import { getCaretPosition, setCaret, setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
 import ContextMenuElement, { ContextMenuType } from '../contextMenu/ContextMenuElement';
 
@@ -323,7 +323,14 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           // setEol(noteBlockRef.current);
         });
       }}
-      onBlur={() => {}}
+      onFocusCapture={() => {
+        //refocuses the cursor back onto the current block
+        const caretPosition = getCaretPosition(noteBlockRef.current);
+        if (caretPosition) {
+          setCaret(noteBlockRef.current, caretPosition[0], caretPosition[2] + 1);
+        }
+      }}
+      onBlur={() => props.setTriggerRerender(!props.triggerRerender)}
     />
   );
 

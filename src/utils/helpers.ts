@@ -113,14 +113,30 @@ export const setCaret = (
       return;
     }
 
+    // setCaret triggered when indenting, however, elem.childNodes[index] always set to undefined, crashing the app.
+    // this may just be a temporary solution
+    if (!elem.childNodes[index]) {
+      return;
+    }
+
     if (startOffset) {
       const newRange = document.createRange();
+
+      console.log(elem.childNodes[index].nodeValue);
+      const length = elem.childNodes[index].nodeValue?.length;
+      if (length) {
+        if (length > startOffset) {
+          newRange.setStart(elem.childNodes[index], startOffset);
+        } else {
+          setEol(elem);
+          return;
+        }
+      }
 
       // console.log(elem);
       // console.log(elem.childNodes[index]);
 
       // console.log(startOffset);
-      newRange.setStart(elem.childNodes[index], startOffset);
 
       const selection = window.getSelection();
       if (selection) {
