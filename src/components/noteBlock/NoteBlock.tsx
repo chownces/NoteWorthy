@@ -30,7 +30,8 @@ export type NoteBlockHandlerProps = {
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
     currentBlocks: NoteBlockStateProps[],
-    html: string
+    html: string,
+    isSplit: boolean
   ) => void;
   deleteBlock: (
     currentBlock: NoteBlockStateProps,
@@ -118,8 +119,21 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   const onFocus = () => {
     if (props.isAppendedToPreviousBlock[0]) {
       if (props.html !== html.current) {
+        console.log('test');
         html.current = props.html;
       }
+
+      props.setIsAppendedToPreviousBlock([false, () => {}], props.isAppendedToPreviousBlock[1]);
+    }
+  };
+
+  const onBlur = () => {
+    if (props.isAppendedToPreviousBlock[0]) {
+      if (props.html !== html.current) {
+        console.log('test');
+        html.current = props.html;
+      }
+
       props.setIsAppendedToPreviousBlock([false, () => {}], props.isAppendedToPreviousBlock[1]);
     }
   };
@@ -162,7 +176,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
             noteBlockRef,
             props.updateBlocksHandler,
             props.blocks,
-            html.current
+            html.current,
+            true
           );
         }
         break;
@@ -267,7 +282,14 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     currentName: '',
     id: props.id,
     createHandler: () =>
-      props.addBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks, html.current),
+      props.addBlock(
+        props,
+        noteBlockRef,
+        props.updateBlocksHandler,
+        props.blocks,
+        html.current,
+        false
+      ),
     deleteHandler: () =>
       props.deleteBlock(props, noteBlockRef, props.updateBlocksHandler, props.blocks),
     updateNameHandler: () => {}
@@ -331,6 +353,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         }
       }}
       onBlur={() => props.setTriggerRerender(!props.triggerRerender)}
+      onBlurCapture={onBlur}
     />
   );
 

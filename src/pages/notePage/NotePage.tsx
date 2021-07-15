@@ -8,6 +8,7 @@ import NoteBlock, {
 } from '../../components/noteBlock/NoteBlock';
 import {
   getCaretPosition,
+  getCharLength,
   getNodeLength,
   setCaret,
   setEol,
@@ -184,7 +185,8 @@ const NotePage: React.FC<NotePageProps> = props => {
     ref: React.RefObject<HTMLElement>,
     updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
     currentBlocks: NoteBlockStateProps[],
-    html: string
+    html: string,
+    isSplit: boolean
   ): void => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
@@ -193,11 +195,28 @@ const NotePage: React.FC<NotePageProps> = props => {
       children: []
     };
 
+    let currentHtml = html;
+    const caretPosition = getCaretPosition(ref.current);
+    if (caretPosition && isSplit) {
+      console.log(caretPosition);
+      const [startOffset, , index] = caretPosition;
+      const charLength = getCharLength(ref.current, startOffset, index);
+      console.log(charLength);
+      newBlock.html = html.substring(charLength, html.length);
+      currentHtml = html.substring(0, charLength);
+      setIsAppendedToPreviousBlock([
+        true,
+        () => {
+          setEol(nextBlockGetter(ref) as HTMLElement);
+        }
+      ]);
+    }
+
     const blocksCopy = [...currentBlocks];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     const currentBlockCopy = {
       id: currentBlock.id,
-      html: html,
+      html: currentHtml,
       tag: currentBlock.tag,
       children: currentBlock.children
     };

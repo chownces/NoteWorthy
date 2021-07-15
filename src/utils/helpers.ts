@@ -75,6 +75,27 @@ export const getNodeLength = (elem: HTMLElement | undefined | null) => {
 
   return [length, charCount];
 };
+
+export const getCharLength = (
+  elem: HTMLElement | undefined | null,
+  startOffset: number,
+  num: number
+) => {
+  let charCount = 0;
+  if (elem) {
+    elem.childNodes.forEach((node, index) => {
+      if (index >= num) {
+      }
+      // console.log(elem.childNodes.length);
+      else if (node.nodeValue && node.nodeValue?.length !== 0) {
+        charCount += node.nodeValue?.length;
+        // console.log(length, node.nodeValue);
+      }
+    });
+  }
+  return charCount + startOffset;
+};
+
 //Get caret startOffset, endOffset and node index for noteBlock
 export const getCaretPosition = (elem: HTMLElement | undefined | null) => {
   const isSupported = typeof window.getSelection !== 'undefined';
@@ -108,7 +129,8 @@ export const setCaret = (
   index: number
 ): void => {
   if (elem) {
-    if (index <= 0 && startOffset === 0) {
+    console.log(elem, startOffset, index);
+    if (index <= 0) {
       elem.focus();
       return;
     }
