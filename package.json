@@ -28,6 +28,7 @@
     "format": "eslint --ext \".js,.jsx,.ts,.tsx\" --fix src && prettier --write \"src/**/*.{js,jsx,ts,tsx}\" && prettier --write --parser scss \"src/**/*.scss\"",
     "format:tsx": "prettier --list-different \"src/**/*.{js,jsx,ts,tsx}\"",
     "format:scss": "prettier --list-different --parser scss \"src/**/*.scss\"",
+    "format:ci": "yarn run format:tsx && yarn run format:scss",
     "start": "BROWSER=none react-scripts start",
     "test": "react-scripts test"
   },
