@@ -48,7 +48,7 @@ export const setSol = (elem: HTMLElement | null | undefined): void => {
     range.selectNodeContents(elem);
     range.collapse(true); // collapse range to the start
 
-    // Set the cursor to EOL 'position'
+    // Set the cursor to SOL 'position'
     const selection = window.getSelection();
     if (selection) {
       selection.removeAllRanges(); // clear all existing selections
@@ -130,12 +130,13 @@ export const setCaret = (
 ): void => {
   if (elem) {
     console.log(elem, startOffset, index);
-    if (index <= 0) {
+    if (index < 0 || (index === 0 && startOffset === 0)) {
       elem.focus();
       return;
     }
 
-    // setCaret triggered when indenting, however, elem.childNodes[index] always set to undefined, crashing the app.
+    // When indenting, setCaret triggered twice, but elem.childNodes[index]
+    // set to undefined on second run, crashing the app.
     // this may just be a temporary solution
     if (!elem.childNodes[index]) {
       return;
@@ -154,11 +155,6 @@ export const setCaret = (
           return;
         }
       }
-
-      // console.log(elem);
-      // console.log(elem.childNodes[index]);
-
-      // console.log(startOffset);
 
       const selection = window.getSelection();
       if (selection) {

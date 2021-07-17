@@ -72,16 +72,9 @@ export type NoteBlockHandlerProps = {
     currentBlocks: NoteBlockStateProps[],
     html: string
   ) => void;
-  refocusHandler: (
-    currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>,
-    updateBlocksHandler: (updatedBlocks: NoteBlockStateProps[]) => void,
-    currentBlocks: NoteBlockStateProps[],
-    html: string
-  ) => void;
   setIsEditMode(bool: boolean, callback?: (newState?: boolean) => void): void;
-  isAppendedToPreviousBlock: [boolean, () => void];
-  setIsAppendedToPreviousBlock: (
+  updateHtmlCurrent: [boolean, () => void];
+  setUpdateHtmlCurrent: (
     newState: [boolean, () => void],
     callback?: ((newState?: [boolean, () => void] | undefined) => void) | undefined
   ) => void;
@@ -116,25 +109,31 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   // TODO: For future use when tag changes are implemented
   // const tag = React.useRef<string>(props.tag);
 
+  // Activates when appending to previous block upon 'backspace' keyevent
   const onFocus = () => {
-    if (props.isAppendedToPreviousBlock[0]) {
+    //refocuses the cursor back onto the current block after rerender by onBlur
+    const caretPosition = getCaretPosition(noteBlockRef.current);
+    if (caretPosition) {
+      setCaret(noteBlockRef.current, caretPosition[0], caretPosition[2] + 1);
+    }
+
+    if (props.updateHtmlCurrent[0]) {
       if (props.html !== html.current) {
-        console.log('test');
         html.current = props.html;
       }
 
-      props.setIsAppendedToPreviousBlock([false, () => {}], props.isAppendedToPreviousBlock[1]);
+      props.setUpdateHtmlCurrent([false, () => {}], props.updateHtmlCurrent[1]);
     }
   };
 
-  const onBlur = () => {
-    if (props.isAppendedToPreviousBlock[0]) {
+  // Activates upon splitting block upon 'enter' keyevent
+  const onBlurCapture = () => {
+    if (props.updateHtmlCurrent[0]) {
       if (props.html !== html.current) {
-        console.log('test');
         html.current = props.html;
       }
 
-      props.setIsAppendedToPreviousBlock([false, () => {}], props.isAppendedToPreviousBlock[1]);
+      props.setUpdateHtmlCurrent([false, () => {}], props.updateHtmlCurrent[1]);
     }
   };
 
@@ -311,11 +310,10 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     unindentBlockHandler: props.unindentBlockHandler,
     unindentBlock: unindentBlock,
     appendToPreviousBlockHandler: props.appendToPreviousBlockHandler,
-    refocusHandler: props.refocusHandler,
     blocks: props.children,
     setIsEditMode: props.setIsEditMode,
-    isAppendedToPreviousBlock: props.isAppendedToPreviousBlock,
-    setIsAppendedToPreviousBlock: props.setIsAppendedToPreviousBlock,
+    updateHtmlCurrent: props.updateHtmlCurrent,
+    setUpdateHtmlCurrent: props.setUpdateHtmlCurrent,
     triggerRerender: props.triggerRerender,
     setTriggerRerender: props.setTriggerRerender
   };
@@ -345,15 +343,10 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           // setEol(noteBlockRef.current);
         });
       }}
-      onFocusCapture={() => {
-        //refocuses the cursor back onto the current block
-        const caretPosition = getCaretPosition(noteBlockRef.current);
-        if (caretPosition) {
-          setCaret(noteBlockRef.current, caretPosition[0], caretPosition[2] + 1);
-        }
+      onBlur={() => {
+        props.setTriggerRerender(!props.triggerRerender);
       }}
-      onBlur={() => props.setTriggerRerender(!props.triggerRerender)}
-      onBlurCapture={onBlur}
+      onBlurCapture={onBlurCapture}
     />
   );
 
