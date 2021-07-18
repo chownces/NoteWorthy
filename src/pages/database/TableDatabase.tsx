@@ -1,11 +1,8 @@
 import React from 'react';
-import { ContextMenuTrigger } from 'react-contextmenu';
-import { Link } from 'react-router-dom';
 
-import ContextMenuElement, {
-  ContextMenuType
-} from '../../components/contextMenu/ContextMenuElement';
+import { ContextMenuType } from '../../components/contextMenu/ContextMenuElement';
 import { DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
+import TableRow from './tableDatabaseComponents/tableRow';
 
 const TableDatabase: React.FC<DatabaseProps> = props => {
   // TODO: Probably want a react-beautiful-dnd view again for displaying all notes
@@ -39,16 +36,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
       </button>
       <div>
         {props.notes.map((note: Note, index: number) => (
-          <ContextMenuTrigger id={note.id} holdToDisplay={1000} key={note.id}>
-            <Link to={`/note/${note.id}`} key={note.id}>
-              <div className="database-note">
-                <p>Title: {note.title}</p>
-                <p>Latest Update: {new Date(note.latestUpdate).toDateString()}</p>
-              </div>
-            </Link>
-
-            <ContextMenuElement {...contextMenuProps(note, index)} />
-          </ContextMenuTrigger>
+          <TableRow note={note} contextMenuProps={contextMenuProps(note, index)} key={note.id} />
         ))}
       </div>
     </>

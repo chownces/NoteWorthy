@@ -3,5 +3,14 @@
 }
 
 .context-menu {
+  z-index: 2;
+}
+
+.context-menu-button {
+  position: absolute;
   z-index: 1;
+  height: 20px;
+  width: 40px;
+  right: 5px;
+  top: 5px;
 }

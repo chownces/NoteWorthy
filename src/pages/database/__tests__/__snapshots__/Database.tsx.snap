@@ -49,46 +49,48 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
             <div
               class="ui fluid card"
             >
-              <a
-                href="/note/60adcd6e38a95f0f75f1c089"
-              >
-                <div
-                  class="ui fluid card"
+              <div>
+                <a
+                  href="/note/60adcd6e38a95f0f75f1c089"
                 >
                   <div
-                    class="content"
+                    class="ui fluid card"
                   >
                     <div
-                      class="header"
-                    >
-                      My first note
-                    </div>
-                    <div
-                      class="description"
+                      class="content"
                     >
                       <div
-                        class="ui bulleted list"
-                        role="list"
-                      />
+                        class="header"
+                      >
+                        My first note
+                      </div>
+                      <div
+                        class="description"
+                      >
+                        <div
+                          class="ui bulleted list"
+                          role="list"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div
-                    class="extra content"
-                  >
                     <div
-                      class="ui label"
+                      class="extra content"
                     >
-                       placeholder tag 
+                      <div
+                        class="ui label"
+                      >
+                         placeholder tag 
+                      </div>
+                    </div>
+                    <div
+                      class="meta"
+                    >
+                      Last update: 
+                      Tue Jun 22 2021
                     </div>
                   </div>
-                  <div
-                    class="meta"
-                  >
-                    Last update: 
-                    Tue Jun 22 2021
-                  </div>
-                </div>
-              </a>
+                </a>
+              </div>
             </div>
             <nav
               class="react-contextmenu context-menu"
@@ -149,46 +151,48 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
             <div
               class="ui fluid card"
             >
-              <a
-                href="/note/6098bbdc04c0fa63070bfe5e"
-              >
-                <div
-                  class="ui fluid card"
+              <div>
+                <a
+                  href="/note/6098bbdc04c0fa63070bfe5e"
                 >
                   <div
-                    class="content"
+                    class="ui fluid card"
                   >
                     <div
-                      class="header"
-                    >
-                      untitled
-                    </div>
-                    <div
-                      class="description"
+                      class="content"
                     >
                       <div
-                        class="ui bulleted list"
-                        role="list"
-                      />
+                        class="header"
+                      >
+                        untitled
+                      </div>
+                      <div
+                        class="description"
+                      >
+                        <div
+                          class="ui bulleted list"
+                          role="list"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div
-                    class="extra content"
-                  >
                     <div
-                      class="ui label"
+                      class="extra content"
                     >
-                       placeholder tag 
+                      <div
+                        class="ui label"
+                      >
+                         placeholder tag 
+                      </div>
+                    </div>
+                    <div
+                      class="meta"
+                    >
+                      Last update: 
+                      Tue Jun 22 2021
                     </div>
                   </div>
-                  <div
-                    class="meta"
-                  >
-                    Last update: 
-                    Tue Jun 22 2021
-                  </div>
-                </div>
-              </a>
+                </a>
+              </div>
             </div>
             <nav
               class="react-contextmenu context-menu"
@@ -261,22 +265,26 @@ exports[`Gets all notes successfully and renders them correctly in table view 1`
     <div
       class="react-contextmenu-wrapper"
     >
-      <a
-        href="/note/60adcd6e38a95f0f75f1c089"
+      <div
+        style="position: relative;"
       >
-        <div
-          class="database-note"
+        <a
+          href="/note/60adcd6e38a95f0f75f1c089"
         >
-          <p>
-            Title: 
-            My first note
-          </p>
-          <p>
-            Latest Update: 
-            Tue Jun 22 2021
-          </p>
-        </div>
-      </a>
+          <div
+            class="database-note"
+          >
+            <p>
+              Title: 
+              My first note
+            </p>
+            <p>
+              Latest Update: 
+              Tue Jun 22 2021
+            </p>
+          </div>
+        </a>
+      </div>
       <nav
         class="react-contextmenu context-menu"
         role="menu"
@@ -322,22 +330,26 @@ exports[`Gets all notes successfully and renders them correctly in table view 1`
     <div
       class="react-contextmenu-wrapper"
     >
-      <a
-        href="/note/6098bbdc04c0fa63070bfe5e"
+      <div
+        style="position: relative;"
       >
-        <div
-          class="database-note"
+        <a
+          href="/note/6098bbdc04c0fa63070bfe5e"
         >
-          <p>
-            Title: 
-            untitled
-          </p>
-          <p>
-            Latest Update: 
-            Tue Jun 22 2021
-          </p>
-        </div>
-      </a>
+          <div
+            class="database-note"
+          >
+            <p>
+              Title: 
+              untitled
+            </p>
+            <p>
+              Latest Update: 
+              Tue Jun 22 2021
+            </p>
+          </div>
+        </a>
+      </div>
       <nav
         class="react-contextmenu context-menu"
         role="menu"
