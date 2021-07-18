@@ -119,21 +119,7 @@ const DatabaseContainer: React.FC = () => {
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
-  const createNoteHandler = (
-    categoryId: string,
-    title: string,
-    index: number,
-    database: Database
-  ) => {
-    // const tempNote = {
-    //   userId: 'temp_userId',
-    //   databaseId: 'temp_databaseId',
-    //   id: 'temp_id',
-    //   title: title,
-    //   creationDate: new Date(Date.now()).toDateString(),
-    //   latestUpdate: new Date(Date.now()).toDateString()
-    // };
-
+  const createNoteHandler = (categoryId: string, title: string, index: number) => {
     createNote({
       variables: {
         id: DATABASE_ID,
@@ -144,103 +130,47 @@ const DatabaseContainer: React.FC = () => {
       optimisticResponse: {
         createNote: {
           userId: 'temp_userId',
-          databaseId: 'temp_databaseId',
+          databaseId: DATABASE_ID,
+          categoryId: categoryId,
           id: 'temp_id',
           title: title,
+          blocks: [],
           creationDate: new Date(Date.now()).toDateString(),
           latestUpdate: new Date(Date.now()).toDateString(),
           __typename: 'Note'
         }
       },
-      // update(cache,
-      //   {
-      //     data: { createNote }
-      //   }
-      // ) {
-      //   cache.modify({
-      //     fields: {
-      //       notes(existingNotes = []) {
-      //         const newNoteRef = cache.writeFragment({
-
-      //           data: createNote,
-      //           fragment: gql`
-      //             fragment NewNote on Note {
-      //               userId
-      //               databaseId
-      //               id
-      //               title
-      //               creationDate
-      //               latestUpdate
-      //             }
-      //           `
-      //         });
-      //         return existingNotes.concat(newNoteRef);
-      //       }
-      //     }
-      //   })
-      // }
-
-      update: (cache, response) => {
+      update: (cache, { data: { createNote } }) => {
         // TODO: Handle typing
         const previousData: any = cache.readQuery({
           query: GET_DATABASE_QUERY,
           variables: {
-            id: database.id
+            id: DATABASE_ID
           }
         });
 
-        console.log(previousData);
-        console.log(response);
-
-        const tempNote = response.data.createNote;
-        const newNote = { __typename: 'Note', categoryId: categoryId, ...tempNote, blocks: [] };
-        console.log(newNote);
-
-        const tempCategories = previousData.getDatabase.categories.map((cat: any) => {
-          if (cat.id === categoryId) {
-            const tempNotes = [...cat.notes];
-            tempNotes.splice(index, 0, newNote.id);
-            return { ...cat, notes: tempNotes, __typename: 'Category' };
-          } else {
-            return { ...cat, notes: [...cat.notes], __typename: 'Category' };
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...previousData.getDatabase,
+              // Append newly createdNote to a new notes array, and the corresponding categories array
+              categories: previousData.getDatabase.categories.map((cat: any) =>
+                cat.id === categoryId
+                  ? {
+                      ...cat,
+                      notes: [...cat.notes, createNote.id]
+                    }
+                  : cat
+              ),
+              notes: [...previousData.getDatabase.notes, createNote]
+            }
           }
         });
-
-        const tempNotes = [...previousData.getDatabase.notes];
-        tempNotes.push(newNote);
-
-        console.log(tempCategories);
-
-        const newData = {
-          getDatabase: {
-            currentview: previousData.getDatabase.currentView,
-            categories: tempCategories,
-            notes: tempNotes,
-            title: previousData.getDatabase.title,
-            id: previousData.getDatabase.id,
-            __typename: 'PopulatedDatabase'
-          }
-        };
-
-        console.log(newData);
-
-        if (newData.getDatabase) {
-          cache.writeQuery({
-            query: GET_DATABASE_QUERY,
-            variables: {
-              id: database.id
-            },
-            data: newData
-          });
-        }
       }
-      // refetchQueries: [
-      //   {
-      //     query: GET_DATABASE_QUERY,
-      //     variables: { id: database.id }
-      //   }
-      // ],
-      // awaitRefetchQueries: true
     });
   };
 
