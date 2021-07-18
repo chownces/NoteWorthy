@@ -11,24 +11,6 @@ import useStateCallback from '../../utils/useStateCallback';
 export type NotePageProps = {
   blocks: React.MutableRefObject<NoteBlockStateProps[]>;
   updateBlocksInDatabase: (newBlocks: NoteBlockStateProps[]) => void;
-  updateBlockHandler: (block: NoteBlockStateProps) => void;
-  deleteBlockHandler: (block: NoteBlockStateProps) => void;
-  createBlockHandler: (block: NoteBlockStateProps, index: number) => void;
-  updateBlockOrderHandler: (block: NoteBlockStateProps, index: number) => void;
-};
-
-enum TypeOfChange {
-  Order = 0,
-  Create = 1,
-  Delete = 2,
-  Update = 3,
-  None = 4
-}
-
-export type unsavedProps = {
-  type: TypeOfChange;
-  index: number;
-  block: NoteBlockStateProps;
 };
 
 const NotePage: React.FC<NotePageProps> = props => {
@@ -37,15 +19,7 @@ const NotePage: React.FC<NotePageProps> = props => {
    * When true, the ContentEditable components (i.e. each note block) will be editable.
    */
   const [isEditMode, setIsEditMode] = useStateCallback<boolean>(false); // TODO: Look into setting a better toggle between modes
-  const hasUnsavedChanges = React.useRef<unsavedProps>({
-    type: 4,
-    index: -1,
-    block: {
-      id: '',
-      html: '',
-      tag: ''
-    }
-  });
+  const hasUnsavedChanges = React.useRef<boolean>(false);
 
   /**
    * Window interval updates the backend whenever there are changes to the `blocks` state.
@@ -57,53 +31,20 @@ const NotePage: React.FC<NotePageProps> = props => {
    * triggered outside it.
    */
   React.useEffect(() => {
-    // pause time for create/delete/updateOrder mutation set to 0, to ensure each mutation is executed immediately
-
     const interval = window.setInterval(() => {
-      const setUnsaved = () => {
-        hasUnsavedChanges.current = {
-          type: 4,
-          index: -1,
-          block: {
-            id: '',
-            html: '',
-            tag: ''
-          }
-        };
-      };
-      switch (hasUnsavedChanges.current.type) {
-        case 0:
-          props.updateBlockOrderHandler(
-            hasUnsavedChanges.current.block,
-            hasUnsavedChanges.current.index
-          );
-          setUnsaved();
-          break;
-        case 1:
-          props.createBlockHandler(
-            hasUnsavedChanges.current.block,
-            hasUnsavedChanges.current.index
-          );
-          setUnsaved();
-          break;
-        case 2:
-          props.deleteBlockHandler(hasUnsavedChanges.current.block);
-          setUnsaved();
-          break;
-        case 3:
-          props.updateBlockHandler(hasUnsavedChanges.current.block);
-          setUnsaved();
-          break;
+      if (hasUnsavedChanges.current) {
+        props.updateBlocksInDatabase(props.blocks.current);
+        hasUnsavedChanges.current = false;
       }
-    }, 0);
+    }, 1000);
 
     return () => window.clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const setBlocksAndSetUnsaved = (newBlocks: NoteBlockStateProps[], change: unsavedProps): void => {
+  const setBlocksAndSetUnsaved = (newBlocks: NoteBlockStateProps[]): void => {
     props.blocks.current = newBlocks;
-    hasUnsavedChanges.current = change;
+    hasUnsavedChanges.current = true;
   };
 
   /**
@@ -119,7 +60,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       tag: updatedBlock.tag // TODO: Handle tag change for different type of blocks (e.g. h1, img, etc.)
     };
 
-    setBlocksAndSetUnsaved(blocksCopy, { type: 3, index: index, block: updatedBlock });
+    setBlocksAndSetUnsaved(blocksCopy);
   };
 
   /**
@@ -153,7 +94,7 @@ const NotePage: React.FC<NotePageProps> = props => {
         ?.children[1] as HTMLElement).focus();
     };
 
-    setBlocksAndSetUnsaved(blocksCopy, { type: 1, index: index + 1, block: newBlock });
+    setBlocksAndSetUnsaved(blocksCopy);
     setTriggerRerender(!triggerRerender, focusNextBlockCallback);
   };
 
@@ -173,28 +114,22 @@ const NotePage: React.FC<NotePageProps> = props => {
     const blocksCopy = [...props.blocks.current];
     const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
     blocksCopy.splice(index, 1);
-
-    const change: unsavedProps = {
-      type: 2,
-      index: index,
-      block: currentBlock
-    };
     if (previousBlock) {
       const focusPreviousBlockEolCallback = () => {
         setEol(previousBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy, change);
+      setBlocksAndSetUnsaved(blocksCopy);
       setTriggerRerender(!triggerRerender, focusPreviousBlockEolCallback);
     } else if (nextBlock) {
       const focusNextBlockEolCallback = () => {
         setEol(nextBlock);
       };
 
-      setBlocksAndSetUnsaved(blocksCopy, change);
+      setBlocksAndSetUnsaved(blocksCopy);
       setTriggerRerender(!triggerRerender, focusNextBlockEolCallback);
     } else {
-      setBlocksAndSetUnsaved(blocksCopy, change);
+      setBlocksAndSetUnsaved(blocksCopy);
       setIsEditMode(false);
     }
   };
@@ -218,7 +153,7 @@ const NotePage: React.FC<NotePageProps> = props => {
     blocksCopy.push(newBlock);
 
     setIsEditMode(true, () => lastBlockRef.current?.focus());
-    setBlocksAndSetUnsaved(blocksCopy, { type: 1, index: blocksCopy.length - 1, block: newBlock });
+    setBlocksAndSetUnsaved(blocksCopy);
   };
 
   /**
@@ -243,11 +178,7 @@ const NotePage: React.FC<NotePageProps> = props => {
 
     const newBlocks = reorder(props.blocks.current, result.source.index, result.destination.index);
 
-    setBlocksAndSetUnsaved(newBlocks, {
-      type: 0,
-      index: result.destination.index,
-      block: newBlocks[result.destination.index]
-    });
+    setBlocksAndSetUnsaved(newBlocks);
   };
 
   const noteBlockHandlerProps: NoteBlockHandlerProps = {

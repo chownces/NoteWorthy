@@ -34,71 +34,6 @@ const NotePageContainer: React.FC = () => {
     });
   };
 
-  const [updateBlockOrder] = useMutation(UPDATE_BLOCK_ORDER_MUTATION, {
-    ignoreResults: true
-  });
-
-  const updateBlockOrderHandler = (block: NoteBlockStateProps, index: number) => {
-    updateBlockOrder({
-      variables: {
-        noteId: NOTE_ID,
-        blockId: block.id,
-        index: index
-      }
-    });
-  };
-  const [createBlock] = useMutation(CREATE_BLOCK_MUTATION, {
-    ignoreResults: true
-  });
-
-  const createBlockHandler = (block: NoteBlockStateProps, index: number) => {
-    createBlock({
-      variables: {
-        noteId: NOTE_ID,
-        blockId: block.id,
-        index: index
-      }
-      // update: caches => {
-      //   caches.writeQuery({
-      //     query: GET_NOTE_QUERY,
-      //     variables: {
-      //       id:NOTE_ID
-      //     },
-      //     data: {
-      //       getNote: createBlock
-      //     }
-      //   });
-      // }
-    });
-  };
-
-  const [deleteBlock] = useMutation(DELETE_BLOCK_MUTATION, {
-    ignoreResults: true
-  });
-
-  const deleteBlockHandler = (block: NoteBlockStateProps) => {
-    deleteBlock({
-      variables: {
-        noteId: NOTE_ID,
-        blockId: block.id
-      }
-    });
-  };
-
-  const [updateBlock] = useMutation(UPDATE_BLOCK_MUTATION, {
-    ignoreResults: true
-  });
-
-  const updateBlockHandler = (block: NoteBlockStateProps) => {
-    updateBlock({
-      variables: {
-        noteId: NOTE_ID,
-        blockId: block.id,
-        input: { id: block.id, html: block.html, tag: block.tag }
-      }
-    });
-  };
-
   if (queryLoading) {
     return <Loader />;
   }
@@ -112,11 +47,7 @@ const NotePageContainer: React.FC = () => {
 
   const notePageProps: NotePageProps = {
     blocks: blocks,
-    updateBlocksInDatabase: updateBlocksInDatabase,
-    createBlockHandler: createBlockHandler,
-    deleteBlockHandler: deleteBlockHandler,
-    updateBlockHandler: updateBlockHandler,
-    updateBlockOrderHandler: updateBlockOrderHandler
+    updateBlocksInDatabase: updateBlocksInDatabase
   };
 
   return <NotePage {...notePageProps} />;
@@ -155,36 +86,6 @@ const GET_NOTE_QUERY = gql`
 const UPDATE_NOTE_BLOCKS_MUTATION = gql`
   mutation updateNoteBlocks($id: ID!, $blocks: [NoteBlockInput]) {
     updateNoteBlocks(noteId: $id, input: { blocks: $blocks }) {
-      id
-    }
-  }
-`;
-
-const UPDATE_BLOCK_MUTATION = gql`
-  mutation updateBlock($noteId: ID!, $blockId: String!, $input: NoteBlockInput!) {
-    updateBlock(noteId: $noteId, blockId: $blockId, input: $input) {
-      id
-    }
-  }
-`;
-
-const UPDATE_BLOCK_ORDER_MUTATION = gql`
-  mutation updateBlockOrder($noteId: ID!, $blockId: String!, $index: Int!) {
-    updateBlockOrder(noteId: $noteId, blockId: $blockId, index: $index) {
-      id
-    }
-  }
-`;
-const CREATE_BLOCK_MUTATION = gql`
-  mutation createBlock($noteId: ID!, $blockId: String!, $index: Int!) {
-    createBlock(noteId: $noteId, blockId: $blockId, index: $index) {
-      id
-    }
-  }
-`;
-const DELETE_BLOCK_MUTATION = gql`
-  mutation deleteBlock($noteId: ID!, $blockId: String!) {
-    deleteBlock(noteId: $noteId, blockId: $blockId) {
       id
     }
   }
