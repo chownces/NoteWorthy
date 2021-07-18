@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import BoardDatabase from './BoardDatabase';
-import { Database, DatabaseProps, DatabaseViews } from './DatabaseTypes';
+import { Category, Database, DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
 
 export const GET_DATABASE_QUERY = gql`
@@ -117,25 +117,7 @@ const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
-  const [createNote] = useMutation(CREATE_NOTE_MUTATION, {
-    update: (cache, { data: { createNote } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
-
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: { getDatabase: [...data.getDatabase.notes, createNote] }
-      });
-    }
-  });
+  const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
   const createNoteHandler = (categoryId: string, title: string, index: number) => {
     createNote({
@@ -144,35 +126,98 @@ const DatabaseContainer: React.FC = () => {
         categoryId: categoryId,
         title: title,
         index: index
+      },
+      optimisticResponse: {
+        createNote: {
+          userId: 'temp_userId',
+          databaseId: DATABASE_ID,
+          categoryId: categoryId,
+          id: 'temp_id',
+          title: title,
+          blocks: [],
+          creationDate: new Date(Date.now()).toDateString(),
+          latestUpdate: new Date(Date.now()).toDateString(),
+          __typename: 'Note'
+        }
+      },
+      update: (cache, { data: { createNote } }) => {
+        // TODO: Handle typing
+        const previousData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...previousData.getDatabase,
+              // Append newly createdNote to a new notes array, and the corresponding categories array
+              categories: previousData.getDatabase.categories.map((cat: any) =>
+                cat.id === categoryId
+                  ? {
+                      ...cat,
+                      notes: [...cat.notes, createNote.id]
+                    }
+                  : cat
+              ),
+              notes: [...previousData.getDatabase.notes, createNote]
+            }
+          }
+        });
       }
     });
   };
 
-  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION, {
-    update: (cache, { data: { deleteNote } }) => {
-      const data: any = cache.readQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        }
-      });
-
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: [...data.getDatabase.notes].filter(x => x.noteId !== deleteNote.id)
-        }
-      });
-    }
-  });
+  const [deleteNote] = useMutation(DELETE_NOTE_MUTATION);
 
   const deleteNoteHandler = (noteId: string) => {
     deleteNote({
       variables: {
         noteId: noteId
+      },
+
+      // Placeholder optimistic return to force cache update
+      optimisticResponse: {
+        deleteNote: null
+      },
+
+      update: (cache, { data: { deleteNote } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        const categoryId = data.getDatabase.notes.filter((note: Note) => note.id === noteId)[0]
+          .categoryId;
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              notes: data.getDatabase.notes.filter((note: Note) => note.id !== noteId),
+              categories: data.getDatabase.categories.map((cat: Category) =>
+                cat.id === categoryId
+                  ? {
+                      ...cat,
+                      notes: cat.notes.filter(note => note !== noteId)
+                    }
+                  : cat
+              )
+            }
+          }
+        });
       }
     });
   };
@@ -281,7 +326,7 @@ const DatabaseContainer: React.FC = () => {
           updatedDatabase
         }
       },
-      update: (cache, { data: { updateNoteCategory } }) => {
+      update: cache => {
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
