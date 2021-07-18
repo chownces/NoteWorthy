@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import BoardDatabase from './BoardDatabase';
-import { Database, DatabaseProps, DatabaseViews } from './DatabaseTypes';
+import { Category, Database, DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
 
 export const GET_DATABASE_QUERY = gql`
@@ -176,27 +176,46 @@ const DatabaseContainer: React.FC = () => {
 
   const [deleteNote] = useMutation(DELETE_NOTE_MUTATION);
 
-  const deleteNoteHandler = (noteId: string, database: Database) => {
-    const deletedNote = database.notes.filter(note => note.id === noteId)[0];
+  const deleteNoteHandler = (noteId: string) => {
     deleteNote({
       variables: {
         noteId: noteId
       },
 
+      // Placeholder optimistic return to force cache update
       optimisticResponse: {
-        deleteNote: {
-          deletedNote
-        }
+        deleteNote: null
       },
 
-      update: cache => {
+      update: (cache, { data: { deleteNote } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        const categoryId = data.getDatabase.notes.filter((note: Note) => note.id === noteId)[0]
+          .categoryId;
+
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
             id: DATABASE_ID
           },
           data: {
-            getDatabase: database
+            getDatabase: {
+              ...data.getDatabase,
+              notes: data.getDatabase.notes.filter((note: Note) => note.id !== noteId),
+              categories: data.getDatabase.categories.map((cat: Category) =>
+                cat.id === categoryId
+                  ? {
+                      ...cat,
+                      notes: cat.notes.filter(note => note !== noteId)
+                    }
+                  : cat
+              )
+            }
           }
         });
       }
