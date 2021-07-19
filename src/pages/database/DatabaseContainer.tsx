@@ -77,7 +77,6 @@ export const DELETE_DATABASE_CATEGORY_MUTATION = gql`
   mutation deleteDatabaseCategory($databaseId: ID!, $categoryId: ID!) {
     deleteDatabaseCategory(databaseId: $databaseId, categoryId: $categoryId) {
       id
-      categories
     }
   }
 `;
@@ -231,25 +230,45 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const [deleteDatabaseCategory] = useMutation(DELETE_DATABASE_CATEGORY_MUTATION, {
-    update: (cache, { data: { deleteDatabaseCategory } }) => {
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: deleteDatabaseCategory
-        }
-      });
-    }
-  });
+  const [deleteDatabaseCategory] = useMutation(DELETE_DATABASE_CATEGORY_MUTATION);
 
   const deleteDatabaseCategoryHandler = (databaseId: string, categoryId: string) => {
     deleteDatabaseCategory({
       variables: {
         databaseId: databaseId,
         categoryId: categoryId
+      },
+      optimisticResponse: {
+        deleteDatabaseCategory: {
+          id: categoryId
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              categories: data.getDatabase.categories.filter((e: Category) => e.id !== categoryId),
+              notes: data.getDatabase.notes.filter(
+                (e: Note) =>
+                  !data.getDatabase.categories
+                    .filter((e: Category) => e.id === categoryId)[0]
+                    .notes.includes(e.id)
+              )
+            }
+          }
+        });
       }
     });
   };
