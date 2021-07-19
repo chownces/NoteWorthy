@@ -1,27 +1,31 @@
-.Notepage {
-  display: flex;
-  flex-direction: column;
+.Notepage-container {
   height: 100%;
 
-  .notepage-title {
-    outline: none;
-    font-size: xx-large;
-    font-weight: bold;
-    padding-left: 10px;
-    margin-bottom: 10px;
-    min-height: 45px;
-  }
+  .Notepage {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
-  .bottom-placeholder-div {
-    flex: 1;
-    font-size: medium;
-    color: #aaa;
-
-    .bottom-placeholder-div-text {
-      padding-left: 10px;
+    .notepage-title {
+      outline: none;
+      font-size: xx-large;
+      font-weight: bold;
+      padding-left: 16px;
+      margin: 1rem 0 10px 0;
+      min-height: 45px;
     }
-  }
-  .bottom-placeholder-div:hover {
-    cursor: pointer;
+
+    .bottom-placeholder-div {
+      flex: 1;
+      font-size: medium;
+      color: #aaa;
+
+      .bottom-placeholder-div-text {
+        padding-left: 10px;
+      }
+    }
+    .bottom-placeholder-div:hover {
+      cursor: pointer;
+    }
   }
 }

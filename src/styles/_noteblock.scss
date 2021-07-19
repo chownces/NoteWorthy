@@ -3,13 +3,28 @@
   margin: 0.5em 0;
   font-size: 20px;
 
-  .noteblock-handle {
+  .noteblock-handle-container {
     cursor: grab;
-    width: 10px;
+    width: 16px;
+
+    .noteblock-handle {
+      margin-right: 5px;
+      border-radius: 5px;
+      height: 100%;
+    }
+
+    i {
+      margin-top: 7px;
+      color: #aaa;
+    }
+
+    i::before {
+      margin-right: 7px;
+    }
   }
 
-  .noteblock-handle:hover {
-    background-color: grey;
+  .show-noteblock-handle {
+    background-color: #ddd;
   }
 
   .noteblock-text {
@@ -17,6 +32,14 @@
     margin: 0;
     width: calc(100% - 10px);
     outline: none;
+  }
+
+  .draggingOver {
+    background-color: #eee;
+  }
+
+  .isDragging {
+    background-color: lightcyan;
   }
 }
 

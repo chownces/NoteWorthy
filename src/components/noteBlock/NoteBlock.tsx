@@ -1,7 +1,12 @@
 import React from 'react';
-import { DraggableProvided } from 'react-beautiful-dnd';
+import {
+  DraggableProvided,
+  DraggableStateSnapshot,
+  DroppableStateSnapshot
+} from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
+import { Icon } from 'semantic-ui-react';
 
 import { setEol, toggleBold } from '../../utils/helpers';
 import useMergedRef from '../../utils/useMergedRef';
@@ -26,6 +31,8 @@ type OwnProps = {
   innerRef: (element?: HTMLElement | null | undefined) => any;
   lastBlockRef?: React.RefObject<HTMLElement>;
   provided: DraggableProvided;
+  draggableSnapshot: DraggableStateSnapshot;
+  droppableSnapshot: DroppableStateSnapshot;
   isEditMode: boolean;
 };
 
@@ -126,6 +133,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
   };
 
   const [contentEditablePlaceholder, setContentEditablePlaceholder] = React.useState('');
+  const [isHovering, setIsHovering] = React.useState(false);
 
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
@@ -143,10 +151,21 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         ref={props.innerRef}
         {...props.provided.dragHandleProps} // react-beautiful-dnd props
         {...props.provided.draggableProps} // react-beautiful-dnd props
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-        <div className="noteblock-handle"></div>
+        <div className="noteblock-handle-container">
+          <div className={'noteblock-handle' + (isHovering ? ' show-noteblock-handle' : '')}>
+            {isHovering && <Icon name="ellipsis vertical" size="small" />}
+          </div>
+        </div>
+
         <ContentEditable
-          className="noteblock-text"
+          className={
+            'noteblock-text' +
+            (props.droppableSnapshot.isDraggingOver ? ' draggingOver' : '') +
+            (props.draggableSnapshot.isDragging ? ' isDragging' : '')
+          }
           innerRef={mergedRef}
           html={html.current}
           tagName={props.tag}

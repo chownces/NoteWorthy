@@ -1,6 +1,7 @@
 import React from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { Container } from 'semantic-ui-react';
 
 import NoteBlock, {
   NoteBlockHandlerProps,
@@ -218,48 +219,52 @@ const NotePage: React.FC<NotePageProps> = props => {
   }, []);
 
   return (
-    <div className="Notepage">
-      <ContentEditable
-        className="notepage-title"
-        tagName="p"
-        html={noteTitleRef.current}
-        onChange={(e: ContentEditableEvent) => {
-          noteTitleRef.current = e.target.value;
-          hasUnsavedChangesTitle.current = true;
-        }}
-      />
-      <DragDropContext onDragEnd={onDragEndHandler}>
-        <Droppable droppableId="note-blocks">
-          {provided => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {props.blocks.current.map((block, index) => (
-                <Draggable draggableId={block.id} index={index} key={block.id}>
-                  {provided => (
-                    <NoteBlock
-                      {...block}
-                      {...noteBlockHandlerProps}
-                      key={block.id}
-                      isEditMode={isEditMode}
-                      innerRef={provided.innerRef}
-                      lastBlockRef={
-                        index === props.blocks.current.length - 1 ? lastBlockRef : undefined
-                      }
-                      provided={provided}
-                    />
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
+    <Container className="Notepage-container">
+      <div className="Notepage">
+        <ContentEditable
+          className="notepage-title"
+          tagName="p"
+          html={noteTitleRef.current}
+          onChange={(e: ContentEditableEvent) => {
+            noteTitleRef.current = e.target.value;
+            hasUnsavedChangesTitle.current = true;
+          }}
+        />
+        <DragDropContext onDragEnd={onDragEndHandler}>
+          <Droppable droppableId="note-blocks">
+            {(provided, droppableSnapshot) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {props.blocks.current.map((block, index) => (
+                  <Draggable draggableId={block.id} index={index} key={block.id}>
+                    {(provided, draggableSnapshot) => (
+                      <NoteBlock
+                        {...block}
+                        {...noteBlockHandlerProps}
+                        key={block.id}
+                        isEditMode={isEditMode}
+                        innerRef={provided.innerRef}
+                        lastBlockRef={
+                          index === props.blocks.current.length - 1 ? lastBlockRef : undefined
+                        }
+                        provided={provided}
+                        draggableSnapshot={draggableSnapshot}
+                        droppableSnapshot={droppableSnapshot}
+                      />
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+        <div className="bottom-placeholder-div" onClick={placeHolderDivHandler}>
+          {props.blocks.current.length === 0 && (
+            <div className="bottom-placeholder-div-text">Click here to add a new block!</div>
           )}
-        </Droppable>
-      </DragDropContext>
-      <div className="bottom-placeholder-div" onClick={placeHolderDivHandler}>
-        {props.blocks.current.length === 0 && (
-          <div className="bottom-placeholder-div-text">Click here to add a new block!</div>
-        )}
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
