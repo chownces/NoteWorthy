@@ -1,6 +1,5 @@
 import React, { ReactElement } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Container } from 'semantic-ui-react';
 
 import AllDatabasesContainer from '../../pages/allDatabases/AllDatabasesContainer';
 import DatabaseContainer from '../../pages/database/DatabaseContainer';
@@ -29,7 +28,7 @@ const Application: React.FC = () => {
   return (
     <div className="Application">
       <NavigationBar />
-      <Container className="content">
+      <div className="content">
         <Switch>
           {nonAuthPaths}
           {userCtx.user.loggedIn ? (
@@ -47,7 +46,7 @@ const Application: React.FC = () => {
             <Route render={redirectToLogin} />
           )}
         </Switch>
-      </Container>
+      </div>
     </div>
   );
 };

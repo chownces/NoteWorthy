@@ -22,7 +22,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
   };
 
   return (
-    <>
+    <div className="database">
       <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.BOARD)}>
         go to board view
       </button>
@@ -39,7 +39,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
           <TableRow note={note} contextMenuProps={contextMenuProps(note, index)} key={note.id} />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

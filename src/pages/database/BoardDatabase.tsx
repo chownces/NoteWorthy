@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { Divider, Grid, Header } from 'semantic-ui-react';
+import { Divider, Header } from 'semantic-ui-react';
 
 import AddCategoryPopup from './boardDatabaseComponents/AddCategoryPopup';
 import CategoryColumn from './boardDatabaseComponents/CategoryColumn';
@@ -75,24 +75,32 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEndHandler}>
-      <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.TABLE)}>
-        go to table view
-      </button>
-      <Header as="h1" textAlign="center" style={{ marginTop: '20px' }}>
-        {props.title}
-      </Header>
-      <Divider></Divider>
-      <Grid columns="equal">
-        {props.categories.map((category, index) => (
-          <CategoryColumn key={index} index={index} category={category} {...categoryColumnProps} />
-        ))}
-
-        <Grid.Column>
-          <AddCategoryPopup {...props} />
-        </Grid.Column>
-      </Grid>
-    </DragDropContext>
+    <div className="database">
+      <div className="board">
+        <DragDropContext onDragEnd={onDragEndHandler}>
+          <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.TABLE)}>
+            go to table view
+          </button>
+          <Header as="h1" textAlign="center">
+            {props.title}
+          </Header>
+          <Divider className="divider" />
+          <div className="board-items-container">
+            {props.categories.map((category, index) => (
+              <CategoryColumn
+                key={index}
+                index={index}
+                category={category}
+                {...categoryColumnProps}
+              />
+            ))}
+            <div className="column">
+              <AddCategoryPopup {...props} />
+            </div>
+          </div>
+        </DragDropContext>
+      </div>
+    </div>
   );
 };
 

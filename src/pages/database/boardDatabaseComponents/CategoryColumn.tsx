@@ -1,6 +1,6 @@
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import { Grid, Header, Icon } from 'semantic-ui-react';
+import { Header, Icon } from 'semantic-ui-react';
 
 import BoardItem from '../boardDatabaseComponents/BoardItem';
 import { Category, Note } from '../DatabaseTypes';
@@ -26,7 +26,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
   };
 
   return (
-    <Grid.Column key={props.category.name}>
+    <div className="column" key={props.category.name}>
       <Header as="h5" textAlign="center">
         {props.category.name}
 
@@ -62,7 +62,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
       >
         Add Note
       </button>
-    </Grid.Column>
+    </div>
   );
 };
 

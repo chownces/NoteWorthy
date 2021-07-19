@@ -23,7 +23,7 @@ const TableRow: React.FC<TableRowProps> = props => {
       >
         {isHovering && <ContextMenuButton contextMenuProps={contextMenuProps} noteid={note.id} />}
         <Link to={`/note/${note.id}`} key={note.id}>
-          <div className="database-note">
+          <div className="table-database-note">
             <p>Title: {note.title}</p>
             <p>Latest Update: {new Date(note.latestUpdate).toDateString()}</p>
           </div>

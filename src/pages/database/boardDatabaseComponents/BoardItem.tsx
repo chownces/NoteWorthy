@@ -43,48 +43,46 @@ const BoardItem: React.FC<BoardItemProps> = props => {
           ref={provided.innerRef}
         >
           <ContextMenuTrigger id={props.note.id} holdToDisplay={-1}>
-            <Card fluid>
-              <div
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                {isHovering && (
-                  <ContextMenuButton contextMenuProps={contextMenuProps} noteid={props.note.id} />
-                )}
-                <Link to={`/note/${props.note.id}`} key={props.note.id}>
-                  <Card fluid>
-                    <Card.Content>
-                      <Card.Header>{props.note.title}</Card.Header>
-                      <Card.Description>
-                        <List bulleted>
-                          {/* Cap of 3 blocks displayed */}
-                          {props.note.blocks.map((block, index) =>
-                            index > 2 ? null : block.html === '' ? null : (
-                              <List.Item style={{ lineHeight: '1.4285em' }} key={index}>
-                                <ContentEditable
-                                  html={block.html}
-                                  tagName="p"
-                                  onChange={() => {}}
-                                  disabled
-                                />
-                              </List.Item>
-                            )
-                          )}
-                        </List>
-                      </Card.Description>
-                    </Card.Content>
-                    <Card.Content extra>
-                      {/* TODO: Implement note tagging */}
-                      <Label> placeholder tag </Label>
-                    </Card.Content>
-                    <Card.Meta>
-                      Last update: {new Date(props.note.latestUpdate).toDateString()}
-                    </Card.Meta>
-                  </Card>
-                </Link>
-              </div>
-            </Card>
-
+            <div
+              className="board-item"
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              {isHovering && (
+                <ContextMenuButton contextMenuProps={contextMenuProps} noteid={props.note.id} />
+              )}
+              <Link to={`/note/${props.note.id}`} key={props.note.id}>
+                <Card fluid>
+                  <Card.Content>
+                    <Card.Header>{props.note.title}</Card.Header>
+                    <Card.Description>
+                      <List bulleted>
+                        {/* Cap of 3 blocks displayed */}
+                        {props.note.blocks.map((block, index) =>
+                          index > 2 ? null : block.html === '' ? null : (
+                            <List.Item style={{ lineHeight: '1.4285em' }} key={index}>
+                              <ContentEditable
+                                html={block.html}
+                                tagName="p"
+                                onChange={() => {}}
+                                disabled
+                              />
+                            </List.Item>
+                          )
+                        )}
+                      </List>
+                    </Card.Description>
+                  </Card.Content>
+                  <Card.Content extra>
+                    {/* TODO: Implement note tagging */}
+                    <Label> placeholder tag </Label>
+                  </Card.Content>
+                  <Card.Meta>
+                    Last update: {new Date(props.note.latestUpdate).toDateString()}
+                  </Card.Meta>
+                </Card>
+              </Link>
+            </div>
             <ContextMenuElement {...contextMenuProps} />
           </ContextMenuTrigger>
         </div>

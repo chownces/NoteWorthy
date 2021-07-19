@@ -1,16 +1,44 @@
-.database-note {
-  outline: 1px solid red;
-}
+.database {
+  height: 100%;
+  overflow: auto;
 
-.context-menu {
-  z-index: 2;
-}
+  .table-database-note {
+    outline: 1px solid red;
+  }
 
-.context-menu-button {
-  position: absolute;
-  z-index: 1;
-  height: 20px;
-  width: 40px;
-  right: 5px;
-  top: 5px;
+  .context-menu {
+    z-index: 2;
+  }
+
+  .context-menu-button {
+    position: absolute;
+    z-index: 1;
+    height: 20px;
+    width: 40px;
+    right: 5px;
+    top: 5px;
+  }
+
+  .board {
+    height: 100%;
+    width: min-content;
+    min-width: 100%;
+
+    .board-items-container {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+      width: min-content;
+
+      .column {
+        width: 260px;
+        min-width: 260px;
+        margin: 0 8px;
+
+        .board-item {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
 }
