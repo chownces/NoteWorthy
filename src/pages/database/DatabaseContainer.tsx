@@ -3,6 +3,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
+import { GET_ALL_USER_DATABASES_QUERY } from '../allDatabases/AllDatabasesContainer';
 import BoardDatabase from './BoardDatabase';
 import { Category, Database, DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
 import TableDatabase from './TableDatabase';
@@ -304,6 +305,47 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         id: DATABASE_ID,
         title
+      },
+      optimisticResponse: {
+        updateDatabaseTitle: {
+          id: DATABASE_ID
+        }
+      },
+      update: cache => {
+        const allDatabasesData: any = cache.readQuery({
+          query: GET_ALL_USER_DATABASES_QUERY
+        });
+
+        if (allDatabasesData) {
+          cache.writeQuery({
+            query: GET_ALL_USER_DATABASES_QUERY,
+            data: {
+              getAllUserDatabases: allDatabasesData.getAllUserDatabases.map((e: Database) =>
+                e.id === DATABASE_ID ? { ...e, title: title } : e
+              )
+            }
+          });
+        }
+
+        const databaseData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...databaseData.getDatabase,
+              title: title
+            }
+          }
+        });
       }
     });
   };
@@ -313,6 +355,32 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         databaseId: databaseId,
         view: view
+      },
+      optimisticResponse: {
+        updateDatabaseView: {
+          id: DATABASE_ID,
+          view: view
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              currentView: view
+            }
+          }
+        });
       }
     });
   };
@@ -362,9 +430,7 @@ const DatabaseContainer: React.FC = () => {
   };
 
   const { loading: queryLoading, error: queryError, data, refetch } = useQuery(GET_DATABASE_QUERY, {
-    variables: { id: DATABASE_ID },
-    // Always fetch from backend instead of checking cache first
-    fetchPolicy: 'network-only'
+    variables: { id: DATABASE_ID }
   });
 
   React.useEffect(() => {

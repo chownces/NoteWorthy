@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import { NoteBlockStateProps } from '../../components/noteBlock/NoteBlock';
+import { GET_DATABASE_QUERY } from '../database/DatabaseContainer';
+import { Note } from '../database/DatabaseTypes';
 import NotePage, { NotePageProps } from './NotePage';
 
 const NotePageContainer: React.FC = () => {
@@ -14,8 +16,7 @@ const NotePageContainer: React.FC = () => {
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_NOTE_QUERY, {
     variables: {
       id: NOTE_ID
-    },
-    fetchPolicy: 'network-only'
+    }
   });
 
   // TODO: Handle fetching errors
@@ -44,6 +45,51 @@ const NotePageContainer: React.FC = () => {
       variables: {
         id: NOTE_ID,
         title: title
+      },
+      optimisticResponse: {
+        updateNoteTitle: {
+          id: NOTE_ID
+        }
+      },
+      update: cache => {
+        const noteData: any = cache.readQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          }
+        });
+        const databaseData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: noteData.getNote.databaseId
+          }
+        });
+        cache.writeQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          },
+          data: {
+            getNote: {
+              ...noteData.getNote,
+              title: title
+            }
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: noteData.getNote.databaseId
+          },
+          data: {
+            getDatabase: {
+              ...databaseData.getDatabase,
+              notes: databaseData.getDatabase.notes.map((e: Note) =>
+                e.id === NOTE_ID ? { ...e, title: title } : e
+              )
+            }
+          }
+        });
       }
     });
   };

@@ -64,11 +64,7 @@ const AllDatabasesController: React.FC = () => {
   };
 
   const { loading: queryLoading, error: queryError, data, refetch } = useQuery(
-    GET_ALL_USER_DATABASES_QUERY,
-    {
-      // Always fetch from backend instead of checking cache first
-      fetchPolicy: 'network-only'
-    }
+    GET_ALL_USER_DATABASES_QUERY
   );
 
   React.useEffect(() => {
@@ -135,8 +131,6 @@ export const UPDATE_DATABASE_TITLE_MUTATION = gql`
     updateDatabaseTitle(databaseId: $databaseId, title: $title) {
       id
       title
-      currentView
-      notes
     }
   }
 `;
