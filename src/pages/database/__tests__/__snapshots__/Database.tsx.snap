@@ -38,6 +38,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
           <div
             data-rbd-droppable-context-id="0"
             data-rbd-droppable-id="60cc5982c3987e2ac0b44fd9"
+            style="min-height: 1px;"
           >
             <div
               aria-describedby="rbd-hidden-text-0-hidden-text-0"

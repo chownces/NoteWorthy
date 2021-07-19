@@ -38,7 +38,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
       </Header>
       <Droppable droppableId={props.category.id}>
         {provided => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
+          <div ref={provided.innerRef} {...provided.droppableProps} style={{ minHeight: '1px' }}>
             {props.category.notes.map((note: string, index: number) => (
               <BoardItem
                 key={index}
