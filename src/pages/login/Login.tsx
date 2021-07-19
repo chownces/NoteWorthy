@@ -52,7 +52,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <>
+    <div style={{ marginTop: '1rem' }}>
       <Header as="h3" textAlign="center">
         Welcome to NoteWorthy!
       </Header>
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
           </Card.Content>
         </Card>
       </Card.Group>
-    </>
+    </div>
   );
 };
 

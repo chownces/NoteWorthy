@@ -20,6 +20,14 @@ test('NoteBlock renders correctly with <p> tag', () => {
         'data-rbd-draggable-context-id': '',
         'data-rbd-draggable-id': ''
       }
+    },
+    draggableSnapshot: {
+      isDragging: false,
+      isDropAnimating: false
+    },
+    droppableSnapshot: {
+      isDraggingOver: false,
+      isUsingPlaceholder: false
     }
   };
   const tree = shallow(<NoteBlock {...props} />);

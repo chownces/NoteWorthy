@@ -55,7 +55,7 @@ const BoardItem: React.FC<BoardItemProps> = props => {
                 <Card fluid>
                   <Card.Content>
                     <Card.Header>{props.note.title}</Card.Header>
-                    <Card.Description>
+                    <Card.Description style={{ overflow: 'hidden' }}>
                       <List bulleted>
                         {/* Cap of 3 blocks displayed */}
                         {props.note.blocks.map((block, index) =>
