@@ -1,5 +1,6 @@
 import React from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 import NoteBlock, {
   NoteBlockHandlerProps,
@@ -10,7 +11,9 @@ import useStateCallback from '../../utils/useStateCallback';
 
 export type NotePageProps = {
   blocks: React.MutableRefObject<NoteBlockStateProps[]>;
+  title: string;
   updateBlocksInDatabase: (newBlocks: NoteBlockStateProps[]) => void;
+  updateNoteTitle: (title: string) => void;
 };
 
 const NotePage: React.FC<NotePageProps> = props => {
@@ -64,12 +67,10 @@ const NotePage: React.FC<NotePageProps> = props => {
   };
 
   /**
-   * A React useState to trigger a rerender whenever there is a block addition or deletion.
-   *
-   * This is because we store `blocks` state as a mutable ref instead of useState as react-contenteditable
-   * does not play well with rerenders triggered outside of it (as recommended by their docs).
-   * We thus need to force a rerender when there are block additions or deletions to add/ remove the
-   * block from the DOM.
+   * Under normal circumstances, this is bad React code. However, since we are using
+   * react-contenteditable which recommends mutable refs to prevent the cursor jumping
+   * problem, we need a way to trigger a rerender when necessary (such as when adding
+   * or deleting blocks).
    */
   const [triggerRerender, setTriggerRerender] = useStateCallback(false);
 
@@ -133,27 +134,40 @@ const NotePage: React.FC<NotePageProps> = props => {
       setIsEditMode(false);
     }
   };
+
   /**
    * This ref is passed to the last ContextEditable block in order to focus the newly appended block
-   * in the appendBlockHandler callback.
+   * in the placeHolderDivHandler callback.
    */
   const lastBlockRef = React.useRef<HTMLElement>(null);
 
-  const appendBlockHandler = (): void => {
-    if (isEditMode) {
-      setIsEditMode(false);
-      return;
-    }
-    const newBlock: NoteBlockStateProps = {
-      id: uniqueId(), // TODO: Consider using the id provided by MongoDB
-      html: '',
-      tag: 'p' // TODO: Reconsider default block tag
-    };
-    const blocksCopy = [...props.blocks.current];
-    blocksCopy.push(newBlock);
+  /**
+   * onClick handler for the placeHolderDiv at the bottom of the notepage.
+   *
+   * It adds a new block when there are 0 blocks, or when the last block
+   * already has text in it. Otherwise, it just focuses on the last block.
+   */
+  const placeHolderDivHandler = (): void => {
+    if (props.blocks.current.length === 0 || props.blocks.current.slice(-1)[0].html !== '') {
+      const newBlock: NoteBlockStateProps = {
+        id: uniqueId(), // TODO: Consider using the id provided by MongoDB
+        html: '',
+        tag: 'p' // TODO: Reconsider default block tag
+      };
+      const blocksCopy = [...props.blocks.current];
+      blocksCopy.push(newBlock);
 
-    setIsEditMode(true, () => lastBlockRef.current?.focus());
-    setBlocksAndSetUnsaved(blocksCopy);
+      setIsEditMode(true);
+      setTriggerRerender(!triggerRerender, () => lastBlockRef.current?.focus());
+      setBlocksAndSetUnsaved(blocksCopy);
+    } else {
+      setIsEditMode(true);
+
+      setTriggerRerender(!triggerRerender, () => {
+        lastBlockRef.current?.focus();
+        setEol(lastBlockRef.current);
+      });
+    }
   };
 
   /**
@@ -188,8 +202,32 @@ const NotePage: React.FC<NotePageProps> = props => {
     setIsEditMode: setIsEditMode
   };
 
+  // Handle title updates
+  const noteTitleRef = React.useRef(props.title);
+  const hasUnsavedChangesTitle = React.useRef(false);
+  React.useEffect(() => {
+    const interval = window.setInterval(() => {
+      if (hasUnsavedChangesTitle.current) {
+        props.updateNoteTitle(noteTitleRef.current);
+        hasUnsavedChangesTitle.current = false;
+      }
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="Notepage">
+      <ContentEditable
+        className="notepage-title"
+        tagName="p"
+        html={noteTitleRef.current}
+        onChange={(e: ContentEditableEvent) => {
+          noteTitleRef.current = e.target.value;
+          hasUnsavedChangesTitle.current = true;
+        }}
+      />
       <DragDropContext onDragEnd={onDragEndHandler}>
         <Droppable droppableId="note-blocks">
           {provided => (
@@ -216,7 +254,11 @@ const NotePage: React.FC<NotePageProps> = props => {
           )}
         </Droppable>
       </DragDropContext>
-      <div className="placeholder" onClick={appendBlockHandler} />
+      <div className="bottom-placeholder-div" onClick={placeHolderDivHandler}>
+        {props.blocks.current.length === 0 && (
+          <div className="bottom-placeholder-div-text">Click here to add a new block!</div>
+        )}
+      </div>
     </div>
   );
 };

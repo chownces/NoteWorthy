@@ -25,3 +25,11 @@
     background-color: lightblue;
   }
 }
+
+// For placeholder text inside contenteditable
+[contenteditable='true']:empty:before {
+  content: attr(placeholder);
+  display: block;
+  color: #aaa;
+  font-size: medium;
+}

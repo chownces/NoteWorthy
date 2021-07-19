@@ -125,6 +125,8 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
     updateNameHandler: () => {}
   };
 
+  const [contentEditablePlaceholder, setContentEditablePlaceholder] = React.useState('');
+
   // TODO: Improve dragging experience
   // TODO: Improve edit mode toggle
   // TODO: Add toggle handle icon
@@ -148,6 +150,11 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
           innerRef={mergedRef}
           html={html.current}
           tagName={props.tag}
+          onFocus={() =>
+            html.current === '' ? setContentEditablePlaceholder('Type something') : null
+          }
+          onBlur={() => setContentEditablePlaceholder('')}
+          placeholder={contentEditablePlaceholder}
           onChange={onChangeHandler}
           onKeyDown={onKeydownHandler}
           disabled={!props.isEditMode}

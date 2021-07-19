@@ -34,6 +34,19 @@ const NotePageContainer: React.FC = () => {
     });
   };
 
+  const [updateNoteTitleMutation] = useMutation(UPDATE_NOTE_TITLE_MUTATION, {
+    ignoreResults: true
+  });
+
+  const updateNoteTitle = (title: String) => {
+    updateNoteTitleMutation({
+      variables: {
+        id: NOTE_ID,
+        title: title
+      }
+    });
+  };
+
   if (queryLoading) {
     return <Loader />;
   }
@@ -47,7 +60,9 @@ const NotePageContainer: React.FC = () => {
 
   const notePageProps: NotePageProps = {
     blocks: blocks,
-    updateBlocksInDatabase: updateBlocksInDatabase
+    title: data.getNote.title,
+    updateBlocksInDatabase: updateBlocksInDatabase,
+    updateNoteTitle: updateNoteTitle
   };
 
   return <NotePage {...notePageProps} />;
@@ -86,6 +101,14 @@ const GET_NOTE_QUERY = gql`
 const UPDATE_NOTE_BLOCKS_MUTATION = gql`
   mutation updateNoteBlocks($id: ID!, $blocks: [NoteBlockInput]) {
     updateNoteBlocks(noteId: $id, input: { blocks: $blocks }) {
+      id
+    }
+  }
+`;
+
+const UPDATE_NOTE_TITLE_MUTATION = gql`
+  mutation updateNoteTitle($id: ID!, $title: String!) {
+    updateNoteTitle(noteId: $id, title: $title) {
       id
     }
   }
