@@ -12,7 +12,8 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
         go to table view
       </button>
       <h1
-        class="ui center aligned header"
+        class="database-title"
+        contenteditable="true"
       >
         untitled
       </h1>
@@ -269,6 +270,12 @@ exports[`Gets all notes successfully and renders them correctly in table view 1`
     <button>
       Create Note
     </button>
+    <h1
+      class="database-title"
+      contenteditable="true"
+    >
+      untitled
+    </h1>
     <div>
       <div
         class="react-contextmenu-wrapper"

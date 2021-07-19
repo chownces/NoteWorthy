@@ -14,7 +14,8 @@ const NotePageContainer: React.FC = () => {
   const { loading: queryLoading, error: queryError, data } = useQuery(GET_NOTE_QUERY, {
     variables: {
       id: NOTE_ID
-    }
+    },
+    fetchPolicy: 'network-only'
   });
 
   // TODO: Handle fetching errors

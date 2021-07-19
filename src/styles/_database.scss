@@ -37,8 +37,18 @@
 
         .board-item {
           margin-bottom: 1rem;
+          // For absolute positioning of context menu button
+          position: relative;
         }
       }
     }
+  }
+
+  .database-title {
+    outline: none;
+    font-size: xx-large;
+    font-weight: bold;
+    padding-left: 1rem;
+    min-height: 45px;
   }
 }

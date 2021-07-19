@@ -223,7 +223,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       <div className="Notepage">
         <ContentEditable
           className="notepage-title"
-          tagName="p"
+          tagName="h1"
           html={noteTitleRef.current}
           onChange={(e: ContentEditableEvent) => {
             noteTitleRef.current = e.target.value;

@@ -63,7 +63,19 @@ const AllDatabasesController: React.FC = () => {
     });
   };
 
-  const { loading: queryLoading, error: queryError, data } = useQuery(GET_ALL_USER_DATABASES_QUERY);
+  const { loading: queryLoading, error: queryError, data, refetch } = useQuery(
+    GET_ALL_USER_DATABASES_QUERY,
+    {
+      // Always fetch from backend instead of checking cache first
+      fetchPolicy: 'network-only'
+    }
+  );
+
+  React.useEffect(() => {
+    if (!queryLoading && !queryError) {
+      refetch();
+    }
+  }, [queryLoading, queryError, refetch]);
 
   if (queryLoading) {
     return <Loader />;

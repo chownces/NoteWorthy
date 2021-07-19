@@ -90,6 +90,14 @@ export const UPDATE_DATABASE_VIEW_MUTATION = gql`
   }
 `;
 
+export const UPDATE_DATABASE_TITLE_MUTATION = gql`
+  mutation updateDatabaseTitle($id: ID!, $title: String!) {
+    updateDatabaseTitle(databaseId: $id, title: $title) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
   mutation updateNoteCategory($noteId: ID!, $categoryId: ID!, $index: Int!) {
     updateNoteCategory(noteId: $noteId, categoryId: $categoryId, index: $index) {
@@ -287,6 +295,19 @@ const DatabaseContainer: React.FC = () => {
     }
   });
 
+  const [updateDatabaseTitleMutation] = useMutation(UPDATE_DATABASE_TITLE_MUTATION, {
+    ignoreResults: true
+  });
+
+  const updateDatabaseTitle = (title: string) => {
+    updateDatabaseTitleMutation({
+      variables: {
+        id: DATABASE_ID,
+        title
+      }
+    });
+  };
+
   const updateDatabaseViewHandler = (databaseId: string, view: string) => {
     updateDatabaseView({
       variables: {
@@ -340,9 +361,17 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const { loading: queryLoading, error: queryError, data } = useQuery(GET_DATABASE_QUERY, {
-    variables: { id: DATABASE_ID }
+  const { loading: queryLoading, error: queryError, data, refetch } = useQuery(GET_DATABASE_QUERY, {
+    variables: { id: DATABASE_ID },
+    // Always fetch from backend instead of checking cache first
+    fetchPolicy: 'network-only'
   });
+
+  React.useEffect(() => {
+    if (!queryLoading && !queryError) {
+      refetch();
+    }
+  }, [queryLoading, queryError, refetch]);
 
   if (queryLoading) {
     return <Loader />;
@@ -364,6 +393,7 @@ const DatabaseContainer: React.FC = () => {
     createDatabaseCategoryHandler: createDatabaseCategoryHandler,
     deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
     updateDatabaseViewHandler: updateDatabaseViewHandler,
+    updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,
     updateNoteTitleHandler: updateNoteTitleHandler
   };

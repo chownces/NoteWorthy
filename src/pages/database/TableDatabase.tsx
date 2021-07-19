@@ -1,4 +1,5 @@
 import React from 'react';
+import ContentEditable from 'react-contenteditable';
 
 import { ContextMenuType } from '../../components/contextMenu/ContextMenuElement';
 import { DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
@@ -8,6 +9,20 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
   // TODO: Probably want a react-beautiful-dnd view again for displaying all notes
 
   // TODO: Change note.date to reflect the latest date and time of update to the note (requires changes in backend)
+
+  const databaseTitle = React.useRef(props.title);
+  const hasUnsavedChangesTitle = React.useRef(false);
+  React.useEffect(() => {
+    const interval = window.setInterval(() => {
+      if (hasUnsavedChangesTitle.current) {
+        props.updateDatabaseTitleHandler(databaseTitle.current);
+        hasUnsavedChangesTitle.current = false;
+      }
+    }, 800);
+
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const contextMenuProps = (note: Note, index: number) => {
     return {
@@ -34,6 +49,15 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
       >
         Create Note
       </button>
+      <ContentEditable
+        className="database-title"
+        tagName="h1"
+        html={databaseTitle.current}
+        onChange={e => {
+          hasUnsavedChangesTitle.current = true;
+          databaseTitle.current = e.target.value;
+        }}
+      />
       <div>
         {props.notes.map((note: Note, index: number) => (
           <TableRow note={note} contextMenuProps={contextMenuProps(note, index)} key={note.id} />

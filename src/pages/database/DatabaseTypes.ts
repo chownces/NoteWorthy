@@ -18,6 +18,7 @@ export type DatabaseProps = {
   createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
   deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
   updateDatabaseViewHandler: (databaseId: string, view: string) => void;
+  updateDatabaseTitleHandler: (title: string) => void;
   updateNoteCategoryHandler: (
     noteId: string,
     categoryId: string,
