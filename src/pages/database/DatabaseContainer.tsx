@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import { GET_ALL_USER_DATABASES_QUERY } from '../allDatabases/AllDatabasesContainer';
-import BoardDatabase from './BoardDatabase';
-import { Category, Database, DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
-import TableDatabase from './TableDatabase';
+import Database, { DatabaseProps } from './Database';
+import { Database as DatabaseType } from './DatabaseTypes';
+import { Category, Note } from './DatabaseTypes';
 
 export const GET_DATABASE_QUERY = gql`
   query getDatabase($id: ID!) {
@@ -339,7 +339,7 @@ const DatabaseContainer: React.FC = () => {
           cache.writeQuery({
             query: GET_ALL_USER_DATABASES_QUERY,
             data: {
-              getAllUserDatabases: allDatabasesData.getAllUserDatabases.map((e: Database) =>
+              getAllUserDatabases: allDatabasesData.getAllUserDatabases.map((e: DatabaseType) =>
                 e.id === DATABASE_ID ? { ...e, title: title } : e
               )
             }
@@ -421,7 +421,7 @@ const DatabaseContainer: React.FC = () => {
     noteId: string,
     categoryId: string,
     index: number,
-    updatedDatabase: Database
+    updatedDatabase: DatabaseType
   ) => {
     updateNoteCategory({
       variables: {
@@ -483,13 +483,7 @@ const DatabaseContainer: React.FC = () => {
     updateNoteTitleHandler: updateNoteTitleHandler
   };
 
-  return data.getDatabase.currentView === DatabaseViews.BOARD ? (
-    <BoardDatabase {...DatabaseProps} />
-  ) : DatabaseViews.TABLE ? (
-    <TableDatabase {...DatabaseProps} />
-  ) : (
-    <></>
-  );
+  return <Database {...DatabaseProps} />;
 };
 
 export default DatabaseContainer;

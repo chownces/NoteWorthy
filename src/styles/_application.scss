@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+body {
+  overscroll-behavior-y: none;
+}
+
 .Application {
   height: 100%;
   display: flex;
@@ -9,5 +13,6 @@
 
   .content {
     height: 100%;
+    overflow: auto;
   }
 }

@@ -1,8 +1,8 @@
 import React from 'react';
-import ContentEditable from 'react-contenteditable';
 
 import { ContextMenuType } from '../../components/contextMenu/ContextMenuElement';
-import { DatabaseProps, DatabaseViews, Note } from './DatabaseTypes';
+import { DatabaseProps } from './Database';
+import { Note } from './DatabaseTypes';
 import TableRow from './tableDatabaseComponents/tableRow';
 
 const TableDatabase: React.FC<DatabaseProps> = props => {
@@ -37,32 +37,10 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
   };
 
   return (
-    <div className="database">
-      <button onClick={() => props.updateDatabaseViewHandler(props.id, DatabaseViews.BOARD)}>
-        go to board view
-      </button>
-
-      <button
-        onClick={() =>
-          props.createNoteHandler(props.nonCategorisedId, 'untitled', props.notes.length)
-        }
-      >
-        Create Note
-      </button>
-      <ContentEditable
-        className="database-title"
-        tagName="h1"
-        html={databaseTitle.current}
-        onChange={e => {
-          hasUnsavedChangesTitle.current = true;
-          databaseTitle.current = e.target.value;
-        }}
-      />
-      <div>
-        {props.notes.map((note: Note, index: number) => (
-          <TableRow note={note} contextMenuProps={contextMenuProps(note, index)} key={note.id} />
-        ))}
-      </div>
+    <div>
+      {props.notes.map((note: Note, index: number) => (
+        <TableRow note={note} contextMenuProps={contextMenuProps(note, index)} key={note.id} />
+      ))}
     </div>
   );
 };

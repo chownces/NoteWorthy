@@ -19,7 +19,7 @@ const TableRow: React.FC<TableRowProps> = props => {
       <div
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
-        style={{ position: 'relative' }}
+        style={{ position: 'relative', zIndex: -1 }}
       >
         {isHovering && <ContextMenuButton contextMenuProps={contextMenuProps} noteid={note.id} />}
         <Link to={`/note/${note.id}`} key={note.id}>

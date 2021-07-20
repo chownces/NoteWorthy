@@ -6,28 +6,6 @@ export type Database = {
   notes: Note[];
 };
 
-export type DatabaseProps = {
-  id: string;
-  nonCategorisedId: string;
-  title: string;
-  currentView: string;
-  categories: Category[];
-  notes: Note[];
-  createNoteHandler: (categoryId: string, title: string, index: number) => void;
-  deleteNoteHandler: (noteId: string) => void;
-  createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
-  deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
-  updateDatabaseViewHandler: (databaseId: string, view: string) => void;
-  updateDatabaseTitleHandler: (title: string) => void;
-  updateNoteCategoryHandler: (
-    noteId: string,
-    categoryId: string,
-    index: number,
-    updatedDatabase: Database
-  ) => void;
-  updateNoteTitleHandler: (noteId: string, title: string) => void;
-};
-
 export type Category = {
   id: string;
   name: string;

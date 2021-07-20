@@ -1,6 +1,7 @@
 .database {
   height: 100%;
-  overflow: auto;
+  width: min-content;
+  min-width: 100%;
 
   .table-database-note {
     outline: 1px solid red;
@@ -19,36 +20,45 @@
     top: 5px;
   }
 
-  .board {
-    height: 100%;
-    width: min-content;
-    min-width: 100%;
+  .sticky-top {
+    position: sticky;
+    left: 0;
+    width: calc(100vw - 10px);
 
-    .board-items-container {
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-      width: min-content;
+    .database-title {
+      outline: none;
+      font-size: xx-large;
+      font-weight: bold;
+      padding-left: 1rem;
+      margin-top: 1rem;
+      min-height: 45px;
+    }
 
-      .column {
-        width: 260px;
-        min-width: 260px;
-        margin: 0 8px;
+    .view-dropdown {
+      padding-left: 1rem;
+    }
 
-        .board-item {
-          margin-bottom: 1rem;
-          // For absolute positioning of context menu button
-          position: relative;
-        }
-      }
+    .divider {
+      margin-top: 0.5rem;
     }
   }
 
-  .database-title {
-    outline: none;
-    font-size: xx-large;
-    font-weight: bold;
-    padding-left: 1rem;
-    min-height: 45px;
+  .board-items-container {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: min-content;
+
+    .column {
+      width: 260px;
+      min-width: 260px;
+      margin: 0 8px;
+
+      .board-item {
+        margin-bottom: 1rem;
+        // For absolute positioning of context menu button
+        position: relative;
+      }
+    }
   }
 }
