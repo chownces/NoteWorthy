@@ -1,6 +1,6 @@
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import { Header, Icon } from 'semantic-ui-react';
+import { Button, Header, Icon } from 'semantic-ui-react';
 
 import BoardItem from '../boardDatabaseComponents/BoardItem';
 import { Category, Note } from '../DatabaseTypes';
@@ -55,13 +55,16 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
         )}
       </Droppable>
 
-      <button
+      <Button
+        fluid
+        basic
         onClick={() =>
           props.createNoteHandler(props.category.id, 'untitled', props.category.notes.length)
         }
       >
-        Add Note
-      </button>
+        <Icon name="plus" />
+        New
+      </Button>
     </div>
   );
 };

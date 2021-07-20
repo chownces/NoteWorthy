@@ -243,8 +243,14 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
               </div>
             </div>
           </div>
-          <button>
-            Add Note
+          <button
+            class="ui basic fluid button"
+          >
+            <i
+              aria-hidden="true"
+              class="plus icon"
+            />
+            New
           </button>
         </div>
         <div
