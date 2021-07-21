@@ -81,6 +81,14 @@ export const DELETE_DATABASE_CATEGORY_MUTATION = gql`
   }
 `;
 
+export const UPDATE_DATABASE_CATEGORIES_MUTATION = gql`
+  mutation updateDatabaseCategories($databaseId: ID!, $categories: [ID]!) {
+    updateDatabaseCategories(databaseId: $databaseId, categories: $categories) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_DATABASE_VIEW_MUTATION = gql`
   mutation updateDatabaseView($databaseId: ID!, $view: String!) {
     updateDatabaseView(databaseId: $databaseId, view: $view) {
@@ -266,6 +274,41 @@ const DatabaseContainer: React.FC = () => {
                     .filter((e: Category) => e.id === categoryId)[0]
                     .notes.includes(e.id)
               )
+            }
+          }
+        });
+      }
+    });
+  };
+
+  const [updateDatabaseCategoriesMutation] = useMutation(UPDATE_DATABASE_CATEGORIES_MUTATION);
+  const updateDatabaseCategories = (categories: Category[]) => {
+    updateDatabaseCategoriesMutation({
+      variables: {
+        databaseId: DATABASE_ID,
+        categories: categories.map(e => e.id)
+      },
+      optimisticResponse: {
+        updateDatabaseCategories: {
+          id: DATABASE_ID
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              categories: categories
             }
           }
         });
@@ -477,6 +520,7 @@ const DatabaseContainer: React.FC = () => {
     deleteNoteHandler: deleteNoteHandler,
     createDatabaseCategoryHandler: createDatabaseCategoryHandler,
     deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
+    updateDatabaseCategoriesOrdering: updateDatabaseCategories,
     updateDatabaseViewHandler: updateDatabaseViewHandler,
     updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,

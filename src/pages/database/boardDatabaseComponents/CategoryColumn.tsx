@@ -1,7 +1,8 @@
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { Button, Header, Icon } from 'semantic-ui-react';
 
+import { BoardViewDraggableType } from '../BoardDatabase';
 import BoardItem from '../boardDatabaseComponents/BoardItem';
 import { Category, Note } from '../DatabaseTypes';
 
@@ -26,46 +27,58 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
   };
 
   return (
-    <div className="column" key={props.category.name}>
-      <Header as="h5" textAlign="center">
-        {props.category.name}
+    <Draggable draggableId={props.category.id} index={props.index} key={props.category.name}>
+      {provided => (
+        <div
+          className="column"
+          {...provided.dragHandleProps}
+          {...provided.draggableProps}
+          ref={provided.innerRef}
+        >
+          <Header as="h5" textAlign="center">
+            {props.category.name}
+            <Icon
+              name="close"
+              size="mini"
+              onClick={() => deleteCategory(props.databaseId, props.category.id)}
+            />
+          </Header>
+          <Droppable droppableId={props.category.id} type={BoardViewDraggableType.BOARD_ITEM}>
+            {provided => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{ minHeight: '1px' }}
+              >
+                {props.category.notes.map((note: string, index: number) => (
+                  <BoardItem
+                    key={index}
+                    index={index}
+                    category={props.category}
+                    note={props.notes.filter(x => x.id === note)[0]}
+                    createNoteHandler={props.createNoteHandler}
+                    deleteNoteHandler={props.deleteNoteHandler}
+                    updateNoteTitleHandler={props.updateNoteTitleHandler}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
 
-        <Icon
-          name="close"
-          size="mini"
-          onClick={() => deleteCategory(props.databaseId, props.category.id)}
-        />
-      </Header>
-      <Droppable droppableId={props.category.id}>
-        {provided => (
-          <div ref={provided.innerRef} {...provided.droppableProps} style={{ minHeight: '1px' }}>
-            {props.category.notes.map((note: string, index: number) => (
-              <BoardItem
-                key={index}
-                index={index}
-                category={props.category}
-                note={props.notes.filter(x => x.id === note)[0]}
-                createNoteHandler={props.createNoteHandler}
-                deleteNoteHandler={props.deleteNoteHandler}
-                updateNoteTitleHandler={props.updateNoteTitleHandler}
-              />
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-
-      <Button
-        fluid
-        basic
-        onClick={() =>
-          props.createNoteHandler(props.category.id, 'untitled', props.category.notes.length)
-        }
-      >
-        <Icon name="plus" />
-        New
-      </Button>
-    </div>
+          <Button
+            fluid
+            basic
+            onClick={() =>
+              props.createNoteHandler(props.category.id, 'untitled', props.category.notes.length)
+            }
+          >
+            <Icon name="plus" />
+            New
+          </Button>
+        </div>
+      )}
+    </Draggable>
   );
 };
 
