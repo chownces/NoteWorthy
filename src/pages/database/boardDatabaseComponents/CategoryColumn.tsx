@@ -1,7 +1,10 @@
 import React from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { Button, Header, Icon } from 'semantic-ui-react';
+import { ContextMenu, ContextMenuTrigger, MenuItem, showMenu } from 'react-contextmenu';
+import { Button, Header, Icon, Menu } from 'semantic-ui-react';
 
+import { ContextMenuType } from '../../../components/contextMenu/ContextMenuElement';
+import RenamePopup from '../../../components/contextMenu/RenamePopup';
 import { BoardViewDraggableType } from '../BoardDatabase';
 import BoardItem from '../boardDatabaseComponents/BoardItem';
 import { Category, Note } from '../DatabaseTypes';
@@ -9,22 +12,37 @@ import { Category, Note } from '../DatabaseTypes';
 export type CategoryColumnProps = {
   index: number;
   databaseId: string;
+  nonCategorisedId: string;
   notes: Note[];
   category: Category;
   deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
   createNoteHandler: (categoryId: string, title: string, index: number) => void;
   deleteNoteHandler: (noteId: string) => void;
+  updateCategoryName: (categoryId: string, name: string) => void;
   updateNoteTitleHandler: (noteId: string, title: string) => void;
 };
 
 const CategoryColumn: React.FC<CategoryColumnProps> = props => {
-  const deleteCategory = (databaseId: string, categoryId: string) => {
-    if (props.category.name === 'Non-categorised') {
-      alert('Cannot delete this category!');
-    } else {
-      props.deleteDatabaseCategoryHandler(databaseId, categoryId.trim());
-    }
-  };
+  const columnMenu = (
+    <ContextMenu id={props.category.id} hideOnLeave style={{ zIndex: 2 }}>
+      <MenuItem>
+        <Menu vertical compact>
+          <Menu.Item
+            onClick={() => props.deleteDatabaseCategoryHandler(props.databaseId, props.category.id)}
+          >
+            <Icon name="trash alternate" />
+            Delete category
+          </Menu.Item>
+          <RenamePopup
+            context={ContextMenuType.CATEGORY}
+            id={props.category.id}
+            currentName={props.category.name}
+            updateNameHandler={props.updateCategoryName}
+          />
+        </Menu>
+      </MenuItem>
+    </ContextMenu>
+  );
 
   return (
     <Draggable draggableId={props.category.id} index={props.index} key={props.category.name}>
@@ -35,13 +53,26 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
           {...provided.draggableProps}
           ref={provided.innerRef}
         >
-          <Header as="h5" textAlign="center">
+          <Header as="h5" textAlign="center" style={{ position: 'relative' }}>
             {props.category.name}
-            <Icon
-              name="close"
-              size="mini"
-              onClick={() => deleteCategory(props.databaseId, props.category.id)}
-            />
+            {props.category.id !== props.nonCategorisedId && (
+              <ContextMenuTrigger id={props.category.id} holdToDisplay={-1}>
+                <Button
+                  icon="ellipsis horizontal"
+                  basic
+                  floated="right"
+                  style={{ boxShadow: 'none', position: 'absolute', top: '-2px', right: '0' }}
+                  onClick={e => {
+                    showMenu({
+                      position: { x: e.clientX, y: e.clientY },
+                      target: columnMenu,
+                      id: props.category.id
+                    });
+                  }}
+                />
+                {columnMenu}
+              </ContextMenuTrigger>
+            )}
           </Header>
           <Droppable droppableId={props.category.id} type={BoardViewDraggableType.BOARD_ITEM}>
             {provided => (

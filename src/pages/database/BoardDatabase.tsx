@@ -78,11 +78,13 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
 
   const categoryColumnProps = {
     databaseId: props.id,
+    nonCategorisedId: props.nonCategorisedId,
     renaming: true,
     notes: props.notes,
     deleteDatabaseCategoryHandler: props.deleteDatabaseCategoryHandler,
     createNoteHandler: props.createNoteHandler,
     deleteNoteHandler: props.deleteNoteHandler,
+    updateCategoryName: props.updateCategoryName,
     updateNoteTitleHandler: props.updateNoteTitleHandler
   };
 

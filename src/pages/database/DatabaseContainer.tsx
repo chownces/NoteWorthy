@@ -89,6 +89,14 @@ export const UPDATE_DATABASE_CATEGORIES_MUTATION = gql`
   }
 `;
 
+export const UPDATE_CATEGORY_NAME_MUTATION = gql`
+  mutation updateCategoryName($categoryId: ID!, $name: String!) {
+    updateCategoryName(categoryId: $categoryId, name: $name) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_DATABASE_VIEW_MUTATION = gql`
   mutation updateDatabaseView($databaseId: ID!, $view: String!) {
     updateDatabaseView(databaseId: $databaseId, view: $view) {
@@ -316,6 +324,43 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
+  const [updateCategoryNameMutation] = useMutation(UPDATE_CATEGORY_NAME_MUTATION);
+  const updateCategoryName = (categoryId: string, name: string) => {
+    updateCategoryNameMutation({
+      variables: {
+        categoryId: categoryId,
+        name: name
+      },
+      optimisticResponse: {
+        updateCategoryName: {
+          id: categoryId
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              categories: data.getDatabase.categories.map((e: Category) =>
+                e.id === categoryId ? { ...e, name: name } : e
+              )
+            }
+          }
+        });
+      }
+    });
+  };
+
   const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION, {
     update: (cache, { data: { createDatabaseCategory } }) => {
       cache.writeQuery({
@@ -511,7 +556,9 @@ const DatabaseContainer: React.FC = () => {
 
   const DatabaseProps: DatabaseProps = {
     id: data.getDatabase.id,
-    nonCategorisedId: data.getDatabase.categories[0].id,
+    nonCategorisedId: data.getDatabase.categories.filter(
+      (e: Category) => e.name === 'Non-categorised'
+    )[0].id,
     title: data.getDatabase.title,
     currentView: data.getDatabase.currentView,
     categories: data.getDatabase.categories,
@@ -521,6 +568,7 @@ const DatabaseContainer: React.FC = () => {
     createDatabaseCategoryHandler: createDatabaseCategoryHandler,
     deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
     updateDatabaseCategoriesOrdering: updateDatabaseCategories,
+    updateCategoryName: updateCategoryName,
     updateDatabaseViewHandler: updateDatabaseViewHandler,
     updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,
