@@ -36,6 +36,11 @@
     .side-bar-button {
       padding: 0.4rem !important;
       background: transparent !important;
+      color: gray;
+      border: 0;
+      :hover {
+        color: black;
+      }
     }
 
     .divider {
@@ -72,22 +77,18 @@
   font-weight: bold;
   color: darkgray;
   overflow: hidden;
-  
 }
 
 .side-bar-header {
   font-weight: bold;
   color: black;
   overflow: hidden;
-  margin-left: 20.8px;
-  
+  margin-left: 1.49rem;
 }
-
 
 .side-bar-item:hover {
   color: black;
   margin-left: 0;
-  
 }
 
 .side-bar-selected {
@@ -117,16 +118,19 @@
   right: 0;
   z-index: 1;
   border: 0;
-  bottom: 5.5px;
+  bottom: 0.37rem;
   color: darkgray;
   background-color: transparent;
-  :hover{
+  :hover {
     color: black;
     cursor: pointer;
   }
 }
 
 .space-right {
-  margin-left: 20.8px;
+  margin-left: 1.49em;
 }
 
+.isDraggingSideBar {
+  transform: translate(0, -11em);
+}

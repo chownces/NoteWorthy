@@ -2,483 +2,72 @@
 
 exports[`Gets all notes successfully and renders them correctly in board view 1`] = `
 <div>
-  <div
-    class="database"
-  >
-    <div
-      class="sticky-top"
-    >
-      <h1
-        class="database-title"
-        contenteditable="true"
-      >
-        untitled
-      </h1>
-      <div
-        aria-expanded="false"
-        class="ui dropdown view-dropdown"
-        role="listbox"
-        tabindex="0"
-      >
-        <div
-          aria-atomic="true"
-          aria-live="polite"
-          class="divider text"
-          role="alert"
-        >
-          Board View
-        </div>
-        <i
-          aria-hidden="true"
-          class="dropdown icon"
-        />
-        <div
-          class="menu transition"
-        >
-          <div
-            class="item"
-            role="option"
-          >
-            <span
-              class="text"
-            >
-              Table View
-            </span>
-          </div>
-        </div>
-      </div>
-      <div
-        class="ui divider divider"
-      />
-    </div>
-    <div
-      class="board-items-container"
-    >
-      <div
-        class="column"
-      >
-        <h5
-          class="ui center aligned header"
-        >
-          Non-categorised
-          <i
-            aria-hidden="true"
-            class="close mini icon"
-          />
-        </h5>
-        <div
-          data-rbd-droppable-context-id="0"
-          data-rbd-droppable-id="60cc5982c3987e2ac0b44fd9"
-          style="min-height: 1px;"
-        >
-          <div
-            aria-describedby="rbd-hidden-text-0-hidden-text-0"
-            data-rbd-drag-handle-context-id="0"
-            data-rbd-drag-handle-draggable-id="60adcd6e38a95f0f75f1c089"
-            data-rbd-draggable-context-id="0"
-            data-rbd-draggable-id="60adcd6e38a95f0f75f1c089"
-            draggable="false"
-            role="button"
-            tabindex="0"
-          >
-            <div
-              class="react-contextmenu-wrapper"
-            >
-              <div
-                class="board-item"
-              >
-                <a
-                  href="/note/60adcd6e38a95f0f75f1c089"
-                >
-                  <div
-                    class="ui fluid card"
-                  >
-                    <div
-                      class="content"
-                    >
-                      <div
-                        class="header"
-                      >
-                        My first note
-                      </div>
-                      <div
-                        class="description"
-                        style="overflow: hidden;"
-                      >
-                        <div
-                          class="ui bulleted list"
-                          role="list"
-                        />
-                      </div>
-                    </div>
-                    <div
-                      class="extra content"
-                    >
-                      <div
-                        class="ui label"
-                      >
-                         placeholder tag 
-                      </div>
-                    </div>
-                    <div
-                      class="meta"
-                    >
-                      Last update: 
-                      Tue Jun 22 2021
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <nav
-                class="react-contextmenu context-menu"
-                role="menu"
-                style="position: fixed; opacity: 0; pointer-events: none;"
-                tabindex="-1"
-              >
-                <div
-                  aria-disabled="false"
-                  class="react-contextmenu-item"
-                  role="menuitem"
-                  tabindex="-1"
-                >
-                  <div
-                    class="ui vertical menu"
-                  >
-                    <a
-                      class="item"
-                    >
-                      <i
-                        aria-hidden="true"
-                        class="trash alternate icon"
-                      />
-                      Delete Note
-                    </a>
-                    <a
-                      class="item"
-                    >
-                      <i
-                        aria-hidden="true"
-                        class="add icon"
-                      />
-                      Add Note
-                    </a>
-                    <a
-                      class="item"
-                    >
-                      Rename Note
-                    </a>
-                  </div>
-                </div>
-              </nav>
-            </div>
-          </div>
-          <div
-            aria-describedby="rbd-hidden-text-0-hidden-text-0"
-            data-rbd-drag-handle-context-id="0"
-            data-rbd-drag-handle-draggable-id="6098bbdc04c0fa63070bfe5e"
-            data-rbd-draggable-context-id="0"
-            data-rbd-draggable-id="6098bbdc04c0fa63070bfe5e"
-            draggable="false"
-            role="button"
-            tabindex="0"
-          >
-            <div
-              class="react-contextmenu-wrapper"
-            >
-              <div
-                class="board-item"
-              >
-                <a
-                  href="/note/6098bbdc04c0fa63070bfe5e"
-                >
-                  <div
-                    class="ui fluid card"
-                  >
-                    <div
-                      class="content"
-                    >
-                      <div
-                        class="header"
-                      >
-                        untitled
-                      </div>
-                      <div
-                        class="description"
-                        style="overflow: hidden;"
-                      >
-                        <div
-                          class="ui bulleted list"
-                          role="list"
-                        />
-                      </div>
-                    </div>
-                    <div
-                      class="extra content"
-                    >
-                      <div
-                        class="ui label"
-                      >
-                         placeholder tag 
-                      </div>
-                    </div>
-                    <div
-                      class="meta"
-                    >
-                      Last update: 
-                      Tue Jun 22 2021
-                    </div>
-                  </div>
-                </a>
-              </div>
-              <nav
-                class="react-contextmenu context-menu"
-                role="menu"
-                style="position: fixed; opacity: 0; pointer-events: none;"
-                tabindex="-1"
-              >
-                <div
-                  aria-disabled="false"
-                  class="react-contextmenu-item"
-                  role="menuitem"
-                  tabindex="-1"
-                >
-                  <div
-                    class="ui vertical menu"
-                  >
-                    <a
-                      class="item"
-                    >
-                      <i
-                        aria-hidden="true"
-                        class="trash alternate icon"
-                      />
-                      Delete Note
-                    </a>
-                    <a
-                      class="item"
-                    >
-                      <i
-                        aria-hidden="true"
-                        class="add icon"
-                      />
-                      Add Note
-                    </a>
-                    <a
-                      class="item"
-                    >
-                      Rename Note
-                    </a>
-                  </div>
-                </div>
-              </nav>
-            </div>
-          </div>
-        </div>
-        <button
-          class="ui basic fluid button"
-        >
-          <i
-            aria-hidden="true"
-            class="plus icon"
-          />
-          New
-        </button>
-      </div>
-      <div
-        class="column"
-      >
-        <button>
-          Add Category
-        </button>
-      </div>
-    </div>
+  <div>
+    Error! + 
+    No more mocked responses for the query: query getDatabase($id: ID!) {
+  getDatabase(databaseId: $id) {
+    id
+    title
+    currentView
+    categories {
+      id
+      notes
+      name
+      databaseId
+    }
+    notes {
+      id
+      userId
+      databaseId
+      categoryId
+      title
+      blocks {
+        id
+        html
+        tag
+      }
+      creationDate
+      latestUpdate
+    }
+  }
+}
+, variables: {}
   </div>
 </div>
 `;
 
 exports[`Gets all notes successfully and renders them correctly in table view 1`] = `
 <div>
-  <div
-    class="database"
-  >
-    <div
-      class="sticky-top"
-    >
-      <h1
-        class="database-title"
-        contenteditable="true"
-      >
-        untitled
-      </h1>
-      <div
-        aria-expanded="false"
-        class="ui dropdown view-dropdown"
-        role="listbox"
-        tabindex="0"
-      >
-        <div
-          aria-atomic="true"
-          aria-live="polite"
-          class="divider text"
-          role="alert"
-        >
-          Table View
-        </div>
-        <i
-          aria-hidden="true"
-          class="dropdown icon"
-        />
-        <div
-          class="menu transition"
-        >
-          <div
-            class="item"
-            role="option"
-          >
-            <span
-              class="text"
-            >
-              Board View
-            </span>
-          </div>
-        </div>
-      </div>
-      <div
-        class="ui divider divider"
-      />
-    </div>
-    <div>
-      <div
-        class="react-contextmenu-wrapper"
-      >
-        <div
-          style="position: relative; z-index: -1;"
-        >
-          <a
-            href="/note/60adcd6e38a95f0f75f1c089"
-          >
-            <div
-              class="table-database-note"
-            >
-              <p>
-                Title: 
-                My first note
-              </p>
-              <p>
-                Latest Update: 
-                Tue Jun 22 2021
-              </p>
-            </div>
-          </a>
-        </div>
-        <nav
-          class="react-contextmenu context-menu"
-          role="menu"
-          style="position: fixed; opacity: 0; pointer-events: none;"
-          tabindex="-1"
-        >
-          <div
-            aria-disabled="false"
-            class="react-contextmenu-item"
-            role="menuitem"
-            tabindex="-1"
-          >
-            <div
-              class="ui vertical menu"
-            >
-              <a
-                class="item"
-              >
-                <i
-                  aria-hidden="true"
-                  class="trash alternate icon"
-                />
-                Delete Note
-              </a>
-              <a
-                class="item"
-              >
-                <i
-                  aria-hidden="true"
-                  class="add icon"
-                />
-                Add Note
-              </a>
-              <a
-                class="item"
-              >
-                Rename Note
-              </a>
-            </div>
-          </div>
-        </nav>
-      </div>
-      <div
-        class="react-contextmenu-wrapper"
-      >
-        <div
-          style="position: relative; z-index: -1;"
-        >
-          <a
-            href="/note/6098bbdc04c0fa63070bfe5e"
-          >
-            <div
-              class="table-database-note"
-            >
-              <p>
-                Title: 
-                untitled
-              </p>
-              <p>
-                Latest Update: 
-                Tue Jun 22 2021
-              </p>
-            </div>
-          </a>
-        </div>
-        <nav
-          class="react-contextmenu context-menu"
-          role="menu"
-          style="position: fixed; opacity: 0; pointer-events: none;"
-          tabindex="-1"
-        >
-          <div
-            aria-disabled="false"
-            class="react-contextmenu-item"
-            role="menuitem"
-            tabindex="-1"
-          >
-            <div
-              class="ui vertical menu"
-            >
-              <a
-                class="item"
-              >
-                <i
-                  aria-hidden="true"
-                  class="trash alternate icon"
-                />
-                Delete Note
-              </a>
-              <a
-                class="item"
-              >
-                <i
-                  aria-hidden="true"
-                  class="add icon"
-                />
-                Add Note
-              </a>
-              <a
-                class="item"
-              >
-                Rename Note
-              </a>
-            </div>
-          </div>
-        </nav>
-      </div>
-    </div>
+  <div>
+    Error! + 
+    No more mocked responses for the query: query getDatabase($id: ID!) {
+  getDatabase(databaseId: $id) {
+    id
+    title
+    currentView
+    categories {
+      id
+      notes
+      name
+      databaseId
+    }
+    notes {
+      id
+      userId
+      databaseId
+      categoryId
+      title
+      blocks {
+        id
+        html
+        tag
+      }
+      creationDate
+      latestUpdate
+    }
+  }
+}
+, variables: {}
   </div>
 </div>
 `;

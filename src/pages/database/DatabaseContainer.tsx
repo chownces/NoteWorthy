@@ -150,9 +150,16 @@ export const DELETE_DATABASE_MUTATION = gql`
   }
 `;
 
+export const UPDATE_DATABASES_MUTATION = gql`
+  mutation updateDatabases($databases: [ID]!) {
+    updateDatabases(databases: $databases) {
+      email
+    }
+  }
+`;
+
 const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
-  console.log(DATABASE_ID);
 
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
@@ -505,6 +512,31 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
+  const [updateDatabases] = useMutation(UPDATE_DATABASES_MUTATION);
+
+  const updateDatabasesHandler = (databases: DatabaseType[]) => {
+    updateDatabases({
+      update: cache => {
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: {
+            getAllUserDatabases: [...databases]
+          }
+        });
+      },
+      optimisticResponse: {
+        updateDatabases: {
+          lastname: null,
+          email: null,
+          firstname: null
+        }
+      },
+      variables: {
+        databases: databases.map(database => database.id)
+      }
+    });
+  };
+
   const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
     update: (cache, { data: { deleteDatabase } }) => {
       // TODO: Handle typing
@@ -546,7 +578,6 @@ const DatabaseContainer: React.FC = () => {
   } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
   React.useEffect(() => {
-    console.log('triggered');
     if (!queryDatabaseLoading && !queryDatabaseError) {
       refetchDatabase();
     }
@@ -590,7 +621,8 @@ const DatabaseContainer: React.FC = () => {
     updateDatabaseViewHandler: updateDatabaseViewHandler,
     updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,
-    updateNoteTitleHandler: updateNoteTitleHandler
+    updateNoteTitleHandler: updateNoteTitleHandler,
+    updateDatabases: updateDatabasesHandler
   };
 
   return <Database {...DatabaseProps} />;

@@ -15,7 +15,7 @@ export type ContextMenuProps = {
   setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   nextLink?: () => void;
   isSelfDelete?: boolean;
-  isLastElement?: boolean
+  isLastElement?: boolean;
 };
 
 export enum ContextMenuType {
@@ -38,19 +38,19 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
               setRenamingOpen={props.setRenamingOpen}
             />
           )}
-          <Menu.Item onClick={
-            () => {
+          <Menu.Item
+            onClick={() => {
               if (props.isLastElement) {
-                alert("Cannot delete last " + props.context + "!");
+                alert('Cannot delete last ' + props.context + '!');
                 return;
               }
 
-              props.deleteHandler()
-              if (props.nextLink && props.isSelfDelete ) {
+              props.deleteHandler();
+              if (props.nextLink && props.isSelfDelete) {
                 props.nextLink();
               }
-            }
-            }>
+            }}
+          >
             <Icon name="trash alternate" />
             {`Delete ${props.context}`}
           </Menu.Item>

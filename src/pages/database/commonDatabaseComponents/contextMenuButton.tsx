@@ -35,9 +35,12 @@ const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
         }}
         className="context-menu-button-database"
       >
-        <Icon name="ellipsis vertical" style={{
-          display: "inline"
-        }}/>
+        <Icon
+          name="ellipsis vertical"
+          style={{
+            display: 'inline'
+          }}
+        />
       </button>
     );
   }

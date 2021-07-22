@@ -1,4 +1,5 @@
 import React from 'react';
+import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import ContentEditable from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
@@ -19,7 +20,7 @@ export type DatabaseProps = {
   currentView: string;
   categories: Category[];
   notes: Note[];
-  databases: Database[];
+  databases: DatabaseType[];
   createDatabaseHandler: (index: number) => void;
   deleteDatabaseHandler: (databaseId: string) => void;
   createNoteHandler: (categoryId: string, title: string, index: number) => void;
@@ -35,6 +36,7 @@ export type DatabaseProps = {
     updatedDatabase: DatabaseType
   ) => void;
   updateNoteTitleHandler: (noteId: string, title: string) => void;
+  updateDatabases: (databases: DatabaseType[]) => void;
 };
 
 export type Database = {
@@ -64,10 +66,35 @@ const Database: React.FC<DatabaseProps> = props => {
   }, []);
 
   const [open, setOpen] = React.useState<boolean>(false);
+  const [isLocked, setIsLocked] = React.useState<boolean>(false);
+  const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const [renamingOpen, setRenamingOpen] = React.useState<boolean>(false);
   const [hoveringEnum, setHoveringEnum] = React.useState<number>(-1);
 
-  const contextMenuProps = (database: Database, index: number , nextLink: () => void) => {
+  const onDragEndHandler = (result: DropResult) => {
+    const reorder = (arr: DatabaseType[], startIndex: number, endIndex: number) => {
+      const copy = [...arr];
+      const [removed] = copy.splice(startIndex, 1);
+      copy.splice(endIndex, 0, removed);
+
+      return copy;
+    };
+
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const newDatabases = reorder(props.databases, result.source.index, result.destination.index);
+
+    props.updateDatabases(newDatabases);
+    setIsDragging(false);
+  };
+
+  const contextMenuProps = (database: Database, index: number, nextLink: () => void) => {
     return {
       context: ContextMenuType.DATABASE,
       renaming: true,
@@ -83,7 +110,7 @@ const Database: React.FC<DatabaseProps> = props => {
         props.updateDatabaseTitleHandler(databaseId, title);
       },
       setRenamingOpen: setRenamingOpen,
-      nextLink : nextLink,
+      nextLink: nextLink,
       isSelfDelete: props.id === database.id,
       isLastElement: props.databases.length === 1
     };
@@ -107,66 +134,109 @@ const Database: React.FC<DatabaseProps> = props => {
           hoverable
           position="bottom left"
           flowing={false}
-          open={open || renamingOpen}
+          open={open || renamingOpen || isDragging || isLocked}
           onOpen={() => setOpen(true)}
           onClose={() => setOpen(false)}
+          openOnTriggerClick={false}
           content={
-            <div
-              className="side-bar-menu"
+            <DragDropContext
+              onDragStart={() => {
+                setIsDragging(true);
+              }}
+              onDragEnd={onDragEndHandler}
             >
-              <div className="side-bar-header">{'Databases'}</div>
+              <Droppable droppableId="side-bar">
+                {provided => (
+                  <div
+                    className="side-bar-menu"
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                  >
+                    <div className="side-bar-header">{'Databases'}</div>
 
-              <Divider/>
+                    <Divider />
 
-              {props.databases.map((database: Database, index: number) => {
-                
-                const nextLink = (index === props.databases.length - 1) ? 
-                  () => window.location.replace(`/database/${props.databases[0].id}`) :
-                  () => window.location.replace(`/database/${props.databases[index + 1].id}`)
-                
-                
+                    {props.databases.map((database: Database, index: number) => {
+                      const nextLink =
+                        index === props.databases.length - 1
+                          ? () => window.location.replace(`/database/${props.databases[0].id}`)
+                          : () =>
+                              window.location.replace(`/database/${props.databases[index + 1].id}`);
 
-                return (
-                  <ContextMenuTrigger id={database.id} key={index}>
-                    <div
-                      
-                      style={{ overflow: 'hidden' ,
-                      whiteSpace: 'nowrap'}}
-                      onMouseEnter={() => setHoveringEnum(index)}
-                      onMouseLeave={() => setHoveringEnum(-1)}
-                    >
-                      {hoveringEnum === index && (
-                        <ContextMenuButton
-                          contextMenuProps={contextMenuProps(database, index ,nextLink)}
-                          noteid={database.id}
-                        />
-                      )}
-                      <Link
-                      className = { hoveringEnum !== index ? "space-right" : "no-space"}
-                        to={`/database/${database.id}`}
-                        key={props.id}
-                        onClick={() => {
-                          databaseTitle.current = database.title;
-                          currentId.current = database.id;
-                        }}
-                        style={{display:"inline-block"}}
-                      >
-                        <ContentEditable
-                          className={database.id === props.id ? 'side-bar-selected' : 'side-bar-item'}
-                          html={database.id === props.id ? databaseTitle.current : database.title}
-                          onChange={() => {}}
-                          disabled
-                        />
-                      </Link>
-                      
-                      <div className="react-contextmenu-database">
-                        <ContextMenuElement {...contextMenuProps(database, index + 1, nextLink)} />
-                      </div>
-                    </div>
-                  </ContextMenuTrigger>
-                );
-              })}
+                      return (
+                        <Draggable draggableId={database.id} index={index} key={database.id}>
+                          {(provided, draggableSnapshot) => (
+                            <div
+                              key={database.id}
+                              ref={provided.innerRef}
+                              {...provided.dragHandleProps}
+                              {...provided.draggableProps}
+                            >
+                              <div
+                                className={draggableSnapshot.isDragging ? 'isDraggingSideBar' : ''}
+                              >
+                                <ContextMenuTrigger id={database.id} key={database.id}>
+                                  <div
+                                    style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}
+                                    onMouseEnter={() => setHoveringEnum(index)}
+                                    onMouseLeave={() => setHoveringEnum(-1)}
+                                  >
+                                    {hoveringEnum === index && (
+                                      <ContextMenuButton
+                                        contextMenuProps={contextMenuProps(
+                                          database,
+                                          index,
+                                          nextLink
+                                        )}
+                                        noteid={database.id}
+                                      />
+                                    )}
+                                    <Link
+                                      className={
+                                        hoveringEnum !== index ? 'space-right' : 'no-space'
+                                      }
+                                      to={`/database/${database.id}`}
+                                      key={props.id}
+                                      onClick={() => {
+                                        databaseTitle.current = database.title;
+                                        currentId.current = database.id;
+                                      }}
+                                      style={{ display: 'inline-block' }}
+                                    >
+                                      <ContentEditable
+                                        className={
+                                          database.id === props.id
+                                            ? 'side-bar-selected'
+                                            : 'side-bar-item'
+                                        }
+                                        html={
+                                          database.id === props.id
+                                            ? databaseTitle.current
+                                            : database.title
+                                        }
+                                        onChange={() => {}}
+                                        disabled
+                                      />
+                                    </Link>
 
+                                    <div className="react-contextmenu-database">
+                                      <ContextMenuElement
+                                        {...contextMenuProps(database, index + 1, nextLink)}
+                                      />
+                                    </div>
+                                  </div>
+                                </ContextMenuTrigger>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
               <div
                 className="side-bar-add-button"
                 onClick={() => props.createDatabaseHandler(props.databases.length + 1)}
@@ -174,9 +244,19 @@ const Database: React.FC<DatabaseProps> = props => {
                 <Icon name="add" />
                 {'New database'}
               </div>
-            </div>
+            </DragDropContext>
           }
-          trigger={<Button className="side-bar-button" icon="sidebar" />}
+          trigger={
+            isLocked ? (
+              <Button className="side-bar-button" icon="lock" onClick={() => setIsLocked(false)} />
+            ) : (
+              <Button
+                className="side-bar-button"
+                icon="sidebar"
+                onClick={() => setIsLocked(true)}
+              />
+            )
+          }
         />
         <Dropdown text={startCase(props.currentView) + ' View'}>
           <Dropdown.Menu>
@@ -198,7 +278,6 @@ const Database: React.FC<DatabaseProps> = props => {
           </Dropdown.Menu>
         </Dropdown>
         <Divider className="divider" />
-
       </div>
       {props.currentView === DatabaseViews.BOARD && <BoardDatabase {...props} />}
       {props.currentView === DatabaseViews.TABLE && <TableDatabase {...props} />}
