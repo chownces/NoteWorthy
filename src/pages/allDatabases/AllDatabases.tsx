@@ -8,7 +8,7 @@ import { Database } from './AllDatabasesContainer';
 
 export type AllDatabasesProps = {
   databases: Database[];
-  createDatabaseHandler: () => void;
+  createDatabaseHandler: (index: number) => void;
   deleteDatabaseHandler: (databaseId: string) => void;
   updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
 };
@@ -23,7 +23,7 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
       currentName: database.title,
       id: database.id,
       key: database.id,
-      createHandler: props.createDatabaseHandler,
+      createHandler: () => props.createDatabaseHandler(props.databases.length + 1),
       deleteHandler: () => props.deleteDatabaseHandler(database.id),
       updateNameHandler: props.updateDatabaseTitleHandler
     };
@@ -44,7 +44,9 @@ const AllDatabases: React.FC<AllDatabasesProps> = props => {
           </ContextMenuTrigger>
         ))}
       </div>
-      <button onClick={props.createDatabaseHandler}>New Database</button>
+      <button onClick={() => props.createDatabaseHandler(props.databases.length + 1)}>
+        New Database
+      </button>
     </>
   );
 };

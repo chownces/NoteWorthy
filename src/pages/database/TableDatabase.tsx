@@ -15,7 +15,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
   React.useEffect(() => {
     const interval = window.setInterval(() => {
       if (hasUnsavedChangesTitle.current) {
-        props.updateDatabaseTitleHandler(databaseTitle.current);
+        props.updateDatabaseTitleHandler(props.id, databaseTitle.current);
         hasUnsavedChangesTitle.current = false;
       }
     }, 800);

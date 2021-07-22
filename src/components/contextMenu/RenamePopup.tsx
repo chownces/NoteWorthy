@@ -10,6 +10,7 @@ export type RenameProps = {
   id: string;
   currentName: string;
   updateNameHandler: (id: string, newName: string) => void;
+  setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const RenamePopup: React.FC<RenameProps> = props => {
@@ -19,6 +20,9 @@ const RenamePopup: React.FC<RenameProps> = props => {
 
   const onClose = (id: string) => {
     props.updateNameHandler(id, text);
+    if (props.setRenamingOpen) {
+      props.setRenamingOpen(false);
+    }
     setOpen(false);
   };
 
@@ -38,7 +42,12 @@ const RenamePopup: React.FC<RenameProps> = props => {
     <Popup
       on="click"
       open={open}
-      onOpen={() => setOpen(true, setLine)}
+      onOpen={() => {
+        if (props.setRenamingOpen) {
+          props.setRenamingOpen(true);
+        }
+        setOpen(true, setLine);
+      }}
       onClose={() => onClose(props.id)}
       basic
       pinned

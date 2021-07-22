@@ -14,19 +14,29 @@ export type Database = {
 
 const AllDatabasesController: React.FC = () => {
   // TODO: Add error handling
-  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION, {
-    update: (cache, { data: { createDatabase } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_ALL_USER_DATABASES_QUERY
-      });
+  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
 
-      cache.writeQuery({
-        query: GET_ALL_USER_DATABASES_QUERY,
-        data: { getAllUserDatabases: [...data.getAllUserDatabases, createDatabase] }
-      });
-    }
-  });
+  const createDatabaseHandler = (index: number) => {
+    createDatabase({
+      update: (cache, { data: { createDatabase } }) => {
+        // TODO: Handle typing
+        const data: any = cache.readQuery({
+          query: GET_ALL_USER_DATABASES_QUERY
+        });
+
+        const databaseCopy = [...data.getAllUserDatabases];
+        databaseCopy.splice(index, 0, createDatabase);
+
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: { getAllUserDatabases: databaseCopy }
+        });
+      },
+      variables: {
+        index: index
+      }
+    });
+  };
 
   const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
     update: (cache, { data: { deleteDatabase } }) => {
@@ -83,7 +93,7 @@ const AllDatabasesController: React.FC = () => {
 
   const allDatabasesProps: AllDatabasesProps = {
     databases: data.getAllUserDatabases,
-    createDatabaseHandler: createDatabase,
+    createDatabaseHandler: createDatabaseHandler,
     deleteDatabaseHandler: deleteDatabaseHandler,
     updateDatabaseTitleHandler: updateDatabaseTitleHandler
   };
@@ -108,8 +118,8 @@ export const GET_ALL_USER_DATABASES_QUERY = gql`
 `;
 
 export const CREATE_DATABASE_MUTATION = gql`
-  mutation {
-    createDatabase {
+  mutation createDatabase($index: Int!) {
+    createDatabase(index: $index) {
       id
       title
       currentView

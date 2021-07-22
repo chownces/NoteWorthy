@@ -12,6 +12,7 @@ export type ContextMenuProps = {
   createHandler: () => void;
   deleteHandler: () => void;
   updateNameHandler: (id: string, newName: string) => void;
+  setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export enum ContextMenuType {
@@ -25,6 +26,15 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
     <ContextMenu id={props.id} className="context-menu">
       <MenuItem>
         <Menu vertical>
+          {props.renaming && (
+            <RenamePopup
+              context={props.context}
+              id={props.id}
+              currentName={props.currentName}
+              updateNameHandler={props.updateNameHandler}
+              setRenamingOpen={props.setRenamingOpen}
+            />
+          )}
           <Menu.Item onClick={() => props.deleteHandler()}>
             <Icon name="trash alternate" />
             {`Delete ${props.context}`}
@@ -33,14 +43,6 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
             <Icon name="add" />
             {`Add ${props.context}`}
           </Menu.Item>
-          {props.renaming && (
-            <RenamePopup
-              context={props.context}
-              id={props.id}
-              currentName={props.currentName}
-              updateNameHandler={props.updateNameHandler}
-            />
-          )}
         </Menu>
       </MenuItem>
     </ContextMenu>

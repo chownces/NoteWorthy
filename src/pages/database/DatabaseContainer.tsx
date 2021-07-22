@@ -3,7 +3,6 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
-import { GET_ALL_USER_DATABASES_QUERY } from '../allDatabases/AllDatabasesContainer';
 import Database, { DatabaseProps } from './Database';
 import { Database as DatabaseType } from './DatabaseTypes';
 import { Category, Note } from './DatabaseTypes';
@@ -121,8 +120,39 @@ export const UPDATE_NOTE_TITLE_MUTATION = gql`
   }
 `;
 
+export const GET_ALL_USER_DATABASES_QUERY = gql`
+  {
+    getAllUserDatabases {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
+
+export const CREATE_DATABASE_MUTATION = gql`
+  mutation createDatabase($index: Int!) {
+    createDatabase(index: $index) {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
+
+export const DELETE_DATABASE_MUTATION = gql`
+  mutation deleteDatabase($databaseId: ID!) {
+    deleteDatabase(databaseId: $databaseId) {
+      id
+    }
+  }
+`;
+
 const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
+  console.log(DATABASE_ID);
 
   // TODO: Add error handling
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
@@ -319,15 +349,15 @@ const DatabaseContainer: React.FC = () => {
     ignoreResults: true
   });
 
-  const updateDatabaseTitle = (title: string) => {
+  const updateDatabaseTitle = (databaseId: string, title: string) => {
     updateDatabaseTitleMutation({
       variables: {
-        id: DATABASE_ID,
+        id: databaseId,
         title
       },
       optimisticResponse: {
         updateDatabaseTitle: {
-          id: DATABASE_ID
+          id: databaseId
         }
       },
       update: cache => {
@@ -340,31 +370,34 @@ const DatabaseContainer: React.FC = () => {
             query: GET_ALL_USER_DATABASES_QUERY,
             data: {
               getAllUserDatabases: allDatabasesData.getAllUserDatabases.map((e: DatabaseType) =>
-                e.id === DATABASE_ID ? { ...e, title: title } : e
+                e.id === databaseId ? { ...e, title: title } : e
               )
             }
           });
         }
 
-        const databaseData: any = cache.readQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: DATABASE_ID
-          }
-        });
-
-        cache.writeQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: DATABASE_ID
-          },
-          data: {
-            getDatabase: {
-              ...databaseData.getDatabase,
-              title: title
+        // cache only contains current database, if changing name of other database, ignore this
+        if (databaseId === DATABASE_ID) {
+          const databaseData: any = cache.readQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: databaseId
             }
-          }
-        });
+          });
+
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: databaseId
+            },
+            data: {
+              getDatabase: {
+                ...databaseData.getDatabase,
+                title: title
+              }
+            }
+          });
+        }
       }
     });
   };
@@ -448,31 +481,108 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const { loading: queryLoading, error: queryError, data, refetch } = useQuery(GET_DATABASE_QUERY, {
+  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
+
+  const createDatabaseHandler = (index: number) => {
+    createDatabase({
+      update: (cache, { data: { createDatabase } }) => {
+        // TODO: Handle typing
+        const data: any = cache.readQuery({
+          query: GET_ALL_USER_DATABASES_QUERY
+        });
+
+        const databaseCopy = [...data.getAllUserDatabases];
+        databaseCopy.splice(index, 0, createDatabase);
+
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: { getAllUserDatabases: databaseCopy }
+        });
+      },
+      variables: {
+        index: index
+      }
+    });
+  };
+
+  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
+    update: (cache, { data: { deleteDatabase } }) => {
+      // TODO: Handle typing
+      const data: any = cache.readQuery({
+        query: GET_ALL_USER_DATABASES_QUERY
+      });
+
+      cache.writeQuery({
+        query: GET_ALL_USER_DATABASES_QUERY,
+        data: {
+          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id !== deleteDatabase.id)
+        }
+      });
+    }
+  });
+
+  const deleteDatabaseHandler = (databaseId: string) => {
+    deleteDatabase({
+      variables: {
+        databaseId: databaseId
+      }
+    });
+  };
+
+  const {
+    loading: queryDatabaseLoading,
+    error: queryDatabaseError,
+    data: databaseData,
+    refetch: refetchDatabase
+  } = useQuery(GET_DATABASE_QUERY, {
     variables: { id: DATABASE_ID }
   });
 
-  React.useEffect(() => {
-    if (!queryLoading && !queryError) {
-      refetch();
-    }
-  }, [queryLoading, queryError, refetch]);
+  const {
+    loading: queryAllDatabasesLoading,
+    error: queryAllDatabasesError,
+    data: allDatabasesData,
+    refetch: refetchAllDatabases
+  } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
-  if (queryLoading) {
+  React.useEffect(() => {
+    console.log('triggered');
+    if (!queryDatabaseLoading && !queryDatabaseError) {
+      refetchDatabase();
+    }
+    if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
+      refetchAllDatabases();
+    }
+  }, [
+    queryDatabaseLoading,
+    queryDatabaseError,
+    queryAllDatabasesLoading,
+    queryAllDatabasesError,
+    refetchDatabase,
+    DATABASE_ID
+  ]);
+
+  if (queryDatabaseLoading || queryAllDatabasesLoading) {
     return <Loader />;
   }
-  if (queryError) {
+  if (queryDatabaseError || queryAllDatabasesError) {
     // TODO: Write a common Error component/ Toast
-    return <div>Error! + {queryError.message}</div>;
+
+    if (queryDatabaseError) return <div>Error! + {queryDatabaseError.message}</div>;
+
+    if (queryAllDatabasesError) return <div>Error! + {queryAllDatabasesError.message}</div>;
   }
 
   const DatabaseProps: DatabaseProps = {
-    id: data.getDatabase.id,
-    nonCategorisedId: data.getDatabase.categories[0].id,
-    title: data.getDatabase.title,
-    currentView: data.getDatabase.currentView,
-    categories: data.getDatabase.categories,
-    notes: data.getDatabase.notes,
+    id: databaseData.getDatabase.id,
+    nonCategorisedId: databaseData.getDatabase.categories[0].id,
+    title: databaseData.getDatabase.title,
+    currentView: databaseData.getDatabase.currentView,
+    categories: databaseData.getDatabase.categories,
+    notes: databaseData.getDatabase.notes,
+    databases: allDatabasesData.getAllUserDatabases,
+    createDatabaseHandler: createDatabaseHandler,
+    deleteDatabaseHandler: deleteDatabaseHandler,
     createNoteHandler: createNoteHandler,
     deleteNoteHandler: deleteNoteHandler,
     createDatabaseCategoryHandler: createDatabaseCategoryHandler,
