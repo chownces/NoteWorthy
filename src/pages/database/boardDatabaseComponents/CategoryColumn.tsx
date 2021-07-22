@@ -47,33 +47,30 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
   return (
     <Draggable draggableId={props.category.id} index={props.index} key={props.category.name}>
       {provided => (
-        <div
-          className="column"
-          {...provided.dragHandleProps}
-          {...provided.draggableProps}
-          ref={provided.innerRef}
-        >
-          <Header as="h5" textAlign="center" style={{ position: 'relative' }}>
-            {props.category.name}
-            {props.category.id !== props.nonCategorisedId && (
-              <ContextMenuTrigger id={props.category.id} holdToDisplay={-1}>
-                <Button
-                  icon="ellipsis horizontal"
-                  basic
-                  floated="right"
-                  style={{ boxShadow: 'none', position: 'absolute', top: '-2px', right: '0' }}
-                  onClick={e => {
-                    showMenu({
-                      position: { x: e.clientX, y: e.clientY },
-                      target: columnMenu,
-                      id: props.category.id
-                    });
-                  }}
-                />
-                {columnMenu}
-              </ContextMenuTrigger>
-            )}
-          </Header>
+        <div className="column" {...provided.draggableProps} ref={provided.innerRef}>
+          <div className="column-title-container" {...provided.dragHandleProps}>
+            <Header as="h5" textAlign="center" className="column-title">
+              {props.category.name}
+              {props.category.id !== props.nonCategorisedId && (
+                <ContextMenuTrigger id={props.category.id} holdToDisplay={-1}>
+                  <Button
+                    icon="ellipsis horizontal"
+                    basic
+                    floated="right"
+                    style={{ boxShadow: 'none', position: 'absolute', top: '-2px', right: '0' }}
+                    onClick={e => {
+                      showMenu({
+                        position: { x: e.clientX, y: e.clientY },
+                        target: columnMenu,
+                        id: props.category.id
+                      });
+                    }}
+                  />
+                  {columnMenu}
+                </ContextMenuTrigger>
+              )}
+            </Header>
+          </div>
           <Droppable droppableId={props.category.id} type={BoardViewDraggableType.BOARD_ITEM}>
             {provided => (
               <div
@@ -98,6 +95,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
           </Droppable>
 
           <Button
+            className="new-note-button"
             fluid
             basic
             onClick={() =>

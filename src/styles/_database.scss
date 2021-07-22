@@ -3,6 +3,11 @@
   width: min-content;
   min-width: 100%;
 
+  .table-row-disabled {
+    background-color: rgba(#f3f3f3, 0.8);
+    cursor: not-allowed;
+  }
+
   .table-database-note {
     outline: 1px solid red;
   }
@@ -25,6 +30,9 @@
     left: 0;
     width: calc(100vw - 10px);
 
+    // Necessary to position views contextmenu above draggable columns
+    z-index: 1;
+
     .database-title {
       outline: none;
       font-size: xx-large;
@@ -40,6 +48,7 @@
 
     .divider {
       margin-top: 0.5rem;
+      margin-bottom: 0;
     }
   }
 
@@ -54,10 +63,38 @@
       min-width: 260px;
       margin: 0 8px;
 
+      .column-title-container {
+        padding: 1rem 0;
+
+        .column-title {
+          position: relative;
+        }
+      }
+
       .board-item {
-        margin-bottom: 1rem;
         // For absolute positioning of context menu button
         position: relative;
+      }
+
+      .card {
+        margin-bottom: 1rem;
+
+        .card-description {
+          overflow: hidden;
+        }
+      }
+
+      .card-disabled {
+        background-color: rgba(#f3f3f3, 0.8);
+        cursor: not-allowed;
+
+        .card-title-disabled {
+          color: #aaa;
+        }
+      }
+
+      .new-note-button {
+        background-color: white !important;
       }
     }
   }
