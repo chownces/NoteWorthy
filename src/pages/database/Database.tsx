@@ -67,7 +67,7 @@ const Database: React.FC<DatabaseProps> = props => {
   const [renamingOpen, setRenamingOpen] = React.useState<boolean>(false);
   const [hoveringEnum, setHoveringEnum] = React.useState<number>(-1);
 
-  const contextMenuProps = (database: Database, index: number) => {
+  const contextMenuProps = (database: Database, index: number , nextLink: () => void) => {
     return {
       context: ContextMenuType.DATABASE,
       renaming: true,
@@ -82,7 +82,10 @@ const Database: React.FC<DatabaseProps> = props => {
         }
         props.updateDatabaseTitleHandler(databaseId, title);
       },
-      setRenamingOpen: setRenamingOpen
+      setRenamingOpen: setRenamingOpen,
+      nextLink : nextLink,
+      isSelfDelete: props.id === database.id,
+      isLastElement: props.databases.length === 1
     };
   };
 
@@ -116,9 +119,12 @@ const Database: React.FC<DatabaseProps> = props => {
               <Divider/>
 
               {props.databases.map((database: Database, index: number) => {
-                if (database.id === props.id) {
-                  console.log(index);
-                }
+                
+                const nextLink = (index === props.databases.length - 1) ? 
+                  () => window.location.replace(`/database/${props.databases[0].id}`) :
+                  () => window.location.replace(`/database/${props.databases[index + 1].id}`)
+                
+                
 
                 return (
                   <ContextMenuTrigger id={database.id} key={index}>
@@ -131,7 +137,7 @@ const Database: React.FC<DatabaseProps> = props => {
                     >
                       {hoveringEnum === index && (
                         <ContextMenuButton
-                          contextMenuProps={contextMenuProps(database, index)}
+                          contextMenuProps={contextMenuProps(database, index ,nextLink)}
                           noteid={database.id}
                         />
                       )}
@@ -154,7 +160,7 @@ const Database: React.FC<DatabaseProps> = props => {
                       </Link>
                       
                       <div className="react-contextmenu-database">
-                        <ContextMenuElement {...contextMenuProps(database, index + 1)} />
+                        <ContextMenuElement {...contextMenuProps(database, index + 1, nextLink)} />
                       </div>
                     </div>
                   </ContextMenuTrigger>
@@ -192,6 +198,7 @@ const Database: React.FC<DatabaseProps> = props => {
           </Dropdown.Menu>
         </Dropdown>
         <Divider className="divider" />
+
       </div>
       {props.currentView === DatabaseViews.BOARD && <BoardDatabase {...props} />}
       {props.currentView === DatabaseViews.TABLE && <TableDatabase {...props} />}
