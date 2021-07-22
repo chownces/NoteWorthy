@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Form, Menu, Popup } from 'semantic-ui-react';
+import { Form, Icon, Menu, Popup } from 'semantic-ui-react';
 
 import { setEol } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
@@ -42,7 +42,12 @@ const RenamePopup: React.FC<RenameProps> = props => {
       onClose={() => onClose(props.id)}
       basic
       pinned
-      trigger={<Menu.Item onClick={() => {}}>{`Rename ${props.context}`}</Menu.Item>}
+      trigger={
+        <Menu.Item>
+          <Icon name="edit" />
+          {`Rename ${props.context}`}
+        </Menu.Item>
+      }
     >
       <Form>
         <input
