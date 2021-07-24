@@ -54,7 +54,7 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
       basic
       pinned
       trigger={
-        <Button basic fluid>
+        <Button basic fluid className="new-category-button">
           <Icon name="plus" />
           Category
         </Button>

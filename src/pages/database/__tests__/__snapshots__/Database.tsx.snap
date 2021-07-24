@@ -305,7 +305,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
         class="column"
       >
         <button
-          class="ui basic fluid button"
+          class="ui basic fluid button new-category-button"
         >
           <i
             aria-hidden="true"

@@ -79,16 +79,18 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
    */
   const addBlockHandler = (
-    currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
+    currentBlockId: string,
+    ref: React.RefObject<Element>,
+    tag?: string,
+    html?: string
   ): void => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
-      html: '',
-      tag: 'p' // TODO: Reconsider default block tag
+      html: html || '',
+      tag: tag || 'p' // TODO: Reconsider default block tag
     };
     const blocksCopy = [...props.blocks.current];
-    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlockId);
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
@@ -103,10 +105,7 @@ const NotePage: React.FC<NotePageProps> = props => {
   /**
    * Handles the deletion of an empty block by removing it from `blocks`.
    */
-  const deleteBlockHandler = (
-    currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
-  ): void => {
+  const deleteBlockHandler = (currentBlockId: string, ref: React.RefObject<HTMLElement>): void => {
     const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
       ?.children[0]?.children[1] as HTMLElement;
 
@@ -114,7 +113,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       ?.children[1] as HTMLElement;
 
     const blocksCopy = [...props.blocks.current];
-    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlockId);
     blocksCopy.splice(index, 1);
     if (previousBlock) {
       const focusPreviousBlockEolCallback = () => {

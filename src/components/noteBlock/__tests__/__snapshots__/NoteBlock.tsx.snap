@@ -6,7 +6,7 @@ exports[`NoteBlock renders correctly with <p> tag 1`] = `
     <div className=\\"noteblock-handle-container\\">
       <div className=\\"noteblock-handle\\" />
     </div>
-    <ContentEditable className=\\"noteblock-text\\" innerRef={[Function (anonymous)]} html=\\"Hello World!\\" tagName=\\"p\\" onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} placeholder=\\"\\" onChange={[Function: onChangeHandler]} onKeyDown={[Function: onKeydownHandler]} disabled={true} onClick={[Function: onClick]} />
+    <NoteBlockContentEditable html={{...}} tag=\\"p\\" placeholder=\\"\\" disabled={true} className=\\"noteblock\\" id=\\"1\\" updatePage={[Function: updatePage]} noteBlockRef={{...}} addBlock={[Function: addBlock]} deleteBlock={[Function: deleteBlock]} setIsEditMode={[Function: setIsEditMode]} setContentEditablePlaceholder={[Function: bound _dispatchAction]} lastBlockRef={[undefined]} />
     <ContextMenuElement context=\\"Block\\" renaming={false} currentName=\\"\\" id=\\"1\\" createHandler={[Function: createHandler]} deleteHandler={[Function: deleteHandler]} updateNameHandler={[Function: updateNameHandler]} />
   </div>
 </ContextMenuTrigger>"

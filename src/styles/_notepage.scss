@@ -27,5 +27,9 @@
     .bottom-placeholder-div:hover {
       cursor: pointer;
     }
+
+    .context-menu {
+      z-index: 2;
+    }
   }
 }
