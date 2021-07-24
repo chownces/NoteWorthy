@@ -21,12 +21,13 @@ export type ContextMenuProps = {
 export enum ContextMenuType {
   BLOCK = 'Block',
   DATABASE = 'Database',
-  NOTE = 'Note'
+  NOTE = 'Note',
+  CATEGORY = 'Category'
 }
 
 const ContextMenuElement: React.FC<ContextMenuProps> = props => {
   return (
-    <ContextMenu id={props.id} className="context-menu">
+    <ContextMenu id={props.id} hideOnLeave className="context-menu">
       <MenuItem>
         <Menu vertical>
           {props.renaming && (
@@ -44,7 +45,6 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
                 alert('Cannot delete last ' + props.context + '!');
                 return;
               }
-
               props.deleteHandler();
               if (props.nextLink && props.isSelfDelete) {
                 props.nextLink();

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Form, Popup } from 'semantic-ui-react';
+import { Button, Form, Icon, Popup } from 'semantic-ui-react';
 
 import { setEol } from '../../../utils/helpers';
 import useStateCallback from '../../../utils/useStateCallback';
@@ -53,7 +53,12 @@ const AddCategoryPopup: React.FC<AddCategoryProps> = props => {
       }}
       basic
       pinned
-      trigger={<button onClick={() => {}}>Add Category</button>}
+      trigger={
+        <Button basic fluid>
+          <Icon name="plus" />
+          Category
+        </Button>
+      }
     >
       <Form>
         <input

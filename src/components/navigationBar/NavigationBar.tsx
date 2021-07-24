@@ -14,12 +14,12 @@ const NavigationBar: React.FC = () => {
   const desktopMenuItems = (
     <>
       <Menu className="desktop-navbar">
-        <Link to="/" className="brand-logo-link">
+        <Link to="/database/root" className="brand-logo-link">
           <Menu.Item as="div" className="brand-logo-container">
             <Image src={brandLogo} size="small" />
           </Menu.Item>
         </Link>
-        <NavLink exact to="/" activeClassName="active">
+        <NavLink exact to="/database/root" activeClassName="active">
           <Menu.Item as="div">
             <Icon name="file alternate outline" />
             All Databases
@@ -62,10 +62,10 @@ const NavigationBar: React.FC = () => {
       visible={sidePanelOpen}
       vertical
     >
-      <NavLink exact to="/" activeClassName="active">
+      <NavLink exact to="/database/root" activeClassName="active">
         <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
           <Icon name="file alternate outline" />
-          All Notes
+          All Databases
         </Menu.Item>
       </NavLink>
       <NavLink to="/todos" activeClassName="active">

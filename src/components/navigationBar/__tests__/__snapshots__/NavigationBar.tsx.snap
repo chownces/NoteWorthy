@@ -7,7 +7,7 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
   >
     <a
       class="brand-logo-link"
-      href="/"
+      href="/database/root"
     >
       <div
         class="item brand-logo-container"
@@ -19,9 +19,7 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
       </div>
     </a>
     <a
-      aria-current="page"
-      class="active"
-      href="/"
+      href="/database/root"
     >
       <div
         class="item"
@@ -90,9 +88,7 @@ exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
     class="ui vertical ui overlay left sidebar mobile-navbar menu"
   >
     <a
-      aria-current="page"
-      class="active"
-      href="/"
+      href="/database/root"
     >
       <div
         class="item"
@@ -101,7 +97,7 @@ exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
           aria-hidden="true"
           class="file alternate outline icon"
         />
-        All Notes
+        All Databases
       </div>
     </a>
     <a

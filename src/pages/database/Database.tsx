@@ -2,7 +2,7 @@ import React from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import ContentEditable from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Button, Divider, Dropdown, Icon, Popup } from 'semantic-ui-react';
 
 import ContextMenuElement, {
@@ -27,6 +27,8 @@ export type DatabaseProps = {
   deleteNoteHandler: (noteId: string) => void;
   createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
   deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
+  updateDatabaseCategoriesOrdering: (categories: Category[]) => void;
+  updateCategoryName: (categoryId: string, name: string) => void;
   updateDatabaseViewHandler: (databaseId: string, view: string) => void;
   updateDatabaseTitleHandler: (databaseId: string, title: string) => void;
   updateNoteCategoryHandler: (
@@ -39,16 +41,10 @@ export type DatabaseProps = {
   updateDatabases: (databases: DatabaseType[]) => void;
 };
 
-export type Database = {
-  id: string;
-  title: string;
-  currentView: string;
-  notes: Note[];
-};
-
 const Database: React.FC<DatabaseProps> = props => {
   // TODO: Change note.date to reflect the latest date and time of update to the note (requires changes in backend)
 
+  const history = useHistory();
   const currentId = React.useRef(props.id);
 
   const databaseTitle = React.useRef(props.title);
@@ -94,7 +90,7 @@ const Database: React.FC<DatabaseProps> = props => {
     setIsDragging(false);
   };
 
-  const contextMenuProps = (database: Database, index: number, nextLink: () => void) => {
+  const contextMenuProps = (database: DatabaseType, index: number, nextLink: () => void) => {
     return {
       context: ContextMenuType.DATABASE,
       renaming: true,
@@ -156,12 +152,11 @@ const Database: React.FC<DatabaseProps> = props => {
 
                     <Divider />
 
-                    {props.databases.map((database: Database, index: number) => {
+                    {props.databases.map((database: DatabaseType, index: number) => {
                       const nextLink =
                         index === props.databases.length - 1
-                          ? () => window.location.replace(`/database/${props.databases[0].id}`)
-                          : () =>
-                              window.location.replace(`/database/${props.databases[index + 1].id}`);
+                          ? () => history.push(`/database/${props.databases[0].id}`)
+                          : () => history.push(`/database/${props.databases[index + 1].id}`);
 
                       return (
                         <Draggable draggableId={database.id} index={index} key={database.id}>
@@ -188,7 +183,7 @@ const Database: React.FC<DatabaseProps> = props => {
                                           index,
                                           nextLink
                                         )}
-                                        noteid={database.id}
+                                        id={database.id}
                                       />
                                     )}
                                     <Link

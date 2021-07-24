@@ -35,6 +35,7 @@ const Register: React.FC = () => {
           firstname
           lastname
           email
+          databases
         }
       }
     }
@@ -48,8 +49,10 @@ const Register: React.FC = () => {
       password: formState.password
     },
     onCompleted: ({ register }) => {
+      const firstDatabase = register.user.databases[0];
+      console.log(register.user);
       user.login(register.user.email, register.user.firstname, register.user.lastname);
-      history.push('/');
+      history.push(`/database/${firstDatabase}`);
     },
     onError: err => setIsError(true)
   });

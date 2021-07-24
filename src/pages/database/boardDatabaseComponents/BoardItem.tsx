@@ -33,7 +33,36 @@ const BoardItem: React.FC<BoardItemProps> = props => {
 
   const [isHovering, setIsHovering] = React.useState(false);
 
-  return (
+  const card = (
+    <Card fluid className={'card' + (props.note.id === 'temp_id' ? ' card-disabled' : '')}>
+      <Card.Content>
+        <Card.Header className={props.note.id === 'temp_id' ? 'card-title-disabled' : ''}>
+          {props.note.title}
+        </Card.Header>
+        <Card.Description className="card-description">
+          <List bulleted>
+            {/* Cap of 3 blocks displayed */}
+            {props.note.blocks.map((block, index) =>
+              index > 2 ? null : block.html === '' ? null : (
+                <List.Item style={{ lineHeight: '1.4285em' }} key={index}>
+                  <ContentEditable html={block.html} tagName="p" onChange={() => {}} disabled />
+                </List.Item>
+              )
+            )}
+          </List>
+        </Card.Description>
+      </Card.Content>
+      <Card.Content extra>
+        {/* TODO: Implement note tagging */}
+        <Label> placeholder tag </Label>
+      </Card.Content>
+      <Card.Meta>Last update: {new Date(props.note.latestUpdate).toDateString()}</Card.Meta>
+    </Card>
+  );
+
+  return props.note.id === 'temp_id' ? (
+    card
+  ) : (
     <Draggable draggableId={props.note.id} index={props.index} key={props.note.id}>
       {provided => (
         <div
@@ -49,38 +78,10 @@ const BoardItem: React.FC<BoardItemProps> = props => {
               onMouseLeave={() => setIsHovering(false)}
             >
               {isHovering && (
-                <ContextMenuButton contextMenuProps={contextMenuProps} noteid={props.note.id} />
+                <ContextMenuButton contextMenuProps={contextMenuProps} id={props.note.id} />
               )}
               <Link to={`/note/${props.note.id}`} key={props.note.id}>
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Header>{props.note.title}</Card.Header>
-                    <Card.Description style={{ overflow: 'hidden' }}>
-                      <List bulleted>
-                        {/* Cap of 3 blocks displayed */}
-                        {props.note.blocks.map((block, index) =>
-                          index > 2 ? null : block.html === '' ? null : (
-                            <List.Item style={{ lineHeight: '1.4285em' }} key={index}>
-                              <ContentEditable
-                                html={block.html}
-                                tagName="p"
-                                onChange={() => {}}
-                                disabled
-                              />
-                            </List.Item>
-                          )
-                        )}
-                      </List>
-                    </Card.Description>
-                  </Card.Content>
-                  <Card.Content extra>
-                    {/* TODO: Implement note tagging */}
-                    <Label> placeholder tag </Label>
-                  </Card.Content>
-                  <Card.Meta>
-                    Last update: {new Date(props.note.latestUpdate).toDateString()}
-                  </Card.Meta>
-                </Card>
+                {card}
               </Link>
             </div>
             <ContextMenuElement {...contextMenuProps} />

@@ -4,31 +4,12 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
 <div>
   <div>
     Error! + 
-    No more mocked responses for the query: query getDatabase($id: ID!) {
-  getDatabase(databaseId: $id) {
+    No more mocked responses for the query: {
+  getAllUserDatabases {
     id
     title
     currentView
-    categories {
-      id
-      notes
-      name
-      databaseId
-    }
-    notes {
-      id
-      userId
-      databaseId
-      categoryId
-      title
-      blocks {
-        id
-        html
-        tag
-      }
-      creationDate
-      latestUpdate
-    }
+    notes
   }
 }
 , variables: {}
@@ -40,31 +21,12 @@ exports[`Gets all notes successfully and renders them correctly in table view 1`
 <div>
   <div>
     Error! + 
-    No more mocked responses for the query: query getDatabase($id: ID!) {
-  getDatabase(databaseId: $id) {
+    No more mocked responses for the query: {
+  getAllUserDatabases {
     id
     title
     currentView
-    categories {
-      id
-      notes
-      name
-      databaseId
-    }
-    notes {
-      id
-      userId
-      databaseId
-      categoryId
-      title
-      blocks {
-        id
-        html
-        tag
-      }
-      creationDate
-      latestUpdate
-    }
+    notes
   }
 }
 , variables: {}

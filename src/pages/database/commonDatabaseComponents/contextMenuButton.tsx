@@ -1,11 +1,11 @@
-import { showMenu } from 'react-contextmenu';
+import { hideMenu, showMenu } from 'react-contextmenu';
 import { Button, Icon } from 'semantic-ui-react';
 
 import ContextMenuElement from '../../../components/contextMenu/ContextMenuElement';
 
 type ContextMenuButtonProps = {
   contextMenuProps: any;
-  noteid: string;
+  id: string;
 };
 const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
   if (props.contextMenuProps.context === 'Note') {
@@ -18,7 +18,7 @@ const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
           showMenu({
             position: { x: e.clientX, y: e.clientY },
             target: <ContextMenuElement {...props.contextMenuProps} />,
-            id: props.noteid
+            id: props.id
           });
         }}
       />
@@ -27,11 +27,15 @@ const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
     return (
       <button
         onClick={e => {
+          const menu = <ContextMenuElement {...props.contextMenuProps} />;
+
           showMenu({
             position: { x: e.clientX, y: e.clientY },
-            target: <ContextMenuElement {...props.contextMenuProps} />,
-            id: props.noteid
+            target: menu,
+            id: props.id
           });
+
+          hideMenu({ target: menu });
         }}
         className="context-menu-button-database"
       >
