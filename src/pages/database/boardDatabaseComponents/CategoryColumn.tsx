@@ -101,6 +101,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
             onClick={() =>
               props.createNoteHandler(props.category.id, 'untitled', props.category.notes.length)
             }
+            disabled={props.category.id === 'temp_id'}
           >
             <Icon name="plus" />
             New

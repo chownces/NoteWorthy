@@ -68,7 +68,9 @@ export const CREATE_DATABASE_CATEGORY_MUTATION = gql`
   mutation createDatabaseCategory($databaseId: ID!, $categoryName: String!, $index: Int!) {
     createDatabaseCategory(databaseId: $databaseId, categoryName: $categoryName, index: $index) {
       id
-      categories
+      name
+      notes
+      databaseId
     }
   }
 `;
@@ -361,20 +363,9 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION, {
-    update: (cache, { data: { createDatabaseCategory } }) => {
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: createDatabaseCategory
-        }
-      });
-    }
-  });
+  const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION);
 
+  // Note that for now, categories are only created at the last index (in AddCategoryPopup.tsx)
   const createDatabaseCategoryHandler = (
     databaseId: string,
     categoryName: string,
@@ -385,6 +376,34 @@ const DatabaseContainer: React.FC = () => {
         databaseId: databaseId,
         categoryName: categoryName,
         index: index
+      },
+      optimisticResponse: {
+        createDatabaseCategory: {
+          id: 'temp_id',
+          notes: [],
+          name: categoryName,
+          databaseId: databaseId
+        }
+      },
+      update: (cache, { data: { createDatabaseCategory } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              categories: [...data.getDatabase.categories, createDatabaseCategory]
+            }
+          }
+        });
       }
     });
   };
