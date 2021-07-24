@@ -38,8 +38,10 @@ const Login: React.FC = () => {
       password: formState.password
     },
     onCompleted: ({ login }) => {
+      console.log('test');
       const firstDatabase = login.user.databases[0];
       user.login(login.user.email, login.user.firstname, login.user.lastname);
+      console.log(`/database/${firstDatabase}`);
       history.push(`/database/${firstDatabase}`);
     },
     onError: err => setIsWrongCredentials(true)

@@ -54,7 +54,7 @@ const Register: React.FC = () => {
       user.login(register.user.email, register.user.firstname, register.user.lastname);
       history.push(`/database/${firstDatabase}`);
     },
-    onError: err => setIsError(true)
+    onError: err => console.log(err, setIsError(true))
   });
 
   const handleSubmit = () => {

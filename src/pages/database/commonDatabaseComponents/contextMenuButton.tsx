@@ -25,7 +25,7 @@ const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
     );
   } else {
     return (
-      <button
+      <div
         onClick={e => {
           const menu = <ContextMenuElement {...props.contextMenuProps} />;
 
@@ -42,10 +42,11 @@ const ContextMenuButton: React.FC<ContextMenuButtonProps> = props => {
         <Icon
           name="ellipsis vertical"
           style={{
-            display: 'inline'
+            display: 'inline-block',
+            position: 'fixed'
           }}
         />
-      </button>
+      </div>
     );
   }
 };

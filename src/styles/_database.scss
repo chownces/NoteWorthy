@@ -8,10 +8,6 @@
     cursor: not-allowed;
   }
 
-  .table-database-note {
-    outline: 1px solid red;
-  }
-
   .context-menu {
     z-index: 2;
   }
@@ -150,12 +146,10 @@
 }
 
 .context-menu-button-database {
-  display: inline-block;
-  position: relative;
+  display: inline;
   right: 0;
   z-index: 1;
   border: 0;
-  bottom: 0.37rem;
   color: darkgray;
   background-color: transparent;
   :hover {
@@ -170,4 +164,14 @@
 
 .isDraggingSideBar {
   transform: translate(0, -11em);
+}
+
+.side-bar-item-disabled {
+  color: lightgray;
+  font-weight: bold;
+  overflow: hidden;
+}
+.side-bar-disabled {
+  cursor: not-allowed;
+  pointer-events: none;
 }

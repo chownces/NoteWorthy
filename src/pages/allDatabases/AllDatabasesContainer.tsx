@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -14,10 +14,30 @@ export type Database = {
 
 const AllDatabasesController: React.FC = () => {
   // TODO: Add error handling
-
   const history = useHistory();
 
-  history.replace('/database/root');
+  const {
+    loading: queryAllDatabasesLoading,
+    error: queryAllDatabasesError,
+    data: allDatabasesData,
+    refetch: refetchAllDatabases
+  } = useQuery(GET_ALL_USER_DATABASES_QUERY);
+
+  React.useEffect(() => {
+    if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
+      refetchAllDatabases();
+    }
+  }, [queryAllDatabasesLoading, queryAllDatabasesError, refetchAllDatabases]);
+
+  if (queryAllDatabasesLoading) {
+    return <Loader />;
+  }
+
+  if (queryAllDatabasesError) {
+    return <div>Error! + {queryAllDatabasesError.message}</div>;
+  }
+
+  history.push(`/database/${allDatabasesData.getAllUserDatabases[0].id}`);
 
   return <Loader />;
 };

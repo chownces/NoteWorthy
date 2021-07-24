@@ -14,12 +14,12 @@ const NavigationBar: React.FC = () => {
   const desktopMenuItems = (
     <>
       <Menu className="desktop-navbar">
-        <Link to="/database/root" className="brand-logo-link">
+        <Link to="/" className="brand-logo-link">
           <Menu.Item as="div" className="brand-logo-container">
             <Image src={brandLogo} size="small" />
           </Menu.Item>
         </Link>
-        <NavLink exact to="/database/root" activeClassName="active">
+        <NavLink exact to="/" activeClassName="active">
           <Menu.Item as="div">
             <Icon name="file alternate outline" />
             All Databases

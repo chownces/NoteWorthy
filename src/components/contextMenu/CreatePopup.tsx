@@ -5,21 +5,19 @@ import { setEol } from '../../utils/helpers';
 import useStateCallback from '../../utils/useStateCallback';
 import { ContextMenuType } from './ContextMenuElement';
 
-export type RenameProps = {
+export type CreateProps = {
   context: ContextMenuType;
-  id: string;
-  currentName: string;
-  updateNameHandler: (id: string, newName: string) => void;
+  createHandler: (newName: string) => void;
   setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const RenamePopup: React.FC<RenameProps> = props => {
+const CreatePopup: React.FC<CreateProps> = props => {
   const [open, setOpen] = useStateCallback(false);
-  const [text, setText] = useState(props.currentName);
+  const [text, setText] = useState('New Category');
   const formRef = useRef(null);
 
-  const onClose = (id: string) => {
-    props.updateNameHandler(id, text);
+  const onClose = () => {
+    props.createHandler(text);
     if (props.setRenamingOpen) {
       props.setRenamingOpen(false);
     }
@@ -27,9 +25,9 @@ const RenamePopup: React.FC<RenameProps> = props => {
   };
 
   // Updates title after enter key pressed in popup form
-  const onEnterKey = (id: string) => (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const onEnterKey = () => (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
-      onClose(id);
+      onClose();
     }
   };
 
@@ -48,20 +46,20 @@ const RenamePopup: React.FC<RenameProps> = props => {
         }
         setOpen(true, setLine);
       }}
-      onClose={() => onClose(props.id)}
+      onClose={() => onClose()}
       basic
       pinned
       trigger={
         <Menu.Item>
-          <Icon name="edit" style={{ float: 'right' }} />
-          {`Rename ${props.context}`}
+          <Icon name="plus" style={{ float: 'right' }} />
+          {`New ${props.context}`}
         </Menu.Item>
       }
     >
       <Form>
         <input
           ref={formRef}
-          onKeyDown={onEnterKey(props.id)}
+          onKeyDown={onEnterKey()}
           type="text"
           value={text}
           onChange={e => setText(e.target.value)}
@@ -71,4 +69,4 @@ const RenamePopup: React.FC<RenameProps> = props => {
   );
 };
 
-export default RenamePopup;
+export default CreatePopup;
