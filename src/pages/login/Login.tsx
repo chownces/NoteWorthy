@@ -11,6 +11,7 @@ const Login: React.FC = () => {
 
   const user = React.useContext(userContext);
   const [isWrongCredentials, setIsWrongCredentials] = React.useState<boolean>(false);
+  const [loadingLogin, setLoadingLogin] = React.useState<boolean>(false);
 
   const [formState, setFormState] = React.useState({
     email: '',
@@ -40,7 +41,10 @@ const Login: React.FC = () => {
       user.login(login.user.email, login.user.firstname, login.user.lastname);
       history.push('/');
     },
-    onError: err => setIsWrongCredentials(true)
+    onError: err => {
+      setIsWrongCredentials(true);
+      setLoadingLogin(false);
+    }
   });
 
   const handleSubmit = () => {
@@ -48,6 +52,7 @@ const Login: React.FC = () => {
       setFormState({ ...formState, updatedEmail: true, updatedPassword: true });
       return;
     }
+    setLoadingLogin(true);
     login();
   };
 
@@ -92,7 +97,7 @@ const Login: React.FC = () => {
               />
               <Message error header="Login Failed" content="Invalid username or password!" />
               {/* NOTE: There is a findDomNode deprecation warning when using semantic-ui-react's Button component. This is a known issue. */}
-              <Button primary fluid type="submit">
+              <Button primary fluid type="submit" loading={loadingLogin}>
                 Log In
               </Button>
             </Form>
