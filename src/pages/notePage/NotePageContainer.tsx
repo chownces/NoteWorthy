@@ -32,6 +32,31 @@ const NotePageContainer: React.FC = () => {
         blocks: blocks.map(b => {
           return { id: b.id, html: b.html, tag: b.tag };
         })
+      },
+      optimisticResponse: {
+        updateNoteBlocks: {
+          id: NOTE_ID
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          },
+          data: {
+            getNote: {
+              ...data.getNote,
+              blocks: blocks
+            }
+          }
+        });
       }
     });
   };
@@ -76,20 +101,22 @@ const NotePageContainer: React.FC = () => {
             }
           }
         });
-        cache.writeQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: noteData.getNote.databaseId
-          },
-          data: {
-            getDatabase: {
-              ...databaseData.getDatabase,
-              notes: databaseData.getDatabase.notes.map((e: Note) =>
-                e.id === NOTE_ID ? { ...e, title: title } : e
-              )
+        if (databaseData) {
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: noteData.getNote.databaseId
+            },
+            data: {
+              getDatabase: {
+                ...databaseData.getDatabase,
+                notes: databaseData.getDatabase.notes.map((e: Note) =>
+                  e.id === NOTE_ID ? { ...e, title: title } : e
+                )
+              }
             }
-          }
-        });
+          });
+        }
       }
     });
   };
