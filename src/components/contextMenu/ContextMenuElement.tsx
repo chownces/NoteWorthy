@@ -45,10 +45,10 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
                 alert('Cannot delete last ' + props.context + '!');
                 return;
               }
-              props.deleteHandler();
               if (props.nextLink && props.isSelfDelete) {
                 props.nextLink();
               }
+              props.deleteHandler();
             }}
           >
             <Icon name="trash alternate" />

@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from '@apollo/client';
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import Database, { DatabaseProps } from './Database';
@@ -148,8 +148,8 @@ export const GET_ALL_USER_DATABASES_QUERY = gql`
 `;
 
 export const CREATE_DATABASE_MUTATION = gql`
-  mutation createDatabase($index: Int!) {
-    createDatabase(index: $index) {
+  mutation createDatabase($title: String!, $index: Int!) {
+    createDatabase(title: $title, index: $index) {
       id
       title
       currentView
@@ -181,7 +181,7 @@ const DatabaseContainer: React.FC = () => {
 
   const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
 
-  const createDatabaseHandler = (index: number) => {
+  const createDatabaseHandler = (title: string, index: number) => {
     createDatabase({
       update: (cache, { data: { createDatabase } }) => {
         // TODO: Handle typing
@@ -198,7 +198,17 @@ const DatabaseContainer: React.FC = () => {
         });
       },
       variables: {
+        title: title,
         index: index
+      },
+      optimisticResponse: {
+        createDatabase: {
+          id: 'temp_id',
+          title: title,
+          currentView: 'board',
+          notes: [],
+          __typename: 'Database'
+        }
       }
     });
   };
@@ -228,24 +238,27 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
-    update: (cache, { data: { deleteDatabase } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_ALL_USER_DATABASES_QUERY
-      });
+  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {});
 
-      cache.writeQuery({
-        query: GET_ALL_USER_DATABASES_QUERY,
-        data: {
-          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id !== deleteDatabase.id)
-        }
-      });
-    }
-  });
-
-  const deleteDatabaseHandler = (databaseId: string) => {
+  const deleteDatabaseHandler = (databaseId: string, databases: DatabaseType[]) => {
     deleteDatabase({
+      update: cache => {
+        // TODO: Handle typing
+
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: {
+            getAllUserDatabases: databases
+          }
+        });
+      },
+
+      optimisticResponse: {
+        deleteDatabase: {
+          id: databaseId
+        }
+      },
+
       variables: {
         databaseId: databaseId
       }
@@ -258,11 +271,6 @@ const DatabaseContainer: React.FC = () => {
     data: allDatabasesData,
     refetch: refetchAllDatabases
   } = useQuery(GET_ALL_USER_DATABASES_QUERY);
-
-  const history = useHistory();
-  if (DATABASE_ID === 'root' && !queryAllDatabasesLoading) {
-    history.replace(`/database/${allDatabasesData.getAllUserDatabases[0].id}`);
-  }
 
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
@@ -688,7 +696,7 @@ const DatabaseContainer: React.FC = () => {
     DATABASE_ID
   ]);
 
-  if (queryDatabaseLoading || queryAllDatabasesLoading || DATABASE_ID === 'root') {
+  if (queryDatabaseLoading || queryAllDatabasesLoading) {
     return <Loader />;
   }
   if (queryDatabaseError || queryAllDatabasesError) {
@@ -709,6 +717,7 @@ const DatabaseContainer: React.FC = () => {
     categories: databaseData.getDatabase.categories,
     notes: databaseData.getDatabase.notes,
     databases: allDatabasesData.getAllUserDatabases,
+    refetchDatabase: refetchDatabase,
     createDatabaseHandler: createDatabaseHandler,
     deleteDatabaseHandler: deleteDatabaseHandler,
     createNoteHandler: createNoteHandler,

@@ -21,8 +21,9 @@ export type DatabaseProps = {
   categories: Category[];
   notes: Note[];
   databases: DatabaseType[];
-  createDatabaseHandler: (index: number) => void;
-  deleteDatabaseHandler: (databaseId: string) => void;
+  refetchDatabase: () => void;
+  createDatabaseHandler: (title: string, index: number) => void;
+  deleteDatabaseHandler: (databaseId: string, databases: DatabaseType[]) => void;
   createNoteHandler: (categoryId: string, title: string, index: number) => void;
   deleteNoteHandler: (noteId: string) => void;
   createDatabaseCategoryHandler: (databaseId: string, categoryName: string, index: number) => void;
@@ -49,6 +50,7 @@ const Database: React.FC<DatabaseProps> = props => {
 
   const databaseTitle = React.useRef(props.title);
   const hasUnsavedChangesTitle = React.useRef(false);
+
   React.useEffect(() => {
     const interval = window.setInterval(() => {
       if (hasUnsavedChangesTitle.current) {
@@ -97,8 +99,12 @@ const Database: React.FC<DatabaseProps> = props => {
       currentName: database.title,
       id: database.id,
       key: database.id,
-      createHandler: () => props.createDatabaseHandler(index),
-      deleteHandler: () => props.deleteDatabaseHandler(database.id),
+      createHandler: () => props.createDatabaseHandler('untitled', index),
+      deleteHandler: () =>
+        props.deleteDatabaseHandler(
+          database.id,
+          props.databases.filter(db => db.id !== database.id)
+        ),
       updateNameHandler: (databaseId: string, title: string) => {
         if (databaseId === props.id) {
           databaseTitle.current = title;
@@ -155,8 +161,14 @@ const Database: React.FC<DatabaseProps> = props => {
                     {props.databases.map((database: DatabaseType, index: number) => {
                       const nextLink =
                         index === props.databases.length - 1
-                          ? () => history.push(`/database/${props.databases[0].id}`)
-                          : () => history.push(`/database/${props.databases[index + 1].id}`);
+                          ? () => {
+                              history.push(`/database/${props.databases[0].id}`);
+                              props.refetchDatabase();
+                            }
+                          : () => {
+                              history.push(`/database/${props.databases[index + 1].id}`);
+                              props.refetchDatabase();
+                            };
 
                       return (
                         <Draggable draggableId={database.id} index={index} key={database.id}>
@@ -234,7 +246,7 @@ const Database: React.FC<DatabaseProps> = props => {
               </Droppable>
               <div
                 className="side-bar-add-button"
-                onClick={() => props.createDatabaseHandler(props.databases.length + 1)}
+                onClick={() => props.createDatabaseHandler('untitled', props.databases.length + 1)}
               >
                 <Icon name="add" />
                 {'New database'}

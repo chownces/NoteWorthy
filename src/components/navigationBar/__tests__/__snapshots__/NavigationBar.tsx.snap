@@ -7,7 +7,7 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
   >
     <a
       class="brand-logo-link"
-      href="/database/root"
+      href="/"
     >
       <div
         class="item brand-logo-container"
@@ -19,7 +19,9 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
       </div>
     </a>
     <a
-      href="/database/root"
+      aria-current="page"
+      class="active"
+      href="/"
     >
       <div
         class="item"
