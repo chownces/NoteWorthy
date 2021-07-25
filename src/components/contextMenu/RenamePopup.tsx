@@ -38,6 +38,7 @@ const RenamePopup: React.FC<RenameProps> = props => {
     setEol(formRef.current);
   };
 
+  
   return (
     <Popup
       on="click"
