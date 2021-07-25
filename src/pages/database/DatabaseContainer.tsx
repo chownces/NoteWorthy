@@ -3,6 +3,10 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
+import {
+  CURRENT_USER_QUERY,
+  UPDATE_LAST_VISITED_MUTATION
+} from '../allDatabases/AllDatabasesContainer';
 import Database, { DatabaseProps } from './Database';
 import { Database as DatabaseType } from './DatabaseTypes';
 import { Category, Note } from './DatabaseTypes';
@@ -204,6 +208,38 @@ const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
+
+  const [updateLastVisited] = useMutation(UPDATE_LAST_VISITED_MUTATION);
+
+  const updateLastVisitedHandler = (lastVisited: string) => {
+    updateLastVisited({
+      update: (cache, { data: { updateLastVisited } }) => {
+        // TODO: Handle typing
+        const data: any = cache.readQuery({
+          query: CURRENT_USER_QUERY
+        });
+
+        cache.writeQuery({
+          query: CURRENT_USER_QUERY,
+          data: {
+            currentUser: {
+              ...data.currentUser,
+              lastVisited: lastVisited
+            }
+          }
+        });
+      },
+      optimisticResponse: {
+        updateLastVisited: {
+          lastVisited: lastVisited
+        }
+      },
+
+      variables: {
+        lastVisited: lastVisited
+      }
+    });
+  };
 
   const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
 
@@ -867,7 +903,8 @@ const DatabaseContainer: React.FC = () => {
     updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,
     updateNoteTitleHandler: updateNoteTitleHandler,
-    updateDatabases: updateDatabasesHandler
+    updateDatabases: updateDatabasesHandler,
+    updateLastVisitedHandler: updateLastVisitedHandler
   };
 
   return <Database {...DatabaseProps} />;

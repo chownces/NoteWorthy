@@ -152,7 +152,6 @@ const TableRow: React.FC<TableRowProps> = props => {
                     props.categories.map(category => category.id).indexOf(note.categoryId)
                   ]
                 }
-                options={categoryOptions}
                 floating
                 labeled
                 className="category-drop-down"

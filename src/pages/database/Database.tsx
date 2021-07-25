@@ -46,6 +46,7 @@ export type DatabaseProps = {
   ) => void;
   updateNoteTitleHandler: (noteId: string, title: string) => void;
   updateDatabases: (databases: DatabaseType[]) => void;
+  updateLastVisitedHandler: (lastVisited: string) => void;
 };
 
 const Database: React.FC<DatabaseProps> = props => {
@@ -211,6 +212,7 @@ const Database: React.FC<DatabaseProps> = props => {
                                       to={`/database/${database.id}`}
                                       key={props.id}
                                       onClick={() => {
+                                        props.updateLastVisitedHandler(database.id);
                                         databaseTitle.current = database.title;
                                         currentId.current = database.id;
                                       }}

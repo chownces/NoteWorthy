@@ -27,10 +27,24 @@ const Login: React.FC = () => {
           lastname
           email
           databases
+          lastVisited
         }
       }
     }
   `;
+
+  // const LEGACY_LOGIN_MUTATION =  gql `
+  // mutation login($email: String!, $password: String!) {
+  //     login(email: $email, password: $password) {
+  //       user {
+  //         firstname
+  //         lastname
+  //         email
+  //         databases
+  //       }
+  //     }
+  //   }
+  // `;
 
   const [login] = useMutation(LOGIN_MUTATION, {
     variables: {
@@ -38,13 +52,13 @@ const Login: React.FC = () => {
       password: formState.password
     },
     onCompleted: ({ login }) => {
-      console.log('test');
-      const firstDatabase = login.user.databases[0];
+      const lastVisited = login.user.lastVisited;
       user.login(login.user.email, login.user.firstname, login.user.lastname);
-      console.log(`/database/${firstDatabase}`);
-      history.push(`/database/${firstDatabase}`);
+      history.push(`/database/${lastVisited}`);
     },
-    onError: err => setIsWrongCredentials(true)
+    onError: err => {
+      setIsWrongCredentials(true);
+    }
   });
 
   const handleSubmit = () => {
@@ -54,6 +68,19 @@ const Login: React.FC = () => {
     }
     login();
   };
+
+  // const [legacyLogin] = useMutation(LEGACY_LOGIN_MUTATION, {
+  //   variables: {
+  //     email: formState.email,
+  //     password: formState.password
+  //   },
+  //   onCompleted: ({ login }) => {
+  //      console.log('test');
+  //     user.login(login.user.email, login.user.firstname, login.user.lastname);
+  //     history.push(`/`);
+  //   },
+  //   onError: err => console.log(setIsWrongCredentials(true), 'legacy login failed',)
+  // });
 
   return (
     <div style={{ marginTop: '1rem' }}>
