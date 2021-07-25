@@ -47,6 +47,12 @@ export const CREATE_NOTE_MUTATION = gql`
       title
       creationDate
       latestUpdate
+      blocks {
+        id
+        html
+        tag
+      }
+      categoryId
     }
   }
 `;
