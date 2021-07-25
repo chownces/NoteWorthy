@@ -73,7 +73,7 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         placeholder={contentEditablePlaceholder}
         disabled={!props.isEditMode}
         className={
-          'noteblock' +
+          'noteblock-contenteditable' +
           (props.droppableSnapshot.isDraggingOver ? ' draggingOver' : '') +
           (props.draggableSnapshot.isDragging ? ' isDragging' : '')
         }

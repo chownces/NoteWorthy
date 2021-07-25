@@ -129,11 +129,7 @@ export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
 export const UPDATE_NOTE_TITLE_MUTATION = gql`
   mutation updateNoteTitle($noteId: ID!, $title: String!) {
     updateNoteTitle(noteId: $noteId, title: $title) {
-      userId
-      databaseId
-      id
       title
-      creationDate
       latestUpdate
     }
   }
@@ -518,6 +514,34 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         noteId: noteId,
         title: title
+      },
+      optimisticResponse: {
+        updateNoteTitle: {
+          title: title
+        }
+      },
+      update: cache => {
+        const databaseData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...databaseData.getDatabase,
+              notes: databaseData.getDatabase.notes.map((e: Note) =>
+                e.id === noteId ? { ...e, title: title } : e
+              )
+            }
+          }
+        });
       }
     });
   };

@@ -56,7 +56,9 @@ const BoardItem: React.FC<BoardItemProps> = props => {
         {/* TODO: Implement note tagging */}
         <Label> placeholder tag </Label>
       </Card.Content>
-      <Card.Meta>Last update: {new Date(props.note.latestUpdate).toDateString()}</Card.Meta>
+      <Card.Meta className="last-update">
+        Last update: {new Date(props.note.latestUpdate).toDateString()}
+      </Card.Meta>
     </Card>
   );
 

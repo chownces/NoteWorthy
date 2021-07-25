@@ -8,6 +8,7 @@ import NotePageContainer from '../../pages/notePage/NotePageContainer';
 import NotFound from '../../pages/notFound/NotFound';
 import Poster from '../../pages/poster/Poster';
 import Register from '../../pages/register/Register';
+import SharedNoteContainer from '../../pages/sharedNote/SharedNoteContainer';
 import NavigationBar from '../navigationBar/NavigationBar';
 import userContext, { User } from '../userContext/UserContext';
 
@@ -22,7 +23,8 @@ const Application: React.FC = () => {
       component={ifAuthRedirectToRoot(userCtx.user, <Register />)}
       key="register"
     />,
-    <Route path="/poster" component={Poster} key="poster" />
+    <Route path="/poster" component={Poster} key="poster" />,
+    <Route path="/sharednote" component={SharedNoteContainer} key="sharenote" />
   ];
 
   return (

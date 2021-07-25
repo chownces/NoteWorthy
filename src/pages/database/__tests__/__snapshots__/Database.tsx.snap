@@ -131,7 +131,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
                       </div>
                     </div>
                     <div
-                      class="meta"
+                      class="meta last-update"
                     >
                       Last update: 
                       Tue Jun 22 2021
@@ -235,7 +235,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
                       </div>
                     </div>
                     <div
-                      class="meta"
+                      class="meta last-update"
                     >
                       Last update: 
                       Tue Jun 22 2021

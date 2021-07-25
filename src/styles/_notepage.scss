@@ -6,6 +6,18 @@
     flex-direction: column;
     height: 100%;
 
+    .share-button {
+      margin-top: 10px;
+      margin-left: 16px;
+      cursor: pointer;
+    }
+
+    .label-container {
+      margin-top: 1rem;
+      margin-left: 16px;
+      display: inline-block;
+    }
+
     .notepage-title {
       outline: none;
       font-size: xx-large;
@@ -30,6 +42,18 @@
 
     .context-menu {
       z-index: 2;
+    }
+  }
+}
+
+.share-link-container {
+  .note-share-button-copy {
+    padding: 4px;
+    margin-left: 3px;
+
+    i::before {
+      // margin: 0 !important;
+      padding-left: 6px;
     }
   }
 }
