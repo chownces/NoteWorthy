@@ -87,7 +87,33 @@ const NoteBlock: React.FC<NoteBlockProps> = props => {
         lastBlockRef={props.lastBlockRef}
       />
     ),
-    [props, contentEditablePlaceholder]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      props.id,
+      props.tag,
+
+      // props.html is intentionally left out here (is not used here anw), as we want to update
+      // the cache without rerendering this NoteBlock from outside ContentEditable.
+      // The local html ref here keeps the visuals up to date without the need for
+      // cache html state to propagate down.
+
+      // props.updatePage,
+      // props.addBlock,
+      // props.deleteBlock,
+
+      // These ^ are also intentionally left out. This is because when the cache is updated,
+      // NotePage rerenders, which causes these handlers to be redeclared.
+      // They can be left out as there will not be any stale closure problem due to the way
+      // these handlers were written.
+
+      props.lastBlockRef,
+      props.draggableSnapshot,
+      props.droppableSnapshot,
+      props.isEditMode,
+
+      props.setIsEditMode,
+      contentEditablePlaceholder
+    ]
   );
 
   return (
