@@ -5,6 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.3.16",
     "graphql": "^15.5.0",
+    "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
     "react-contenteditable": "^3.3.5",
@@ -58,7 +59,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
+    "@testing-library/user-event": "^13.2.0",
     "@types/enzyme": "^3.10.8",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/jest": "^26.0.15",
