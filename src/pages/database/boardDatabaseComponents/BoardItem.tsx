@@ -62,10 +62,13 @@ const BoardItem: React.FC<BoardItemProps> = props => {
     </Card>
   );
 
-  return props.note.id === 'temp_id' ? (
-    card
-  ) : (
-    <Draggable draggableId={props.note.id} index={props.index} key={props.note.id}>
+  return (
+    <Draggable
+      draggableId={props.note.id}
+      index={props.index}
+      key={props.note.id}
+      isDragDisabled={props.note.id === 'temp_id'}
+    >
       {provided => (
         <div
           {...provided.dragHandleProps}
@@ -73,18 +76,25 @@ const BoardItem: React.FC<BoardItemProps> = props => {
           key={props.note.id}
           ref={provided.innerRef}
         >
-          <ContextMenuTrigger id={props.note.id} holdToDisplay={-1}>
+          <ContextMenuTrigger
+            id={props.note.id}
+            holdToDisplay={-1}
+            disable={props.note.id === 'temp_id'}
+          >
             <div
               className="board-item"
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              {isHovering && (
+              {isHovering && props.note.id !== 'temp_id' && (
                 <ContextMenuButton contextMenuProps={contextMenuProps} noteid={props.note.id} />
               )}
-              <Link to={`/note/${props.note.id}`} key={props.note.id}>
-                {card}
-              </Link>
+              {props.note.id !== 'temp_id' && (
+                <Link to={`/note/${props.note.id}`} key={props.note.id}>
+                  {card}
+                </Link>
+              )}
+              {props.note.id === 'temp_id' && card}
             </div>
             <ContextMenuElement {...contextMenuProps} />
           </ContextMenuTrigger>

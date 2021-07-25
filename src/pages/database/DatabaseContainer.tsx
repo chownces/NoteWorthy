@@ -126,8 +126,26 @@ export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
   mutation updateNoteCategory($noteId: ID!, $categoryId: ID!, $index: Int!) {
     updateNoteCategory(noteId: $noteId, categoryId: $categoryId, index: $index) {
       id
-      notes
-      categories
+      notes {
+        id
+        userId
+        databaseId
+        categoryId
+        title
+        blocks {
+          id
+          html
+          tag
+        }
+        creationDate
+        latestUpdate
+      }
+      categories {
+        id
+        notes
+        name
+        databaseId
+      }
     }
   }
 `;
@@ -568,17 +586,28 @@ const DatabaseContainer: React.FC = () => {
       },
       optimisticResponse: {
         updateNoteCategory: {
-          updatedDatabase
+          id: updatedDatabase.id,
+          notes: updatedDatabase.notes,
+          categories: updatedDatabase.categories
         }
       },
-      update: cache => {
+      update: (cache, { data: { updateNoteCategory } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
             id: DATABASE_ID
           },
           data: {
-            getDatabase: updatedDatabase
+            getDatabase: {
+              ...data.getDatabase,
+              notes: updateNoteCategory.notes
+            }
           }
         });
       }

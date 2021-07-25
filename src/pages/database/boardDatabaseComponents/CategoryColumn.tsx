@@ -45,7 +45,12 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
   );
 
   return (
-    <Draggable draggableId={props.category.id} index={props.index} key={props.category.name}>
+    <Draggable
+      draggableId={props.category.id}
+      index={props.index}
+      key={props.category.name}
+      isDragDisabled={props.category.id === 'temp_id'}
+    >
       {provided => (
         <div className="column" {...provided.draggableProps} ref={provided.innerRef}>
           <div className="column-title-container" {...provided.dragHandleProps}>
