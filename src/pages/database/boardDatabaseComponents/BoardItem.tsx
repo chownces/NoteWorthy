@@ -50,9 +50,7 @@ const BoardItem: React.FC<BoardItemProps> = props => {
               )
             )}
           </List>
-          <Card.Meta className="last-update">
-            {new Date(props.note.latestUpdate).toDateString()}
-          </Card.Meta>
+          <Card.Meta>{new Date(props.note.latestUpdate).toDateString()}</Card.Meta>
         </Card.Description>
       </Card.Content>
     </Card>

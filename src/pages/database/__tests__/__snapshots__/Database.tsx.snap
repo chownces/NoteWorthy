@@ -128,7 +128,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
                           role="list"
                         />
                         <div
-                          class="meta last-update"
+                          class="meta"
                         >
                           Tue Jun 22 2021
                         </div>
@@ -223,7 +223,7 @@ exports[`Gets all notes successfully and renders them correctly in board view 1`
                           role="list"
                         />
                         <div
-                          class="meta last-update"
+                          class="meta"
                         >
                           Tue Jun 22 2021
                         </div>
