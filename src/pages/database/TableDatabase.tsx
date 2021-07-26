@@ -81,7 +81,7 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
                     categories={props.categories}
                     note={note}
                     contextMenuProps={contextMenuProps(note, index)}
-                    key={note.id}
+                    key={index}
                     index={index}
                     updateCategoryName={props.updateCategoryName}
                     updateNoteCategoryHandler={props.updateNoteCategoryHandler}

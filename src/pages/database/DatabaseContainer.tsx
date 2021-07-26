@@ -606,20 +606,7 @@ const DatabaseContainer: React.FC = () => {
   };
 
   const [createDatabaseCategoryForCurrentNote] = useMutation(
-    CREATE_DATABASE_CATEGORY_FOR_CURRENT_NOTE_MUTATION,
-    {
-      update: (cache, { data: { createDatabaseCategoryForCurrentNote } }) => {
-        cache.writeQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: DATABASE_ID
-          },
-          data: {
-            getDatabase: createDatabaseCategoryForCurrentNote
-          }
-        });
-      }
-    }
+    CREATE_DATABASE_CATEGORY_FOR_CURRENT_NOTE_MUTATION
   );
 
   const createDatabaseCategoryForCurrentNoteHandler = (
@@ -632,6 +619,59 @@ const DatabaseContainer: React.FC = () => {
         databaseId: databaseId,
         categoryName: categoryName,
         noteId: noteId
+      },
+      optimisticResponse: {
+        createDatabaseCategoryForCurrentNote: {
+          id: 'placeholder_database_id_to_force_rerender_when_backend_returns',
+          categories: ['temp_id']
+        }
+      },
+      update: (cache, { data: { createDatabaseCategoryForCurrentNote } }) => {
+        const newCatId =
+          createDatabaseCategoryForCurrentNote.categories[
+            createDatabaseCategoryForCurrentNote.categories.length - 1
+          ];
+        console.log('newcatid: ' + newCatId);
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        const note: Note = data.getDatabase.notes.filter((note: Note) => note.id === noteId)[0];
+        const prevCategoryId = note.categoryId;
+
+        // Remove note from previous category
+        const categories = data.getDatabase.categories.map((cat: Category) =>
+          cat.id === prevCategoryId
+            ? { ...cat, notes: cat.notes.filter((note: string) => note !== noteId) }
+            : cat
+        );
+
+        const newCat: Category = {
+          id: newCatId,
+          name: categoryName,
+          databaseId: databaseId,
+          notes: [note.id]
+        };
+        categories.push(newCat);
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              notes: data.getDatabase.notes.map((note: Note) =>
+                note.id === noteId ? { ...note, categoryId: newCatId } : note
+              ),
+              categories: categories
+            }
+          }
+        });
       }
     });
   };
