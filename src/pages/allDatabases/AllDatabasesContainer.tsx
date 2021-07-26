@@ -12,6 +12,8 @@ export type Database = {
   notes: Note[];
 };
 
+// TODO: This whole component is to be refactored and placed in DatabaseContainer.tsx
+// Merging first for submission
 const AllDatabasesController: React.FC = () => {
   // TODO: Add error handling
   const history = useHistory();

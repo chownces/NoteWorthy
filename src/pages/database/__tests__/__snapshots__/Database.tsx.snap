@@ -2,34 +2,689 @@
 
 exports[`Gets all notes successfully and renders them correctly in board view 1`] = `
 <div>
-  <div>
-    Error! + 
-    No more mocked responses for the query: {
-  currentUser {
-    firstname
-    lastname
-    email
-    lastVisited
-  }
-}
-, variables: {}
+  <div
+    class="database"
+  >
+    <div
+      class="sticky-top"
+    >
+      <h1
+        class="database-title"
+        contenteditable="true"
+      >
+        untitled
+      </h1>
+      <button
+        class="ui icon button side-bar-button"
+      >
+        <i
+          aria-hidden="true"
+          class="sidebar icon"
+        />
+      </button>
+      <div
+        aria-expanded="false"
+        class="ui dropdown"
+        role="listbox"
+        tabindex="0"
+      >
+        <div
+          aria-atomic="true"
+          aria-live="polite"
+          class="divider text"
+          role="alert"
+        >
+          Board View
+        </div>
+        <i
+          aria-hidden="true"
+          class="dropdown icon"
+        />
+        <div
+          class="menu transition"
+        >
+          <div
+            class="item"
+            role="option"
+          >
+            <span
+              class="text"
+            >
+              Table View
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="ui divider divider"
+      />
+    </div>
+    <div
+      class="board-items-container"
+      data-rbd-droppable-context-id="1"
+      data-rbd-droppable-id="columns"
+      style="min-height: 1px;"
+    >
+      <div
+        class="column"
+        data-rbd-draggable-context-id="1"
+        data-rbd-draggable-id="60cc5982c3987e2ac0b44fd9"
+      >
+        <div
+          aria-describedby="rbd-hidden-text-1-hidden-text-4"
+          class="column-title-container"
+          data-rbd-drag-handle-context-id="1"
+          data-rbd-drag-handle-draggable-id="60cc5982c3987e2ac0b44fd9"
+          draggable="false"
+          role="button"
+          tabindex="0"
+        >
+          <h5
+            class="ui center aligned header column-title"
+          >
+            Non-categorised
+          </h5>
+        </div>
+        <div
+          data-rbd-droppable-context-id="1"
+          data-rbd-droppable-id="60cc5982c3987e2ac0b44fd9"
+          style="min-height: 1px;"
+        >
+          <div
+            aria-describedby="rbd-hidden-text-1-hidden-text-4"
+            data-rbd-drag-handle-context-id="1"
+            data-rbd-drag-handle-draggable-id="60adcd6e38a95f0f75f1c089"
+            data-rbd-draggable-context-id="1"
+            data-rbd-draggable-id="60adcd6e38a95f0f75f1c089"
+            draggable="false"
+            role="button"
+            tabindex="0"
+          >
+            <div
+              class="react-contextmenu-wrapper"
+            >
+              <div
+                class="board-item"
+              >
+                <a
+                  href="/note/60adcd6e38a95f0f75f1c089"
+                >
+                  <div
+                    class="ui fluid card card"
+                  >
+                    <div
+                      class="content"
+                    >
+                      <div
+                        class="header"
+                      >
+                        My first note
+                      </div>
+                      <div
+                        class="description card-description"
+                      >
+                        <div
+                          class="ui bulleted list"
+                          role="list"
+                        />
+                        <div
+                          class="meta last-update"
+                        >
+                          Tue Jun 22 2021
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <nav
+                class="react-contextmenu context-menu"
+                role="menu"
+                style="position: fixed; opacity: 0; pointer-events: none;"
+                tabindex="-1"
+              >
+                <div
+                  aria-disabled="false"
+                  class="react-contextmenu-item"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  <div
+                    class="ui vertical menu"
+                  >
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="edit icon"
+                        style="float: right;"
+                      />
+                      Rename Note
+                    </a>
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="trash alternate icon"
+                      />
+                      Delete Note
+                    </a>
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="add icon"
+                      />
+                      Add Note
+                    </a>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          </div>
+          <div
+            aria-describedby="rbd-hidden-text-1-hidden-text-4"
+            data-rbd-drag-handle-context-id="1"
+            data-rbd-drag-handle-draggable-id="6098bbdc04c0fa63070bfe5e"
+            data-rbd-draggable-context-id="1"
+            data-rbd-draggable-id="6098bbdc04c0fa63070bfe5e"
+            draggable="false"
+            role="button"
+            tabindex="0"
+          >
+            <div
+              class="react-contextmenu-wrapper"
+            >
+              <div
+                class="board-item"
+              >
+                <a
+                  href="/note/6098bbdc04c0fa63070bfe5e"
+                >
+                  <div
+                    class="ui fluid card card"
+                  >
+                    <div
+                      class="content"
+                    >
+                      <div
+                        class="header"
+                      >
+                        untitled
+                      </div>
+                      <div
+                        class="description card-description"
+                      >
+                        <div
+                          class="ui bulleted list"
+                          role="list"
+                        />
+                        <div
+                          class="meta last-update"
+                        >
+                          Tue Jun 22 2021
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+              <nav
+                class="react-contextmenu context-menu"
+                role="menu"
+                style="position: fixed; opacity: 0; pointer-events: none;"
+                tabindex="-1"
+              >
+                <div
+                  aria-disabled="false"
+                  class="react-contextmenu-item"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  <div
+                    class="ui vertical menu"
+                  >
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="edit icon"
+                        style="float: right;"
+                      />
+                      Rename Note
+                    </a>
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="trash alternate icon"
+                      />
+                      Delete Note
+                    </a>
+                    <a
+                      class="item"
+                    >
+                      <i
+                        aria-hidden="true"
+                        class="add icon"
+                      />
+                      Add Note
+                    </a>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <button
+          class="ui basic fluid button new-note-button"
+        >
+          <i
+            aria-hidden="true"
+            class="plus icon"
+          />
+          New
+        </button>
+      </div>
+      <div
+        class="column"
+      >
+        <button
+          class="ui basic fluid button new-category-button"
+        >
+          <i
+            aria-hidden="true"
+            class="plus icon"
+          />
+          Category
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 `;
 
 exports[`Gets all notes successfully and renders them correctly in table view 1`] = `
 <div>
-  <div>
-    Error! + 
-    No more mocked responses for the query: {
-  currentUser {
-    firstname
-    lastname
-    email
-    lastVisited
-  }
-}
-, variables: {}
+  <div
+    class="database"
+  >
+    <div
+      class="sticky-top"
+    >
+      <h1
+        class="database-title"
+        contenteditable="true"
+      >
+        untitled
+      </h1>
+      <button
+        class="ui icon button side-bar-button"
+      >
+        <i
+          aria-hidden="true"
+          class="sidebar icon"
+        />
+      </button>
+      <div
+        aria-expanded="false"
+        class="ui dropdown"
+        role="listbox"
+        tabindex="0"
+      >
+        <div
+          aria-atomic="true"
+          aria-live="polite"
+          class="divider text"
+          role="alert"
+        >
+          Table View
+        </div>
+        <i
+          aria-hidden="true"
+          class="dropdown icon"
+        />
+        <div
+          class="menu transition"
+        >
+          <div
+            class="item"
+            role="option"
+          >
+            <span
+              class="text"
+            >
+              Board View
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="ui divider divider"
+      />
+    </div>
+    <div
+      data-rbd-droppable-context-id="0"
+      data-rbd-droppable-id="table-view"
+    >
+      <table
+        class="ui celled single line table"
+      >
+        <thead
+          class=""
+        >
+          <tr
+            class=""
+          >
+            <th
+              class=""
+            >
+              Title
+            </th>
+            <th
+              class=""
+            >
+              Date
+            </th>
+            <th
+              class=""
+            >
+              Category
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class=""
+        >
+          <tr
+            aria-describedby="rbd-hidden-text-0-hidden-text-0"
+            class=""
+            data-rbd-drag-handle-context-id="0"
+            data-rbd-drag-handle-draggable-id="60adcd6e38a95f0f75f1c089"
+            data-rbd-draggable-context-id="0"
+            data-rbd-draggable-id="60adcd6e38a95f0f75f1c089"
+            draggable="false"
+            role="button"
+            tabindex="0"
+          >
+            <td
+              class=""
+              style="position: relative;"
+            >
+              <div
+                class="react-contextmenu-wrapper"
+              >
+                <div
+                  class="context-menu-target"
+                >
+                  <a
+                    href="/note/60adcd6e38a95f0f75f1c089"
+                  >
+                    My first note
+                  </a>
+                </div>
+                <nav
+                  class="react-contextmenu context-menu"
+                  role="menu"
+                  style="position: fixed; opacity: 0; pointer-events: none;"
+                  tabindex="-1"
+                >
+                  <div
+                    aria-disabled="false"
+                    class="react-contextmenu-item"
+                    role="menuitem"
+                    tabindex="-1"
+                  >
+                    <div
+                      class="ui vertical menu"
+                    >
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="edit icon"
+                          style="float: right;"
+                        />
+                        Rename Note
+                      </a>
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="trash alternate icon"
+                        />
+                        Delete Note
+                      </a>
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="add icon"
+                        />
+                        Add Note
+                      </a>
+                    </div>
+                  </div>
+                </nav>
+              </div>
+            </td>
+            <td
+              class=""
+            >
+              Tue Jun 22 2021
+            </td>
+            <td
+              class=""
+              style="overflow: visible;"
+            >
+              <div
+                aria-expanded="false"
+                class="ui fluid floating labeled dropdown category-drop-down"
+                role="listbox"
+                tabindex="0"
+              >
+                <div
+                  aria-atomic="true"
+                  aria-live="polite"
+                  class="divider text"
+                  role="alert"
+                >
+                  Non-categorised
+                </div>
+                <i
+                  aria-hidden="true"
+                  class="dropdown icon"
+                />
+                <div
+                  class="scrolling menu transition"
+                  style="position: absolute;"
+                >
+                  <a
+                    class="item"
+                  >
+                    <i
+                      aria-hidden="true"
+                      class="plus icon"
+                      style="float: right;"
+                    />
+                    New Category
+                  </a>
+                  <div
+                    class="ui divider"
+                  />
+                  <div
+                    class="item"
+                    role="option"
+                  >
+                    <span
+                      class="text"
+                    >
+                      Non-categorised
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr
+            aria-describedby="rbd-hidden-text-0-hidden-text-0"
+            class=""
+            data-rbd-drag-handle-context-id="0"
+            data-rbd-drag-handle-draggable-id="6098bbdc04c0fa63070bfe5e"
+            data-rbd-draggable-context-id="0"
+            data-rbd-draggable-id="6098bbdc04c0fa63070bfe5e"
+            draggable="false"
+            role="button"
+            tabindex="0"
+          >
+            <td
+              class=""
+              style="position: relative;"
+            >
+              <div
+                class="react-contextmenu-wrapper"
+              >
+                <div
+                  class="context-menu-target"
+                >
+                  <a
+                    href="/note/6098bbdc04c0fa63070bfe5e"
+                  >
+                    untitled
+                  </a>
+                </div>
+                <nav
+                  class="react-contextmenu context-menu"
+                  role="menu"
+                  style="position: fixed; opacity: 0; pointer-events: none;"
+                  tabindex="-1"
+                >
+                  <div
+                    aria-disabled="false"
+                    class="react-contextmenu-item"
+                    role="menuitem"
+                    tabindex="-1"
+                  >
+                    <div
+                      class="ui vertical menu"
+                    >
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="edit icon"
+                          style="float: right;"
+                        />
+                        Rename Note
+                      </a>
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="trash alternate icon"
+                        />
+                        Delete Note
+                      </a>
+                      <a
+                        class="item"
+                      >
+                        <i
+                          aria-hidden="true"
+                          class="add icon"
+                        />
+                        Add Note
+                      </a>
+                    </div>
+                  </div>
+                </nav>
+              </div>
+            </td>
+            <td
+              class=""
+            >
+              Tue Jun 22 2021
+            </td>
+            <td
+              class=""
+              style="overflow: visible;"
+            >
+              <div
+                aria-expanded="false"
+                class="ui fluid floating labeled dropdown category-drop-down"
+                role="listbox"
+                tabindex="0"
+              >
+                <div
+                  aria-atomic="true"
+                  aria-live="polite"
+                  class="divider text"
+                  role="alert"
+                >
+                  Non-categorised
+                </div>
+                <i
+                  aria-hidden="true"
+                  class="dropdown icon"
+                />
+                <div
+                  class="scrolling menu transition"
+                  style="position: absolute;"
+                >
+                  <a
+                    class="item"
+                  >
+                    <i
+                      aria-hidden="true"
+                      class="plus icon"
+                      style="float: right;"
+                    />
+                    New Category
+                  </a>
+                  <div
+                    class="ui divider"
+                  />
+                  <div
+                    class="item"
+                    role="option"
+                  >
+                    <span
+                      class="text"
+                    >
+                      Non-categorised
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr
+            class=""
+          >
+            <td
+              class="center aligned"
+              colspan="3"
+              style="color: gray;"
+            >
+              <i
+                aria-hidden="true"
+                class="plus icon"
+              />
+              New
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 `;
@@ -38,15 +693,7 @@ exports[`Handles network error correctly  1`] = `
 <div>
   <div>
     Error! + 
-    No more mocked responses for the query: {
-  currentUser {
-    firstname
-    lastname
-    email
-    lastVisited
-  }
-}
-, variables: {}
+    An error occurred
   </div>
 </div>
 `;

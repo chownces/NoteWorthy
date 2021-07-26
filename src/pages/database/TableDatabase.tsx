@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import { Icon, Ref, Table } from 'semantic-ui-react';
+import { Icon, Table } from 'semantic-ui-react';
 
 import { ContextMenuType } from '../../components/contextMenu/ContextMenuElement';
 import { DatabaseProps } from './Database';
@@ -8,10 +8,6 @@ import { Note } from './DatabaseTypes';
 import TableRow from './tableDatabaseComponents/tableRow';
 
 const TableDatabase: React.FC<DatabaseProps> = props => {
-  // TODO: Probably want a react-beautiful-dnd view again for displaying all notes
-
-  // TODO: Change note.date to reflect the latest date and time of update to the note (requires changes in backend)
-
   const [onHover, setOnHover] = React.useState<boolean>(false);
 
   const databaseTitle = React.useRef(props.title);
@@ -67,19 +63,19 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
   };
 
   return (
-    <Table celled singleLine>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Title</Table.HeaderCell>
-          <Table.HeaderCell>Date</Table.HeaderCell>
-          <Table.HeaderCell>Category</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <DragDropContext onDragEnd={onDragEndHandler}>
-        <Droppable droppableId="table-view">
-          {provided => (
-            <Ref innerRef={provided.innerRef} {...provided.droppableProps}>
-              <Table.Body ref={provided.innerRef} {...provided.droppableProps}>
+    <DragDropContext onDragEnd={onDragEndHandler}>
+      <Droppable droppableId="table-view">
+        {provided => (
+          <div ref={provided.innerRef} {...provided.droppableProps}>
+            <Table celled singleLine>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Title</Table.HeaderCell>
+                  <Table.HeaderCell>Date</Table.HeaderCell>
+                  <Table.HeaderCell>Category</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
                 {props.notes.map((note: Note, index: number) => (
                   <TableRow
                     categories={props.categories}
@@ -120,11 +116,11 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
                   </Table.Cell>
                 </Table.Row>
               </Table.Body>
-            </Ref>
-          )}
-        </Droppable>
-      </DragDropContext>
-    </Table>
+            </Table>
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 };
 

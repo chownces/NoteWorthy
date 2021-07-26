@@ -890,6 +890,8 @@ const DatabaseContainer: React.FC = () => {
     refetch: refetchAllDatabases
   } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
+  // TODO: This is causing a double fetching of data...
+  // Have to merge for submission first
   React.useEffect(() => {
     if (!queryDatabaseLoading && !queryDatabaseError) {
       refetchDatabase();
