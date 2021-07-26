@@ -15,6 +15,7 @@ export type CategoryColumnProps = {
   nonCategorisedId: string;
   notes: Note[];
   category: Category;
+  newCategoryBeingCreated: boolean;
   deleteDatabaseCategoryHandler: (databaseId: string, categoryId: string) => void;
   createNoteHandler: (categoryId: string, title: string, index: number) => void;
   deleteNoteHandler: (noteId: string) => void;
@@ -76,7 +77,11 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
               )}
             </Header>
           </div>
-          <Droppable droppableId={props.category.id} type={BoardViewDraggableType.BOARD_ITEM}>
+          <Droppable
+            droppableId={props.category.id}
+            type={BoardViewDraggableType.BOARD_ITEM}
+            isDropDisabled={props.category.id === 'temp_id'}
+          >
             {provided => (
               <div
                 ref={provided.innerRef}
@@ -89,6 +94,7 @@ const CategoryColumn: React.FC<CategoryColumnProps> = props => {
                     index={index}
                     category={props.category}
                     note={props.notes.filter(x => x.id === note)[0]}
+                    newCategoryBeingCreated={props.newCategoryBeingCreated}
                     createNoteHandler={props.createNoteHandler}
                     deleteNoteHandler={props.deleteNoteHandler}
                     updateNoteTitleHandler={props.updateNoteTitleHandler}

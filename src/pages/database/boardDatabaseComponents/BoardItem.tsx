@@ -15,6 +15,7 @@ export type BoardItemProps = {
   index: number;
   category: Category;
   note: Note;
+  newCategoryBeingCreated: boolean;
   createNoteHandler: (category: string, title: string, index: number) => void;
   deleteNoteHandler: (noteId: string) => void;
   updateNoteTitleHandler: (noteId: string, title: string) => void;
@@ -34,9 +35,21 @@ const BoardItem: React.FC<BoardItemProps> = props => {
   const [isHovering, setIsHovering] = React.useState(false);
 
   const card = (
-    <Card fluid className={'card' + (props.note.id === 'temp_id' ? ' card-disabled' : '')}>
+    <Card
+      fluid
+      className={
+        'card' +
+        (props.note.id === 'temp_id' || props.newCategoryBeingCreated ? ' card-disabled' : '')
+      }
+    >
       <Card.Content>
-        <Card.Header className={props.note.id === 'temp_id' ? 'card-title-disabled' : ''}>
+        <Card.Header
+          className={
+            props.note.id === 'temp_id' || props.newCategoryBeingCreated
+              ? 'card-title-disabled'
+              : ''
+          }
+        >
           {props.note.title}
         </Card.Header>
         <Card.Description className="card-description">
@@ -61,7 +74,7 @@ const BoardItem: React.FC<BoardItemProps> = props => {
       draggableId={props.note.id}
       index={props.index}
       key={props.note.id}
-      isDragDisabled={props.note.id === 'temp_id'}
+      isDragDisabled={props.note.id === 'temp_id' || props.newCategoryBeingCreated}
     >
       {provided => (
         <div

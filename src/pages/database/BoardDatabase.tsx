@@ -76,11 +76,19 @@ const BoardDatabase: React.FC<DatabaseProps> = props => {
     [props]
   );
 
+  // Note: Droppable ids (for each column) cannot be changed during a drag event
+  // This boolean is to prevent board items from being dragged when a new category is created.
+  const newCategoryBeingCreated = props.categories.reduce(
+    (acc, curr) => acc || curr.id === 'temp_id',
+    false
+  );
+
   const categoryColumnProps = {
     databaseId: props.id,
     nonCategorisedId: props.nonCategorisedId,
     renaming: true,
     notes: props.notes,
+    newCategoryBeingCreated: newCategoryBeingCreated,
     deleteDatabaseCategoryHandler: props.deleteDatabaseCategoryHandler,
     createNoteHandler: props.createNoteHandler,
     deleteNoteHandler: props.deleteNoteHandler,
