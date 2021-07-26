@@ -3,7 +3,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import ContentEditable from 'react-contenteditable';
 import { ContextMenuTrigger } from 'react-contextmenu';
 import { Link } from 'react-router-dom';
-import { Card, Label, List } from 'semantic-ui-react';
+import { Card, List } from 'semantic-ui-react';
 
 import ContextMenuElement, {
   ContextMenuType
@@ -50,15 +50,11 @@ const BoardItem: React.FC<BoardItemProps> = props => {
               )
             )}
           </List>
+          <Card.Meta className="last-update">
+            {new Date(props.note.latestUpdate).toDateString()}
+          </Card.Meta>
         </Card.Description>
       </Card.Content>
-      <Card.Content extra>
-        {/* TODO: Implement note tagging */}
-        <Label> placeholder tag </Label>
-      </Card.Content>
-      <Card.Meta className="last-update">
-        Last update: {new Date(props.note.latestUpdate).toDateString()}
-      </Card.Meta>
     </Card>
   );
 
@@ -87,7 +83,7 @@ const BoardItem: React.FC<BoardItemProps> = props => {
               onMouseLeave={() => setIsHovering(false)}
             >
               {isHovering && props.note.id !== 'temp_id' && (
-                <ContextMenuButton contextMenuProps={contextMenuProps} noteid={props.note.id} />
+                <ContextMenuButton contextMenuProps={contextMenuProps} id={props.note.id} />
               )}
               {props.note.id !== 'temp_id' && (
                 <Link to={`/note/${props.note.id}`} key={props.note.id}>

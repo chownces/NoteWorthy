@@ -8,10 +8,6 @@
     cursor: not-allowed;
   }
 
-  .table-database-note {
-    outline: 1px solid red;
-  }
-
   .context-menu {
     z-index: 2;
   }
@@ -37,13 +33,18 @@
       outline: none;
       font-size: xx-large;
       font-weight: bold;
-      padding-left: 1rem;
       margin-top: 1rem;
       min-height: 45px;
     }
 
-    .view-dropdown {
-      padding-left: 1rem;
+    .side-bar-button {
+      padding: 0.4rem !important;
+      background: transparent !important;
+      color: gray;
+      border: 0;
+      :hover {
+        color: black;
+      }
     }
 
     .divider {
@@ -84,7 +85,6 @@
         }
 
         .last-update {
-          margin-left: 1em;
           margin-bottom: 0.75em;
         }
       }
@@ -107,4 +107,78 @@
       margin-top: 1rem;
     }
   }
+}
+
+.react-contextmenu-database {
+  .react-contextmenu {
+    top: initial !important;
+  }
+}
+.side-bar-item {
+  font-weight: bold;
+  color: darkgray;
+  overflow: hidden;
+}
+
+.side-bar-header {
+  font-weight: bold;
+  color: black;
+  overflow: hidden;
+  margin-left: 1.49rem;
+}
+
+.side-bar-item:hover {
+  color: black;
+}
+
+.side-bar-selected {
+  font-weight: bold;
+  color: black;
+  overflow: hidden;
+  width: max-content;
+}
+
+.side-bar-menu {
+  width: 150px;
+}
+
+.side-bar-add-button {
+  font-weight: bold;
+  color: darkgray;
+}
+
+.side-bar-add-button:hover {
+  color: black;
+  cursor: pointer;
+}
+
+.context-menu-button-database {
+  // display: inline;
+  right: 0;
+  z-index: 1;
+  border: 0;
+  color: darkgray;
+  background-color: transparent;
+  :hover {
+    color: black;
+    cursor: pointer;
+  }
+}
+
+.space-right {
+  margin-left: 1.49em;
+}
+
+.isDraggingSideBar {
+  transform: translate(0, -11em);
+}
+
+.side-bar-item-disabled {
+  color: lightgray;
+  font-weight: bold;
+  overflow: hidden;
+}
+.side-bar-disabled {
+  cursor: not-allowed;
+  pointer-events: none;
 }

@@ -19,22 +19,8 @@ const NavigationBar: React.FC = () => {
             <Image src={brandLogo} size="small" />
           </Menu.Item>
         </Link>
-        <NavLink exact to="/" activeClassName="active">
-          <Menu.Item as="div">
-            <Icon name="file alternate outline" />
-            All Databases
-          </Menu.Item>
-        </NavLink>
-        <NavLink to="/todos" activeClassName="active">
-          <Menu.Item as="div">
-            <Icon name="calendar check outline" />
-            Todo List
-          </Menu.Item>
-        </NavLink>
+
         <Menu.Menu position="right">
-          <NavLink to="/contribute" activeClassName="active">
-            <Menu.Item as="div">Contribute</Menu.Item>
-          </NavLink>
           <NavLink to="/login" activeClassName="active">
             <Menu.Item as="div" onClick={user.logout}>
               {user.user.loggedIn ? 'Logout' : 'Login'}
@@ -65,20 +51,10 @@ const NavigationBar: React.FC = () => {
       <NavLink exact to="/" activeClassName="active">
         <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
           <Icon name="file alternate outline" />
-          All Notes
+          All Databases
         </Menu.Item>
       </NavLink>
-      <NavLink to="/todos" activeClassName="active">
-        <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
-          <Icon name="calendar check outline" />
-          Todo List
-        </Menu.Item>
-      </NavLink>
-      <NavLink to="/contribute" activeClassName="active">
-        <Menu.Item as="div" onClick={() => setSidePanelOpen(false)}>
-          Contribute
-        </Menu.Item>
-      </NavLink>
+
       <NavLink to="/login" activeClassName="active">
         <Menu.Item
           as="div"

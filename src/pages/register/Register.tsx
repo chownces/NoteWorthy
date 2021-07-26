@@ -20,6 +20,7 @@ const Register: React.FC = () => {
     updatedPassword: false
   });
   const [isError, setIsError] = React.useState(false);
+  const [loadingRegistration, setLoadingRegistration] = React.useState(false);
 
   const REGISTER_MUTATION = gql`
     mutation register(
@@ -49,9 +50,12 @@ const Register: React.FC = () => {
     },
     onCompleted: ({ register }) => {
       user.login(register.user.email, register.user.firstname, register.user.lastname);
-      history.push('/');
+      history.push(`/`);
     },
-    onError: err => setIsError(true)
+    onError: err => {
+      setLoadingRegistration(false);
+      console.log(err, setIsError(true));
+    }
   });
 
   const handleSubmit = () => {
@@ -65,6 +69,7 @@ const Register: React.FC = () => {
       });
       return;
     }
+    setLoadingRegistration(true);
     register();
   };
 
@@ -139,7 +144,7 @@ const Register: React.FC = () => {
               />
               <Message error header="Registration failed" content="Please try again later." />
               {/* NOTE: There is a findDomNode deprecation warning when using semantic-ui-react's Button component. This is a known issue. */}
-              <Button primary fluid type="submit">
+              <Button primary fluid type="submit" loading={loadingRegistration}>
                 Register
               </Button>
             </Form>

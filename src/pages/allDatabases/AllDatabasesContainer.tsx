@@ -1,9 +1,9 @@
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
 import { Note } from '../database/DatabaseTypes';
-import AllDatabases, { AllDatabasesProps } from './AllDatabases';
 
 export type Database = {
   id: string;
@@ -12,87 +12,68 @@ export type Database = {
   notes: Note[];
 };
 
+// TODO: This whole component is to be refactored and placed in DatabaseContainer.tsx
+// Merging first for submission
 const AllDatabasesController: React.FC = () => {
   // TODO: Add error handling
-  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION, {
-    update: (cache, { data: { createDatabase } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_ALL_USER_DATABASES_QUERY
-      });
+  const history = useHistory();
 
-      cache.writeQuery({
-        query: GET_ALL_USER_DATABASES_QUERY,
-        data: { getAllUserDatabases: [...data.getAllUserDatabases, createDatabase] }
-      });
-    }
-  });
+  // const [updateLastVisited] = useMutation(UPDATE_LAST_VISITED_MUTATION);
 
-  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {
-    update: (cache, { data: { deleteDatabase } }) => {
-      // TODO: Handle typing
-      const data: any = cache.readQuery({
-        query: GET_ALL_USER_DATABASES_QUERY
-      });
+  // const updateLastVisitedHandler = (lastVisited: string) => {
+  //   updateLastVisited({
+  //     variables: {
+  //       lastVisited: lastVisited
+  //     }
+  //   })
+  // }
 
-      cache.writeQuery({
-        query: GET_ALL_USER_DATABASES_QUERY,
-        data: {
-          getAllUserDatabases: [...data.getAllUserDatabases].filter(x => x.id !== deleteDatabase.id)
-        }
-      });
-    }
-  });
+  // const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
 
-  const deleteDatabaseHandler = (databaseId: string) => {
-    deleteDatabase({
-      variables: {
-        databaseId: databaseId
-      }
-    });
-  };
+  // const createDatabaseHandler = () => {
+  //   createDatabase({
 
-  const [updateDatabaseTitle] = useMutation(UPDATE_DATABASE_TITLE_MUTATION);
+  //         variables: {
+  //       title: 'untitled',
+  //       index: 0
+  //     }
+  //   })
+  // }
 
-  const updateDatabaseTitleHandler = (databaseId: string, title: string) => {
-    updateDatabaseTitle({
-      variables: {
-        databaseId: databaseId,
-        title: title
-      }
-    });
-  };
+  // const {
+  //   loading: queryAllDatabasesLoading,
+  //   error: queryAllDatabasesError,
+  //   data: allDatabasesData,
+  //   refetch: refetchAllDatabases
+  // } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
-  const { loading: queryLoading, error: queryError, data, refetch } = useQuery(
-    GET_ALL_USER_DATABASES_QUERY
-  );
+  const {
+    loading: queryUserLoading,
+    error: queryUserError,
+    data: userData,
+    refetch: refetchUser
+  } = useQuery(CURRENT_USER_QUERY);
 
   React.useEffect(() => {
-    if (!queryLoading && !queryError) {
-      refetch();
+    if (!queryUserError && !queryUserLoading) {
+      refetchUser();
     }
-  }, [queryLoading, queryError, refetch]);
+  }, [queryUserError, queryUserLoading, refetchUser]);
 
-  if (queryLoading) {
+  // !userData.currentUser to prevent crash upon fresh login (reload page before login)
+  if (queryUserLoading || !userData.currentUser) {
     return <Loader />;
   }
-  if (queryError) {
-    // TODO: Write a common Error component/ Toast
-    return <div>Error! + {queryError.message}</div>;
+
+  if (queryUserError) {
+    return <div>Error! + {queryUserError.message} </div>;
   }
 
-  const allDatabasesProps: AllDatabasesProps = {
-    databases: data.getAllUserDatabases,
-    createDatabaseHandler: createDatabase,
-    deleteDatabaseHandler: deleteDatabaseHandler,
-    updateDatabaseTitleHandler: updateDatabaseTitleHandler
-  };
+  console.log(userData);
 
-  return (
-    <>
-      <AllDatabases {...allDatabasesProps} />
-    </>
-  );
+  history.push(`/database/${userData.currentUser.lastVisited}`);
+
+  return <Loader />;
 };
 
 // TODO: Recheck return params
@@ -108,8 +89,8 @@ export const GET_ALL_USER_DATABASES_QUERY = gql`
 `;
 
 export const CREATE_DATABASE_MUTATION = gql`
-  mutation {
-    createDatabase {
+  mutation createDatabase($index: Int!) {
+    createDatabase(index: $index) {
       id
       title
       currentView
@@ -131,6 +112,25 @@ export const UPDATE_DATABASE_TITLE_MUTATION = gql`
     updateDatabaseTitle(databaseId: $databaseId, title: $title) {
       id
       title
+    }
+  }
+`;
+
+export const CURRENT_USER_QUERY = gql`
+  {
+    currentUser {
+      firstname
+      lastname
+      email
+      lastVisited
+    }
+  }
+`;
+
+export const UPDATE_LAST_VISITED_MUTATION = gql`
+  mutation updateLastVisited($lastVisited: ID!) {
+    updateLastVisited(lastVisited: $lastVisited) {
+      lastVisited
     }
   }
 `;

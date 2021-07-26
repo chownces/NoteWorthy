@@ -3,7 +3,10 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Loader from '../../components/loader/Loader';
-import { GET_ALL_USER_DATABASES_QUERY } from '../allDatabases/AllDatabasesContainer';
+import {
+  CURRENT_USER_QUERY,
+  UPDATE_LAST_VISITED_MUTATION
+} from '../allDatabases/AllDatabasesContainer';
 import Database, { DatabaseProps } from './Database';
 import { Database as DatabaseType } from './DatabaseTypes';
 import { Category, Note } from './DatabaseTypes';
@@ -77,6 +80,23 @@ export const CREATE_DATABASE_CATEGORY_MUTATION = gql`
       name
       notes
       databaseId
+    }
+  }
+`;
+
+export const CREATE_DATABASE_CATEGORY_FOR_CURRENT_NOTE_MUTATION = gql`
+  mutation createDatabaseCategoryForCurrentNote(
+    $databaseId: ID!
+    $categoryName: String!
+    $noteId: ID!
+  ) {
+    createDatabaseCategoryForCurrentNote(
+      databaseId: $databaseId
+      categoryName: $categoryName
+      noteId: $noteId
+    ) {
+      id
+      categories
     }
   }
 `;
@@ -159,10 +179,176 @@ export const UPDATE_NOTE_TITLE_MUTATION = gql`
   }
 `;
 
+export const UPDATE_DATABASE_NOTES_MUTATION = gql`
+  mutation updatedDatabaseNotes($databaseId: ID!, $notes: [ID]!) {
+    updateDatabaseNotes(databaseId: $databaseId, notes: $notes) {
+      id
+      notes
+    }
+  }
+`;
+
+export const GET_ALL_USER_DATABASES_QUERY = gql`
+  {
+    getAllUserDatabases {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
+
+export const CREATE_DATABASE_MUTATION = gql`
+  mutation createDatabase($title: String!, $index: Int!) {
+    createDatabase(title: $title, index: $index) {
+      id
+      title
+      currentView
+      notes
+    }
+  }
+`;
+
+export const DELETE_DATABASE_MUTATION = gql`
+  mutation deleteDatabase($databaseId: ID!) {
+    deleteDatabase(databaseId: $databaseId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_DATABASES_MUTATION = gql`
+  mutation updateDatabases($databases: [ID]!) {
+    updateDatabases(databases: $databases) {
+      email
+    }
+  }
+`;
+
 const DatabaseContainer: React.FC = () => {
   const { databaseId: DATABASE_ID } = useParams<{ databaseId: string }>();
 
   // TODO: Add error handling
+
+  const [updateLastVisited] = useMutation(UPDATE_LAST_VISITED_MUTATION);
+
+  const updateLastVisitedHandler = (lastVisited: string) => {
+    updateLastVisited({
+      update: (cache, { data: { updateLastVisited } }) => {
+        // TODO: Handle typing
+        const data: any = cache.readQuery({
+          query: CURRENT_USER_QUERY
+        });
+
+        cache.writeQuery({
+          query: CURRENT_USER_QUERY,
+          data: {
+            currentUser: {
+              ...data.currentUser,
+              lastVisited: lastVisited
+            }
+          }
+        });
+      },
+      optimisticResponse: {
+        updateLastVisited: {
+          lastVisited: lastVisited
+        }
+      },
+
+      variables: {
+        lastVisited: lastVisited
+      }
+    });
+  };
+
+  const [createDatabase] = useMutation(CREATE_DATABASE_MUTATION);
+
+  const createDatabaseHandler = (title: string, index: number) => {
+    createDatabase({
+      update: (cache, { data: { createDatabase } }) => {
+        // TODO: Handle typing
+        const data: any = cache.readQuery({
+          query: GET_ALL_USER_DATABASES_QUERY
+        });
+
+        const databaseCopy = [...data.getAllUserDatabases];
+        databaseCopy.splice(index, 0, createDatabase);
+
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: { getAllUserDatabases: databaseCopy }
+        });
+      },
+      variables: {
+        title: title,
+        index: index
+      },
+      optimisticResponse: {
+        createDatabase: {
+          id: 'temp_id',
+          title: title,
+          currentView: 'board',
+          notes: [],
+          __typename: 'Database'
+        }
+      }
+    });
+  };
+
+  const [updateDatabases] = useMutation(UPDATE_DATABASES_MUTATION);
+
+  const updateDatabasesHandler = (databases: DatabaseType[]) => {
+    updateDatabases({
+      update: cache => {
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: {
+            getAllUserDatabases: [...databases]
+          }
+        });
+      },
+      optimisticResponse: {
+        updateDatabases: {
+          lastname: null,
+          email: null,
+          firstname: null
+        }
+      },
+      variables: {
+        databases: databases.map(database => database.id)
+      }
+    });
+  };
+
+  const [deleteDatabase] = useMutation(DELETE_DATABASE_MUTATION, {});
+
+  const deleteDatabaseHandler = (databaseId: string, databases: DatabaseType[]) => {
+    deleteDatabase({
+      update: cache => {
+        // TODO: Handle typing
+
+        cache.writeQuery({
+          query: GET_ALL_USER_DATABASES_QUERY,
+          data: {
+            getAllUserDatabases: databases
+          }
+        });
+      },
+
+      optimisticResponse: {
+        deleteDatabase: {
+          id: databaseId
+        }
+      },
+
+      variables: {
+        databaseId: databaseId
+      }
+    });
+  };
+
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
   const createNoteHandler = (categoryId: string, title: string, index: number) => {
@@ -311,6 +497,42 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
+  const [updateDatabaseNotes] = useMutation(UPDATE_DATABASE_NOTES_MUTATION);
+  const updateDatabaseNotesHandler = (notes: Note[]) => {
+    updateDatabaseNotes({
+      variables: {
+        databaseId: DATABASE_ID,
+        notes: notes.map(note => note.id)
+      },
+      optimisticResponse: {
+        updateDatabaseNotes: {
+          id: DATABASE_ID,
+          notes: notes.map(note => note.id)
+        }
+      },
+      update: cache => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              notes: notes
+            }
+          }
+        });
+      }
+    });
+  };
+
   const [updateDatabaseCategoriesMutation] = useMutation(UPDATE_DATABASE_CATEGORIES_MUTATION);
   const updateDatabaseCategories = (categories: Category[]) => {
     updateDatabaseCategoriesMutation({
@@ -383,6 +605,77 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
+  const [createDatabaseCategoryForCurrentNote] = useMutation(
+    CREATE_DATABASE_CATEGORY_FOR_CURRENT_NOTE_MUTATION
+  );
+
+  const createDatabaseCategoryForCurrentNoteHandler = (
+    databaseId: string,
+    categoryName: string,
+    noteId: string
+  ) => {
+    createDatabaseCategoryForCurrentNote({
+      variables: {
+        databaseId: databaseId,
+        categoryName: categoryName,
+        noteId: noteId
+      },
+      optimisticResponse: {
+        createDatabaseCategoryForCurrentNote: {
+          id: 'placeholder_database_id_to_force_rerender_when_backend_returns',
+          categories: ['temp_id']
+        }
+      },
+      update: (cache, { data: { createDatabaseCategoryForCurrentNote } }) => {
+        const newCatId =
+          createDatabaseCategoryForCurrentNote.categories[
+            createDatabaseCategoryForCurrentNote.categories.length - 1
+          ];
+        console.log('newcatid: ' + newCatId);
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        const note: Note = data.getDatabase.notes.filter((note: Note) => note.id === noteId)[0];
+        const prevCategoryId = note.categoryId;
+
+        // Remove note from previous category
+        const categories = data.getDatabase.categories.map((cat: Category) =>
+          cat.id === prevCategoryId
+            ? { ...cat, notes: cat.notes.filter((note: string) => note !== noteId) }
+            : cat
+        );
+
+        const newCat: Category = {
+          id: newCatId,
+          name: categoryName,
+          databaseId: databaseId,
+          notes: [note.id]
+        };
+        categories.push(newCat);
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              notes: data.getDatabase.notes.map((note: Note) =>
+                note.id === noteId ? { ...note, categoryId: newCatId } : note
+              ),
+              categories: categories
+            }
+          }
+        });
+      }
+    });
+  };
+
   const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION);
 
   // Note that for now, categories are only created at the last index (in AddCategoryPopup.tsx)
@@ -446,15 +739,15 @@ const DatabaseContainer: React.FC = () => {
     ignoreResults: true
   });
 
-  const updateDatabaseTitle = (title: string) => {
+  const updateDatabaseTitle = (databaseId: string, title: string) => {
     updateDatabaseTitleMutation({
       variables: {
-        id: DATABASE_ID,
+        id: databaseId,
         title
       },
       optimisticResponse: {
         updateDatabaseTitle: {
-          id: DATABASE_ID
+          id: databaseId
         }
       },
       update: cache => {
@@ -467,31 +760,34 @@ const DatabaseContainer: React.FC = () => {
             query: GET_ALL_USER_DATABASES_QUERY,
             data: {
               getAllUserDatabases: allDatabasesData.getAllUserDatabases.map((e: DatabaseType) =>
-                e.id === DATABASE_ID ? { ...e, title: title } : e
+                e.id === databaseId ? { ...e, title: title } : e
               )
             }
           });
         }
 
-        const databaseData: any = cache.readQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: DATABASE_ID
-          }
-        });
-
-        cache.writeQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: DATABASE_ID
-          },
-          data: {
-            getDatabase: {
-              ...databaseData.getDatabase,
-              title: title
+        // cache only contains current database, if changing name of other database, ignore this
+        if (databaseId === DATABASE_ID) {
+          const databaseData: any = cache.readQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: databaseId
             }
-          }
-        });
+          });
+
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: databaseId
+            },
+            data: {
+              getDatabase: {
+                ...databaseData.getDatabase,
+                title: title
+              }
+            }
+          });
+        }
       }
     });
   };
@@ -614,43 +910,137 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const { loading: queryLoading, error: queryError, data, refetch } = useQuery(GET_DATABASE_QUERY, {
+  const { loading: queryUserLoading, error: queryUserError, refetch: refetchUser } = useQuery(
+    CURRENT_USER_QUERY
+  );
+
+  const {
+    loading: queryDatabaseLoading,
+    error: queryDatabaseError,
+    data: databaseData,
+    refetch: refetchDatabase
+  } = useQuery(GET_DATABASE_QUERY, {
     variables: { id: DATABASE_ID }
   });
 
-  React.useEffect(() => {
-    if (!queryLoading && !queryError) {
-      refetch();
-    }
-  }, [queryLoading, queryError, refetch]);
+  const {
+    loading: queryAllDatabasesLoading,
+    error: queryAllDatabasesError,
+    data: allDatabasesData,
+    refetch: refetchAllDatabases
+  } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
-  if (queryLoading) {
+  // TODO: This is causing a double fetching of data...
+  // Have to merge for submission first
+  React.useEffect(() => {
+    if (!queryDatabaseLoading && !queryDatabaseError) {
+      refetchDatabase();
+    }
+    if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
+      refetchAllDatabases();
+    }
+    if (!queryUserError && !queryUserLoading) {
+      refetchUser();
+    }
+  }, [
+    queryUserLoading,
+    queryUserError,
+    queryDatabaseLoading,
+    queryDatabaseError,
+    queryAllDatabasesLoading,
+    queryAllDatabasesError,
+    refetchUser,
+    refetchDatabase,
+    refetchAllDatabases,
+    DATABASE_ID
+  ]);
+
+  if (queryDatabaseLoading || queryAllDatabasesLoading || queryUserLoading) {
     return <Loader />;
   }
-  if (queryError) {
+  if (queryDatabaseError || queryAllDatabasesError || queryUserError) {
     // TODO: Write a common Error component/ Toast
-    return <div>Error! + {queryError.message}</div>;
+
+    if (queryUserError) return <div>Error! + {queryUserError.message}</div>;
+
+    if (queryDatabaseError) return <div>Error! + {queryDatabaseError.message}</div>;
+
+    if (queryAllDatabasesError) return <div>Error! + {queryAllDatabasesError.message}</div>;
   }
 
+  const updateCategoryNameHandler = (categoryId: string, name: string) => {
+    const categories: Category[] = databaseData.getDatabase.categories;
+
+    const currentName = categories.map((category: Category) => category.name)[
+      categories.map((category: Category) => category.id).indexOf(categoryId)
+    ];
+    if (currentName === name) {
+      return;
+    }
+    if (categories.some(x => x.name === name)) {
+      alert('Category already exists');
+    } else if (name === '') {
+      alert('Please input a category name');
+    } else {
+      updateCategoryName(categoryId, name);
+    }
+  };
+
+  const addDatabaseCategoryForNote = (databaseId: string, categoryName: string, noteId: string) => {
+    const categories: Category[] = databaseData.getDatabase.categories;
+    const notes = databaseData.getDatabase.notes;
+
+    const currentCategoryId = notes.map((note: Note) => note.categoryId)[
+      notes.map((note: Note) => note.id).indexOf(noteId)
+    ];
+
+    const currentName = categories.map((category: Category) => category.name)[
+      categories.map((category: Category) => category.id).indexOf(currentCategoryId)
+    ];
+
+    if (currentName === categoryName) {
+      return;
+    }
+    if (categories.some(x => x.name === categoryName)) {
+      alert('Category already exists');
+    } else if (categoryName === '') {
+      alert('Please input a category name');
+    } else {
+      createDatabaseCategoryForCurrentNoteHandler(databaseId, categoryName, noteId);
+    }
+  };
+
+  const nonCategorisedCat = databaseData.getDatabase.categories.filter(
+    (e: Category) => e.name === 'Non-categorised'
+  )[0];
+
   const DatabaseProps: DatabaseProps = {
-    id: data.getDatabase.id,
-    nonCategorisedId: data.getDatabase.categories.filter(
-      (e: Category) => e.name === 'Non-categorised'
-    )[0].id,
-    title: data.getDatabase.title,
-    currentView: data.getDatabase.currentView,
-    categories: data.getDatabase.categories,
-    notes: data.getDatabase.notes,
+    id: databaseData.getDatabase.id,
+    nonCategorisedId: nonCategorisedCat
+      ? nonCategorisedCat.id
+      : databaseData.getDatabase.categories[0],
+    title: databaseData.getDatabase.title,
+    currentView: databaseData.getDatabase.currentView,
+    categories: databaseData.getDatabase.categories,
+    notes: databaseData.getDatabase.notes,
+    databases: allDatabasesData.getAllUserDatabases,
+    refetchDatabase: refetchDatabase,
+    updateDatabaseNotesHandler: updateDatabaseNotesHandler,
+    createDatabaseHandler: createDatabaseHandler,
+    deleteDatabaseHandler: deleteDatabaseHandler,
     createNoteHandler: createNoteHandler,
     deleteNoteHandler: deleteNoteHandler,
     createDatabaseCategoryHandler: createDatabaseCategoryHandler,
+    createDatabaseCategoryForCurrentNoteHandler: addDatabaseCategoryForNote,
     deleteDatabaseCategoryHandler: deleteDatabaseCategoryHandler,
     updateDatabaseCategoriesOrdering: updateDatabaseCategories,
-    updateCategoryName: updateCategoryName,
+    updateCategoryName: updateCategoryNameHandler,
     updateDatabaseViewHandler: updateDatabaseViewHandler,
     updateDatabaseTitleHandler: updateDatabaseTitle,
     updateNoteCategoryHandler: updateNoteCategoryHandler,
-    updateNoteTitleHandler: updateNoteTitleHandler
+    updateNoteTitleHandler: updateNoteTitleHandler,
+    updateDatabases: updateDatabasesHandler,
+    updateLastVisitedHandler: updateLastVisitedHandler
   };
 
   return <Database {...DatabaseProps} />;

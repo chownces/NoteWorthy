@@ -12,6 +12,10 @@ export type ContextMenuProps = {
   createHandler: () => void;
   deleteHandler: () => void;
   updateNameHandler: (id: string, newName: string) => void;
+  setPopupOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  nextLink?: () => void;
+  isSelfDelete?: boolean;
+  isLastElement?: boolean;
 };
 
 export enum ContextMenuType {
@@ -26,7 +30,27 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
     <ContextMenu id={props.id} hideOnLeave className="context-menu">
       <MenuItem>
         <Menu vertical>
-          <Menu.Item onClick={() => props.deleteHandler()}>
+          {props.renaming && (
+            <RenamePopup
+              context={props.context}
+              id={props.id}
+              currentName={props.currentName}
+              updateNameHandler={props.updateNameHandler}
+              setPopupOpen={props.setPopupOpen}
+            />
+          )}
+          <Menu.Item
+            onClick={() => {
+              if (props.isLastElement) {
+                alert('Cannot delete last ' + props.context + '!');
+                return;
+              }
+              if (props.nextLink && props.isSelfDelete) {
+                props.nextLink();
+              }
+              props.deleteHandler();
+            }}
+          >
             <Icon name="trash alternate" />
             {`Delete ${props.context}`}
           </Menu.Item>
@@ -34,14 +58,6 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
             <Icon name="add" />
             {`Add ${props.context}`}
           </Menu.Item>
-          {props.renaming && (
-            <RenamePopup
-              context={props.context}
-              id={props.id}
-              currentName={props.currentName}
-              updateNameHandler={props.updateNameHandler}
-            />
-          )}
         </Menu>
       </MenuItem>
     </ContextMenu>

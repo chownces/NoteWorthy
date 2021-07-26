@@ -27,6 +27,7 @@ const Login: React.FC = () => {
           firstname
           lastname
           email
+          lastVisited
         }
       }
     }
