@@ -284,16 +284,16 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         title: title,
         index: index
+      },
+      optimisticResponse: {
+        createDatabase: {
+          id: 'temp_id',
+          title: title,
+          currentView: 'board',
+          notes: [],
+          __typename: 'Database'
+        }
       }
-      // optimisticResponse: {
-      //   createDatabase: {
-      //     id: 'temp_id',
-      //     title: title,
-      //     currentView: 'board',
-      //     notes: [],
-      //     __typename: 'Database'
-      //   }
-      // }
     });
   };
 
@@ -968,11 +968,15 @@ const DatabaseContainer: React.FC = () => {
     }
   };
 
+  const nonCategorisedCat = databaseData.getDatabase.categories.filter(
+    (e: Category) => e.name === 'Non-categorised'
+  )[0];
+
   const DatabaseProps: DatabaseProps = {
     id: databaseData.getDatabase.id,
-    nonCategorisedId: databaseData.getDatabase.categories.filter(
-      (e: Category) => e.name === 'Non-categorised'
-    )[0].id,
+    nonCategorisedId: nonCategorisedCat
+      ? nonCategorisedCat.id
+      : databaseData.getDatabase.categories[0],
     title: databaseData.getDatabase.title,
     currentView: databaseData.getDatabase.currentView,
     categories: databaseData.getDatabase.categories,

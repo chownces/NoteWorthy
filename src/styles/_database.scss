@@ -129,7 +129,6 @@
 
 .side-bar-item:hover {
   color: black;
-  margin-left: 0;
 }
 
 .side-bar-selected {
@@ -140,7 +139,7 @@
 }
 
 .side-bar-menu {
-  width: 8rem;
+  width: 150px;
 }
 
 .side-bar-add-button {
@@ -154,7 +153,7 @@
 }
 
 .context-menu-button-database {
-  display: inline;
+  // display: inline;
   right: 0;
   z-index: 1;
   border: 0;

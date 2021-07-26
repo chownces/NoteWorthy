@@ -179,6 +179,22 @@ const Database: React.FC<DatabaseProps> = props => {
                               props.refetchDatabase();
                             };
 
+                      const databaseRowEntry = (
+                        <ContentEditable
+                          className={
+                            'space-right ' +
+                            (database.id === 'temp_id'
+                              ? 'side-bar-item-disabled'
+                              : database.id === props.id
+                              ? 'side-bar-selected'
+                              : 'side-bar-item')
+                          }
+                          html={database.id === props.id ? databaseTitle.current : database.title}
+                          onChange={() => {}}
+                          disabled
+                        />
+                      );
+
                       return (
                         <Draggable draggableId={database.id} index={index} key={database.id}>
                           {(provided, draggableSnapshot) => (
@@ -197,7 +213,7 @@ const Database: React.FC<DatabaseProps> = props => {
                                     onMouseEnter={() => setHoveringEnum(index)}
                                     onMouseLeave={() => setHoveringEnum(-1)}
                                   >
-                                    {hoveringEnum === index && (
+                                    {hoveringEnum === index && database.id !== 'temp_id' && (
                                       <ContextMenuButton
                                         contextMenuProps={contextMenuProps(
                                           database,
@@ -207,35 +223,22 @@ const Database: React.FC<DatabaseProps> = props => {
                                         id={database.id}
                                       />
                                     )}
-                                    <Link
-                                      className={'space-right'}
-                                      to={`/database/${database.id}`}
-                                      key={props.id}
-                                      onClick={() => {
-                                        props.updateLastVisitedHandler(database.id);
-                                        databaseTitle.current = database.title;
-                                        currentId.current = database.id;
-                                      }}
-                                      style={{ display: 'inline-block' }}
-                                    >
-                                      <ContentEditable
-                                        className={
-                                          database.id === 'temp_id'
-                                            ? 'side-bar-item-disabled'
-                                            : database.id === props.id
-                                            ? 'side-bar-selected'
-                                            : 'side-bar-item'
-                                        }
-                                        html={
-                                          database.id === props.id
-                                            ? databaseTitle.current
-                                            : database.title
-                                        }
-                                        onChange={() => {}}
-                                        disabled
-                                      />
-                                    </Link>
-
+                                    {database.id === 'temp_id' ? (
+                                      databaseRowEntry
+                                    ) : (
+                                      <Link
+                                        to={`/database/${database.id}`}
+                                        key={props.id}
+                                        onClick={() => {
+                                          props.updateLastVisitedHandler(database.id);
+                                          databaseTitle.current = database.title;
+                                          currentId.current = database.id;
+                                        }}
+                                        style={{ display: 'inline-block' }}
+                                      >
+                                        {databaseRowEntry}
+                                      </Link>
+                                    )}
                                     <div className="react-contextmenu-database">
                                       <ContextMenuElement
                                         {...contextMenuProps(database, index + 1, nextLink)}
