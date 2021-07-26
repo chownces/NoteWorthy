@@ -1,14 +1,12 @@
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, Card, Divider, Form, Header, Input, Message } from 'semantic-ui-react';
 
 import userContext from '../../components/userContext/UserContext';
 
 const Login: React.FC = () => {
-  const history = useHistory();
-
   const user = React.useContext(userContext);
   const [isWrongCredentials, setIsWrongCredentials] = React.useState<boolean>(false);
   const [loadingLogin, setLoadingLogin] = React.useState<boolean>(false);
@@ -34,28 +32,13 @@ const Login: React.FC = () => {
     }
   `;
 
-  // const LEGACY_LOGIN_MUTATION =  gql `
-  // mutation login($email: String!, $password: String!) {
-  //     login(email: $email, password: $password) {
-  //       user {
-  //         firstname
-  //         lastname
-  //         email
-  //         databases
-  //       }
-  //     }
-  //   }
-  // `;
-
   const [login] = useMutation(LOGIN_MUTATION, {
     variables: {
       email: formState.email,
       password: formState.password
     },
     onCompleted: ({ login }) => {
-      const lastVisited = login.user.lastVisited;
       user.login(login.user.email, login.user.firstname, login.user.lastname);
-      history.push(`/database/${lastVisited}`);
     },
     onError: err => {
       setIsWrongCredentials(true);
@@ -71,19 +54,6 @@ const Login: React.FC = () => {
     setLoadingLogin(true);
     login();
   };
-
-  // const [legacyLogin] = useMutation(LEGACY_LOGIN_MUTATION, {
-  //   variables: {
-  //     email: formState.email,
-  //     password: formState.password
-  //   },
-  //   onCompleted: ({ login }) => {
-  //      console.log('test');
-  //     user.login(login.user.email, login.user.firstname, login.user.lastname);
-  //     history.push(`/`);
-  //   },
-  //   onError: err => console.log(setIsWrongCredentials(true), 'legacy login failed',)
-  // });
 
   return (
     <div style={{ marginTop: '1rem' }}>

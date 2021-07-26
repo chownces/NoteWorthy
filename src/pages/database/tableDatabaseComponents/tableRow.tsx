@@ -30,11 +30,14 @@ type TableRowProps = {
     categoryName: string,
     noteId: string
   ) => void;
+  currentCategoryName: string;
 };
 
 const TableRow: React.FC<TableRowProps> = props => {
   const [isHovering, setIsHovering] = React.useState(false);
   const { note, contextMenuProps } = props;
+  const [open, setOpen] = React.useState(false);
+  const [popupOpen, setPopupOpen] = React.useState(false);
 
   const changeCategoryOnClick: (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -96,13 +99,7 @@ const TableRow: React.FC<TableRowProps> = props => {
 
       <Table.Cell>{new Date(note.latestUpdate).toDateString()}</Table.Cell>
 
-      <Table.Cell>
-        {
-          props.categories.map(category => category.name)[
-            props.categories.map(category => category.id).indexOf(note.categoryId)
-          ]
-        }
-      </Table.Cell>
+      <Table.Cell>{props.currentCategoryName}</Table.Cell>
     </Table.Row>
   );
 
@@ -113,6 +110,16 @@ const TableRow: React.FC<TableRowProps> = props => {
       text: category.name
     };
   });
+
+  const renamePopup = (
+    <RenamePopup
+      context={ContextMenuType.CATEGORY}
+      id={note.categoryId}
+      currentName={props.currentCategoryName}
+      setPopupOpen={setPopupOpen}
+      updateNameHandler={props.updateCategoryName}
+    />
+  );
 
   return props.note.id === 'temp_id' ? (
     row
@@ -147,11 +154,10 @@ const TableRow: React.FC<TableRowProps> = props => {
             <Table.Cell style={{ overflow: 'visible' }}>
               <Dropdown
                 fluid
-                text={
-                  props.categories.map(category => category.name)[
-                    props.categories.map(category => category.id).indexOf(note.categoryId)
-                  ]
-                }
+                text={props.currentCategoryName}
+                open={open || popupOpen}
+                onOpen={() => setOpen(true)}
+                onClose={() => setOpen(false)}
                 floating
                 labeled
                 className="category-drop-down"
@@ -159,6 +165,7 @@ const TableRow: React.FC<TableRowProps> = props => {
                 <Dropdown.Menu scrolling style={{ position: 'absolute' }}>
                   <CreatePopup
                     context={ContextMenuType.CATEGORY}
+                    setPopupOpen={setPopupOpen}
                     createHandler={(name: string) =>
                       props.createDatabaseCategoryForCurrentNoteHandler(
                         props.database.id,
@@ -168,22 +175,7 @@ const TableRow: React.FC<TableRowProps> = props => {
                     }
                   />
 
-                  {props.categories[
-                    props.categories.map(category => category.id).indexOf(note.categoryId)
-                  ].name === 'Non-categorised' ? (
-                    <></>
-                  ) : (
-                    <RenamePopup
-                      context={ContextMenuType.CATEGORY}
-                      id={note.categoryId}
-                      currentName={
-                        props.categories[
-                          props.categories.map(category => category.id).indexOf(note.categoryId)
-                        ].name
-                      }
-                      updateNameHandler={props.updateCategoryName}
-                    />
-                  )}
+                  {props.currentCategoryName === 'Non-categorised' ? <></> : renamePopup}
                   <Divider />
                   {categoryOptions.map(option => (
                     <Dropdown.Item {...option} onClick={changeCategoryOnClick} />

@@ -93,6 +93,11 @@ const TableDatabase: React.FC<DatabaseProps> = props => {
                       props.createDatabaseCategoryForCurrentNoteHandler
                     }
                     database={props}
+                    currentCategoryName={
+                      props.categories[
+                        props.categories.map(category => category.id).indexOf(note.categoryId)
+                      ].name
+                    }
                   />
                 ))}
                 {provided.placeholder}

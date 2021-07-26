@@ -12,7 +12,7 @@ export type ContextMenuProps = {
   createHandler: () => void;
   deleteHandler: () => void;
   updateNameHandler: (id: string, newName: string) => void;
-  setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setPopupOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   nextLink?: () => void;
   isSelfDelete?: boolean;
   isLastElement?: boolean;
@@ -36,7 +36,7 @@ const ContextMenuElement: React.FC<ContextMenuProps> = props => {
               id={props.id}
               currentName={props.currentName}
               updateNameHandler={props.updateNameHandler}
-              setRenamingOpen={props.setRenamingOpen}
+              setPopupOpen={props.setPopupOpen}
             />
           )}
           <Menu.Item

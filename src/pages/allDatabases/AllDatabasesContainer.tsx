@@ -53,40 +53,21 @@ const AllDatabasesController: React.FC = () => {
   } = useQuery(CURRENT_USER_QUERY);
 
   React.useEffect(() => {
-    // if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
-    //   refetchAllDatabases();
-    // }
-
     if (!queryUserError && !queryUserLoading) {
       refetchUser();
     }
   }, [queryUserError, queryUserLoading, refetchUser]);
 
-  // if (queryAllDatabasesLoading) {
-  //   return <Loader />;
-  // }
-
-  if (queryUserLoading) {
+  // !userData.currentUser to prevent crash upon fresh login (reload page before login)
+  if (queryUserLoading || !userData.currentUser) {
     return <Loader />;
   }
 
   if (queryUserError) {
-    // to fix broken accounts, made before commit
-
-    // console.log(userData.currentUser);
-
-    // if (allDatabasesData.getAllUserDatabases.length === 0) {
-    //   createDatabaseHandler();
-    // }
-
-    // updateLastVisitedHandler(allDatabasesData.getAllUserDatabases[0].id);
-
     return <div>Error! + {queryUserError.message} </div>;
   }
 
-  // if (queryAllDatabasesError) {
-  //   return <div>Error! + {queryAllDatabasesError.message}</div>;
-  // }
+  console.log(userData);
 
   history.push(`/database/${userData.currentUser.lastVisited}`);
 

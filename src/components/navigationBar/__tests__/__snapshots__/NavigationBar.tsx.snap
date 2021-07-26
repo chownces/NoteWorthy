@@ -18,46 +18,9 @@ exports[`Navigation Bar renders correctly at desktop breakpoint 1`] = `
         />
       </div>
     </a>
-    <a
-      aria-current="page"
-      class="active"
-      href="/"
-    >
-      <div
-        class="item"
-      >
-        <i
-          aria-hidden="true"
-          class="file alternate outline icon"
-        />
-        All Databases
-      </div>
-    </a>
-    <a
-      href="/todos"
-    >
-      <div
-        class="item"
-      >
-        <i
-          aria-hidden="true"
-          class="calendar check outline icon"
-        />
-        Todo List
-      </div>
-    </a>
     <div
       class="right menu"
     >
-      <a
-        href="/contribute"
-      >
-        <div
-          class="item"
-        >
-          Contribute
-        </div>
-      </a>
       <a
         href="/login"
       >
@@ -90,7 +53,9 @@ exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
     class="ui vertical ui overlay left sidebar mobile-navbar menu"
   >
     <a
-      href="/database/root"
+      aria-current="page"
+      class="active"
+      href="/"
     >
       <div
         class="item"
@@ -100,28 +65,6 @@ exports[`Navigation Bar renders correctly at mobile breakpoint 1`] = `
           class="file alternate outline icon"
         />
         All Databases
-      </div>
-    </a>
-    <a
-      href="/todos"
-    >
-      <div
-        class="item"
-      >
-        <i
-          aria-hidden="true"
-          class="calendar check outline icon"
-        />
-        Todo List
-      </div>
-    </a>
-    <a
-      href="/contribute"
-    >
-      <div
-        class="item"
-      >
-        Contribute
       </div>
     </a>
     <a

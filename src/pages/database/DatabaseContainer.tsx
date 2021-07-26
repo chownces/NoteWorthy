@@ -870,13 +870,9 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-
-  const {
-    loading: queryUserLoading,
-    error: queryUserError,
-    refetch: refetchUser
-  } = useQuery(CURRENT_USER_QUERY);
-
+  const { loading: queryUserLoading, error: queryUserError, refetch: refetchUser } = useQuery(
+    CURRENT_USER_QUERY
+  );
 
   const {
     loading: queryDatabaseLoading,
@@ -898,13 +894,12 @@ const DatabaseContainer: React.FC = () => {
     if (!queryDatabaseLoading && !queryDatabaseError) {
       refetchDatabase();
     }
-    if (!queryAllDatabasesError && !queryAllDatabasesLoading ) {
+    if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
       refetchAllDatabases();
-    }  if (!queryUserError && !queryUserLoading ) {
+    }
+    if (!queryUserError && !queryUserLoading) {
       refetchUser();
     }
-
-
   }, [
     queryUserLoading,
     queryUserError,
@@ -924,7 +919,7 @@ const DatabaseContainer: React.FC = () => {
   if (queryDatabaseError || queryAllDatabasesError || queryUserError) {
     // TODO: Write a common Error component/ Toast
 
-    if (queryUserError) return <div>Error! + {queryUserError.message}</div>
+    if (queryUserError) return <div>Error! + {queryUserError.message}</div>;
 
     if (queryDatabaseError) return <div>Error! + {queryDatabaseError.message}</div>;
 

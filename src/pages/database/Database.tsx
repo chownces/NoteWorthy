@@ -73,7 +73,7 @@ const Database: React.FC<DatabaseProps> = props => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [isLocked, setIsLocked] = React.useState<boolean>(false);
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
-  const [renamingOpen, setRenamingOpen] = React.useState<boolean>(false);
+  const [popupOpen, setPopupOpen] = React.useState<boolean>(false);
   const [hoveringEnum, setHoveringEnum] = React.useState<number>(-1);
 
   const onDragEndHandler = (result: DropResult) => {
@@ -120,7 +120,7 @@ const Database: React.FC<DatabaseProps> = props => {
         }
         props.updateDatabaseTitleHandler(databaseId, title);
       },
-      setRenamingOpen: setRenamingOpen,
+      setPopupOpen: setPopupOpen,
       nextLink: nextLink,
       isSelfDelete: props.id === database.id,
       isLastElement: props.databases.length === 1
@@ -145,7 +145,7 @@ const Database: React.FC<DatabaseProps> = props => {
           hoverable
           position="bottom left"
           flowing={false}
-          open={open || renamingOpen || isDragging || isLocked}
+          open={open || popupOpen || isDragging || isLocked}
           onOpen={() => setOpen(true)}
           onClose={() => setOpen(false)}
           openOnTriggerClick={false}

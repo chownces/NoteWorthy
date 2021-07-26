@@ -8,7 +8,7 @@ import { ContextMenuType } from './ContextMenuElement';
 export type CreateProps = {
   context: ContextMenuType;
   createHandler: (newName: string) => void;
-  setRenamingOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setPopupOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const CreatePopup: React.FC<CreateProps> = props => {
@@ -18,8 +18,8 @@ const CreatePopup: React.FC<CreateProps> = props => {
 
   const onClose = () => {
     props.createHandler(text);
-    if (props.setRenamingOpen) {
-      props.setRenamingOpen(false);
+    if (props.setPopupOpen) {
+      props.setPopupOpen(false);
     }
     setOpen(false);
   };
@@ -41,8 +41,8 @@ const CreatePopup: React.FC<CreateProps> = props => {
       on="click"
       open={open}
       onOpen={() => {
-        if (props.setRenamingOpen) {
-          props.setRenamingOpen(true);
+        if (props.setPopupOpen) {
+          props.setPopupOpen(true);
         }
         setOpen(true, setLine);
       }}
