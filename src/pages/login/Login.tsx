@@ -1,12 +1,14 @@
 import { useMutation } from '@apollo/client';
 import gql from 'graphql-tag';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Button, Card, Divider, Form, Header, Input, Message } from 'semantic-ui-react';
 
 import userContext from '../../components/userContext/UserContext';
 
 const Login: React.FC = () => {
+  const history = useHistory();
+
   const user = React.useContext(userContext);
   const [isWrongCredentials, setIsWrongCredentials] = React.useState<boolean>(false);
   const [loadingLogin, setLoadingLogin] = React.useState<boolean>(false);
@@ -39,6 +41,7 @@ const Login: React.FC = () => {
     },
     onCompleted: ({ login }) => {
       user.login(login.user.email, login.user.firstname, login.user.lastname);
+      history.push('/');
     },
     onError: err => {
       setIsWrongCredentials(true);
