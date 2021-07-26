@@ -69,8 +69,6 @@ const AllDatabasesController: React.FC = () => {
     return <div>Error! + {queryUserError.message} </div>;
   }
 
-  console.log(userData);
-
   history.push(`/database/${userData.currentUser.lastVisited}`);
 
   return <Loader />;

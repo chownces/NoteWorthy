@@ -631,7 +631,6 @@ const DatabaseContainer: React.FC = () => {
           createDatabaseCategoryForCurrentNote.categories[
             createDatabaseCategoryForCurrentNote.categories.length - 1
           ];
-        console.log('newcatid: ' + newCatId);
         const data: any = cache.readQuery({
           query: GET_DATABASE_QUERY,
           variables: {
