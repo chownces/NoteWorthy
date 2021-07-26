@@ -50,6 +50,12 @@ export const CREATE_NOTE_MUTATION = gql`
       title
       creationDate
       latestUpdate
+      blocks {
+        id
+        html
+        tag
+      }
+      categoryId
     }
   }
 `;
@@ -71,7 +77,9 @@ export const CREATE_DATABASE_CATEGORY_MUTATION = gql`
   mutation createDatabaseCategory($databaseId: ID!, $categoryName: String!, $index: Int!) {
     createDatabaseCategory(databaseId: $databaseId, categoryName: $categoryName, index: $index) {
       id
-      categories
+      name
+      notes
+      databaseId
     }
   }
 `;
@@ -138,8 +146,26 @@ export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
   mutation updateNoteCategory($noteId: ID!, $categoryId: ID!, $index: Int!) {
     updateNoteCategory(noteId: $noteId, categoryId: $categoryId, index: $index) {
       id
-      notes
-      categories
+      notes {
+        id
+        userId
+        databaseId
+        categoryId
+        title
+        blocks {
+          id
+          html
+          tag
+        }
+        creationDate
+        latestUpdate
+      }
+      categories {
+        id
+        notes
+        name
+        databaseId
+      }
     }
   }
 `;
@@ -147,11 +173,7 @@ export const UPDATE_NOTE_CATEGORY_MUTATION = gql`
 export const UPDATE_NOTE_TITLE_MUTATION = gql`
   mutation updateNoteTitle($noteId: ID!, $title: String!) {
     updateNoteTitle(noteId: $noteId, title: $title) {
-      userId
-      databaseId
-      id
       title
-      creationDate
       latestUpdate
     }
   }
@@ -326,13 +348,6 @@ const DatabaseContainer: React.FC = () => {
       }
     });
   };
-
-  const {
-    loading: queryAllDatabasesLoading,
-    error: queryAllDatabasesError,
-    data: allDatabasesData,
-    refetch: refetchAllDatabases
-  } = useQuery(GET_ALL_USER_DATABASES_QUERY);
 
   const [createNote] = useMutation(CREATE_NOTE_MUTATION);
 
@@ -621,20 +636,9 @@ const DatabaseContainer: React.FC = () => {
     });
   };
 
-  const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION, {
-    update: (cache, { data: { createDatabaseCategory } }) => {
-      cache.writeQuery({
-        query: GET_DATABASE_QUERY,
-        variables: {
-          id: DATABASE_ID
-        },
-        data: {
-          getDatabase: createDatabaseCategory
-        }
-      });
-    }
-  });
+  const [createDatabaseCategory] = useMutation(CREATE_DATABASE_CATEGORY_MUTATION);
 
+  // Note that for now, categories are only created at the last index (in AddCategoryPopup.tsx)
   const createDatabaseCategoryHandler = (
     databaseId: string,
     categoryName: string,
@@ -645,6 +649,34 @@ const DatabaseContainer: React.FC = () => {
         databaseId: databaseId,
         categoryName: categoryName,
         index: index
+      },
+      optimisticResponse: {
+        createDatabaseCategory: {
+          id: 'temp_id',
+          notes: [],
+          name: categoryName,
+          databaseId: databaseId
+        }
+      },
+      update: (cache, { data: { createDatabaseCategory } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...data.getDatabase,
+              categories: [...data.getDatabase.categories, createDatabaseCategory]
+            }
+          }
+        });
       }
     });
   };
@@ -762,6 +794,34 @@ const DatabaseContainer: React.FC = () => {
       variables: {
         noteId: noteId,
         title: title
+      },
+      optimisticResponse: {
+        updateNoteTitle: {
+          title: title
+        }
+      },
+      update: cache => {
+        const databaseData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
+
+        cache.writeQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          },
+          data: {
+            getDatabase: {
+              ...databaseData.getDatabase,
+              notes: databaseData.getDatabase.notes.map((e: Note) =>
+                e.id === noteId ? { ...e, title: title } : e
+              )
+            }
+          }
+        });
       }
     });
   };
@@ -782,22 +842,41 @@ const DatabaseContainer: React.FC = () => {
       },
       optimisticResponse: {
         updateNoteCategory: {
-          updatedDatabase
+          id: updatedDatabase.id,
+          notes: updatedDatabase.notes,
+          categories: updatedDatabase.categories
         }
       },
-      update: cache => {
+      update: (cache, { data: { updateNoteCategory } }) => {
+        const data: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: DATABASE_ID
+          }
+        });
         cache.writeQuery({
           query: GET_DATABASE_QUERY,
           variables: {
             id: DATABASE_ID
           },
           data: {
-            getDatabase: updatedDatabase
+            getDatabase: {
+              ...data.getDatabase,
+              notes: updateNoteCategory.notes
+            }
           }
         });
       }
     });
   };
+
+
+  const {
+    loading: queryUserLoading,
+    error: queryUserError,
+    refetch: refetchUser
+  } = useQuery(CURRENT_USER_QUERY);
+
 
   const {
     loading: queryDatabaseLoading,
@@ -808,28 +887,44 @@ const DatabaseContainer: React.FC = () => {
     variables: { id: DATABASE_ID }
   });
 
+  const {
+    loading: queryAllDatabasesLoading,
+    error: queryAllDatabasesError,
+    data: allDatabasesData,
+    refetch: refetchAllDatabases
+  } = useQuery(GET_ALL_USER_DATABASES_QUERY);
+
   React.useEffect(() => {
     if (!queryDatabaseLoading && !queryDatabaseError) {
       refetchDatabase();
     }
-    if (!queryAllDatabasesError && !queryAllDatabasesLoading) {
+    if (!queryAllDatabasesError && !queryAllDatabasesLoading ) {
       refetchAllDatabases();
+    }  if (!queryUserError && !queryUserLoading ) {
+      refetchUser();
     }
+
+
   }, [
+    queryUserLoading,
+    queryUserError,
     queryDatabaseLoading,
     queryDatabaseError,
     queryAllDatabasesLoading,
     queryAllDatabasesError,
+    refetchUser,
     refetchDatabase,
     refetchAllDatabases,
     DATABASE_ID
   ]);
 
-  if (queryDatabaseLoading || queryAllDatabasesLoading) {
+  if (queryDatabaseLoading || queryAllDatabasesLoading || queryUserLoading) {
     return <Loader />;
   }
-  if (queryDatabaseError || queryAllDatabasesError) {
+  if (queryDatabaseError || queryAllDatabasesError || queryUserError) {
     // TODO: Write a common Error component/ Toast
+
+    if (queryUserError) return <div>Error! + {queryUserError.message}</div>
 
     if (queryDatabaseError) return <div>Error! + {queryDatabaseError.message}</div>;
 

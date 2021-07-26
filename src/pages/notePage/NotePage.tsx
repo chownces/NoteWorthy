@@ -1,7 +1,7 @@
 import React from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-import { Container } from 'semantic-ui-react';
+import { Button, Container, Icon, Label, Popup } from 'semantic-ui-react';
 
 import NoteBlock, {
   NoteBlockHandlerProps,
@@ -13,8 +13,13 @@ import useStateCallback from '../../utils/useStateCallback';
 export type NotePageProps = {
   blocks: React.MutableRefObject<NoteBlockStateProps[]>;
   title: string;
+  latestUpdate: string;
   updateBlocksInDatabase: (newBlocks: NoteBlockStateProps[]) => void;
   updateNoteTitle: (title: string) => void;
+  generateSharedLink: () => void;
+  generateSharedLinkLoading: boolean;
+  generateSharedLinkCalled: boolean;
+  generateSharedLinkHash: string;
 };
 
 const NotePage: React.FC<NotePageProps> = props => {
@@ -79,16 +84,18 @@ const NotePage: React.FC<NotePageProps> = props => {
    * Handles the addition of a new block by adding it at the correct index inside `blocks`.
    */
   const addBlockHandler = (
-    currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
+    currentBlockId: string,
+    ref: React.RefObject<Element>,
+    tag?: string,
+    html?: string
   ): void => {
     const newBlock: NoteBlockStateProps = {
       id: uniqueId(), // TODO: Consider using the id provided by MongoDB
-      html: '',
-      tag: 'p' // TODO: Reconsider default block tag
+      html: html || '',
+      tag: tag || 'p' // TODO: Reconsider default block tag
     };
     const blocksCopy = [...props.blocks.current];
-    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlockId);
     blocksCopy.splice(index + 1, 0, newBlock);
 
     const focusNextBlockCallback = () => {
@@ -103,10 +110,7 @@ const NotePage: React.FC<NotePageProps> = props => {
   /**
    * Handles the deletion of an empty block by removing it from `blocks`.
    */
-  const deleteBlockHandler = (
-    currentBlock: NoteBlockStateProps,
-    ref: React.RefObject<HTMLElement>
-  ): void => {
+  const deleteBlockHandler = (currentBlockId: string, ref: React.RefObject<HTMLElement>): void => {
     const previousBlock = ref.current?.parentElement?.parentElement?.previousElementSibling
       ?.children[0]?.children[1] as HTMLElement;
 
@@ -114,7 +118,7 @@ const NotePage: React.FC<NotePageProps> = props => {
       ?.children[1] as HTMLElement;
 
     const blocksCopy = [...props.blocks.current];
-    const index = blocksCopy.map(b => b.id).indexOf(currentBlock.id);
+    const index = blocksCopy.map(b => b.id).indexOf(currentBlockId);
     blocksCopy.splice(index, 1);
     if (previousBlock) {
       const focusPreviousBlockEolCallback = () => {
@@ -218,9 +222,56 @@ const NotePage: React.FC<NotePageProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const frontendRootUrl = process.env.REACT_APP_ROOT_PATH;
+
+  const shareLinkInputRef = React.useRef<HTMLInputElement>(null);
+
   return (
     <Container className="Notepage-container">
       <div className="Notepage">
+        <div>
+          <Popup
+            content={
+              props.generateSharedLinkCalled && props.generateSharedLinkLoading ? (
+                <Button basic loading style={{ boxShadow: 'none' }} />
+              ) : (
+                <div className="share-link-container">
+                  <input
+                    className="share-link-input"
+                    ref={shareLinkInputRef}
+                    value={frontendRootUrl + 'sharednote#sharing=' + props.generateSharedLinkHash}
+                  />
+                  <Button
+                    className="note-share-button-copy"
+                    basic
+                    color="grey"
+                    onClick={() => {
+                      shareLinkInputRef.current?.select();
+                      document.execCommand('copy');
+                    }}
+                  >
+                    <Icon name="copy" />
+                  </Button>
+                </div>
+              )
+            }
+            trigger={
+              <Label
+                className="share-button"
+                color="grey"
+                basic
+                onClick={() => {
+                  props.generateSharedLink();
+                }}
+              >
+                <Icon name="share" />
+                Share
+              </Label>
+            }
+            on="click"
+            position="right center"
+          />
+        </div>
         <ContentEditable
           className="notepage-title"
           tagName="h1"

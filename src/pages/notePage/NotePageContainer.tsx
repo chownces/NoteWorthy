@@ -32,6 +32,54 @@ const NotePageContainer: React.FC = () => {
         blocks: blocks.map(b => {
           return { id: b.id, html: b.html, tag: b.tag };
         })
+      },
+      optimisticResponse: {
+        updateNoteBlocks: {
+          id: NOTE_ID
+        }
+      },
+      update: cache => {
+        const noteData: any = cache.readQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          }
+        });
+        const databaseData: any = cache.readQuery({
+          query: GET_DATABASE_QUERY,
+          variables: {
+            id: noteData.getNote.databaseId
+          }
+        });
+        cache.writeQuery({
+          query: GET_NOTE_QUERY,
+          variables: {
+            id: NOTE_ID
+          },
+          data: {
+            getNote: {
+              ...noteData.getNote,
+              blocks: blocks,
+              latestUpdate: Date.now()
+            }
+          }
+        });
+        if (databaseData) {
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: noteData.getNote.databaseId
+            },
+            data: {
+              getDatabase: {
+                ...databaseData.getDatabase,
+                notes: databaseData.getDatabase.notes.map((e: Note) =>
+                  e.id === NOTE_ID ? { ...e, blocks: blocks, latestUpdate: Date.now() } : e
+                )
+              }
+            }
+          });
+        }
       }
     });
   };
@@ -72,24 +120,44 @@ const NotePageContainer: React.FC = () => {
           data: {
             getNote: {
               ...noteData.getNote,
-              title: title
+              title: title,
+              latestUpdate: Date.now()
             }
           }
         });
-        cache.writeQuery({
-          query: GET_DATABASE_QUERY,
-          variables: {
-            id: noteData.getNote.databaseId
-          },
-          data: {
-            getDatabase: {
-              ...databaseData.getDatabase,
-              notes: databaseData.getDatabase.notes.map((e: Note) =>
-                e.id === NOTE_ID ? { ...e, title: title } : e
-              )
+        if (databaseData) {
+          cache.writeQuery({
+            query: GET_DATABASE_QUERY,
+            variables: {
+              id: noteData.getNote.databaseId
+            },
+            data: {
+              getDatabase: {
+                ...databaseData.getDatabase,
+                notes: databaseData.getDatabase.notes.map((e: Note) =>
+                  e.id === NOTE_ID ? { ...e, title: title, latestUpdate: Date.now() } : e
+                )
+              }
             }
-          }
-        });
+          });
+        }
+      }
+    });
+  };
+
+  const [
+    generateSharedLinkMutation,
+    {
+      loading: generateSharedLinkLoading,
+      called: generateSharedLinkCalled,
+      data: generateSharedLinkData
+    }
+  ] = useMutation(GENERATE_SHARED_LINK_MUTATION);
+
+  const generateSharedLink = () => {
+    generateSharedLinkMutation({
+      variables: {
+        noteId: NOTE_ID
       }
     });
   };
@@ -108,16 +176,20 @@ const NotePageContainer: React.FC = () => {
   const notePageProps: NotePageProps = {
     blocks: blocks,
     title: data.getNote.title,
+    latestUpdate: data.getNote.latestUpdate,
     updateBlocksInDatabase: updateBlocksInDatabase,
-    updateNoteTitle: updateNoteTitle
+    updateNoteTitle: updateNoteTitle,
+    generateSharedLink: generateSharedLink,
+    generateSharedLinkLoading: generateSharedLinkLoading,
+    generateSharedLinkCalled: generateSharedLinkCalled,
+    generateSharedLinkHash: generateSharedLinkData
+      ? generateSharedLinkData.generateSharedLink.hash
+      : ''
   };
 
   return <NotePage {...notePageProps} />;
 };
 
-// TODO: updateNoteTitle mutation
-
-// TODO: Recheck return params
 const GET_NOTE_QUERY = gql`
   query getNote($id: ID!) {
     getNote(noteId: $id) {
@@ -157,6 +229,14 @@ const UPDATE_NOTE_TITLE_MUTATION = gql`
   mutation updateNoteTitle($id: ID!, $title: String!) {
     updateNoteTitle(noteId: $id, title: $title) {
       id
+    }
+  }
+`;
+
+const GENERATE_SHARED_LINK_MUTATION = gql`
+  mutation generateSharedLink($noteId: ID!) {
+    generateSharedLink(noteId: $noteId) {
+      hash
     }
   }
 `;

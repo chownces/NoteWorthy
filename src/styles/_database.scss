@@ -83,6 +83,11 @@
         .card-description {
           overflow: hidden;
         }
+
+        .last-update {
+          margin-left: 1em;
+          margin-bottom: 0.75em;
+        }
       }
 
       .card-disabled {
@@ -97,6 +102,10 @@
       .new-note-button {
         background-color: white !important;
       }
+    }
+
+    .new-category-button {
+      margin-top: 1rem;
     }
   }
 }

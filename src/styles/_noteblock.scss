@@ -10,7 +10,8 @@
     .noteblock-handle {
       margin-right: 5px;
       border-radius: 5px;
-      height: 100%;
+      height: 30px;
+      width: 11px;
     }
 
     i {
@@ -27,7 +28,7 @@
     background-color: #ddd;
   }
 
-  .noteblock-text {
+  .noteblock-contenteditable {
     min-height: 30px;
     margin: 0;
     width: calc(100% - 10px);
