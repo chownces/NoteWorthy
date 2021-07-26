@@ -229,7 +229,7 @@ const NotePage: React.FC<NotePageProps> = props => {
   return (
     <Container className="Notepage-container">
       <div className="Notepage">
-        <div>
+        <div className="label-container">
           <Popup
             content={
               props.generateSharedLinkCalled && props.generateSharedLinkLoading ? (
@@ -258,7 +258,7 @@ const NotePage: React.FC<NotePageProps> = props => {
             trigger={
               <Label
                 className="share-button"
-                color="grey"
+                color="green"
                 basic
                 onClick={() => {
                   props.generateSharedLink();
@@ -271,6 +271,10 @@ const NotePage: React.FC<NotePageProps> = props => {
             on="click"
             position="right center"
           />
+          <Label className="print-button" color="grey" basic onClick={() => window.print()}>
+            <Icon name="print" />
+            Print
+          </Label>
         </div>
         <ContentEditable
           className="notepage-title"

@@ -30,11 +30,18 @@ const SharedNote: React.FC<SharedNoteProps> = props => {
     <Container className="Notepage-container">
       <div className="Notepage">
         <div className="label-container">
-          <Label size="large" color="blue">
+          <Label color="black" basic>
             <Icon name="address card" />
-            {`${user.firstname} ${user.lastname}`}
+            {`Author: ${user.firstname} ${user.lastname}`}
           </Label>
-          <Label size="large">{`Last update: ${new Date(latestUpdate).toDateString()}`}</Label>
+          <Label basic color="brown">
+            <Icon name="edit" />
+            {`Last updated: ${new Date(latestUpdate).toLocaleDateString()}`}
+          </Label>
+          <Label basic color="grey" className="print-button" onClick={() => window.print()}>
+            <Icon name="print" />
+            Print
+          </Label>
         </div>
         <ContentEditable
           className="notepage-title"

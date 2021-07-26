@@ -6,16 +6,15 @@
     flex-direction: column;
     height: 100%;
 
-    .share-button {
-      margin-top: 10px;
-      margin-left: 16px;
-      cursor: pointer;
-    }
-
     .label-container {
       margin-top: 1rem;
       margin-left: 16px;
       display: inline-block;
+
+      .share-button,
+      .print-button {
+        cursor: pointer;
+      }
     }
 
     .notepage-title {
