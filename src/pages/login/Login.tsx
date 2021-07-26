@@ -27,7 +27,6 @@ const Login: React.FC = () => {
           firstname
           lastname
           email
-          databases
           lastVisited
         }
       }
