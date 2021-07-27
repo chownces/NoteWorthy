@@ -34,17 +34,19 @@
       font-size: xx-large;
       font-weight: bold;
       margin-top: 1rem;
+      margin-left: 1rem;
       min-height: 45px;
     }
 
     .side-bar-button {
-      padding: 0.4rem !important;
+      padding: 0.4rem;
       background: transparent !important;
       color: gray;
       border: 0;
       :hover {
         color: black;
       }
+      margin-left: 1rem;
     }
 
     .divider {

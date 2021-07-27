@@ -74,7 +74,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <>
+    <div style={{ marginTop: '1rem' }}>
       <Header as="h3" textAlign="center">
         Register new account
       </Header>
@@ -156,7 +156,7 @@ const Register: React.FC = () => {
           </Card.Content>
         </Card>
       </Card.Group>
-    </>
+    </div>
   );
 };
 
